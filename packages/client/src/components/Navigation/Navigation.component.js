@@ -9,7 +9,7 @@ import { NavLink, Link } from 'react-router-dom';
 import { useUserContext } from '../../userContext';
 import { Button } from '../Button/Button.component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import logo from '../../assets/images/logo1.png';
+import logo from '../../assets/images/logo.png';
 import {
   faUser,
   faRightFromBracket,

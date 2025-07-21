@@ -91,19 +91,6 @@ export const Apps = () => {
         : ''
     }`;
 
-    // if (topicIdParam) {
-    //   url = `${apiURL()}/apps?page=0&filteredTopics=${topicIdParam}&column=${
-    //     orderBy.column
-    //   }&direction=${orderBy.direction}`;
-    // } else if (categoryIdParam) {
-    //   url = `${apiURL()}/apps?page=0&filteredCategories=${categoryIdParam}&column=${
-    //     orderBy.column
-    //   }&direction=${orderBy.direction}`;
-    // } else {
-    //   url = `${apiURL()}/apps?page=0&column=${orderBy.column}&direction=${
-    //     orderBy.direction
-    //   }`;
-    // }
     async function fetchData() {
       const response = await fetch(url);
       const json = await response.json();
@@ -155,21 +142,6 @@ export const Apps = () => {
         : ''
     }`;
 
-    // let url;
-    // if (topicIdParam) {
-    //   url = `${apiURL()}/apps?filteredTopics=${topicIdParam}&page=${page}&column=${
-    //     orderBy.column
-    //   }&direction=${orderBy.direction}`;
-    // } else if (categoryIdParam) {
-    //   url = `${apiURL()}/apps?filteredCategories=${categoryIdParam}&page=${page}&column=${
-    //     orderBy.column
-    //   }&direction=${orderBy.direction}`;
-    // } else {
-    //   url = `${apiURL()}/apps?page=${page}&column=${orderBy.column}&direction=${
-    //     orderBy.direction
-    //   }`;
-    // }
-
     const response = await fetch(url);
     const json = await response.json();
 
@@ -191,46 +163,6 @@ export const Apps = () => {
 
     setPage((prev) => prev + 1);
   };
-
-  // const fetchApps = useCallback(async () => {
-  //   try {
-  //     await setLoading(true);
-  //     await setError(false);
-  //     console.log('pagetest', page);
-  //     let url;
-  //     if (topicIdParam) {
-  //       url = `${apiURL()}/apps?filteredTopics=${topicIdParam}&page=${page}`;
-  //     } else if (categoryIdParam) {
-  //       url = `${apiURL()}/apps?filteredCategories=${categoryIdParam}&page=${page}`;
-  //     } else {
-  //       url = `${apiURL()}/apps?page=${page}`;
-  //     }
-  //     const response = await fetch(url);
-  //     const appsResponse = await response.json();
-
-  //     console.log('appsResponse', appsResponse);
-  //     setApps(appsResponse);
-
-  //     console.log('apps', apps);
-
-  //     //  else {
-  //     //   setApps((prevItems) => [...prevItems, ...appsResponse]);
-  //     // }
-
-  //     // setApps((prevItems) => [...prevItems, ...appsResponse]);
-  //     setLoading(false);
-  //   } catch (err) {
-  //     setError(err);
-  //   }
-  // }, [page, categoryIdParam, topicIdParam]);
-
-  // useEffect(() => {
-  //   fetchApps();
-  // }, [fetchApps]);
-
-  // useEffect(() => {
-  //   setApps([]);
-  // }, [location]);
 
   const setupUrlFilters = useCallback(async () => {
     let urlFilters = '';
@@ -263,40 +195,6 @@ export const Apps = () => {
     fetchAppsSearch();
   }, [searchTerms]);
 
-  // const fetchApps = useCallback(async () => {
-  //   // const urlFilters = await setupUrlFilters();
-  //   let url;
-  //   if (topicIdParam) {
-  //     url = `${apiURL()}/apps/?filteredTopics=${topicIdParam}&page=${page}`;
-  //   } else if (categoryIdParam) {
-  //     url = `${apiURL()}/apps/?filteredCategories=${categoryIdParam}&page=${page}`;
-  //   } else {
-  //     url = `${apiURL()}/apps/?page=${page}`;
-  //   }
-
-  //   const response = await fetch(url);
-  //   const appsResponse = await response.json();
-  //   setApps((prevItems) => [...prevItems, ...appsResponse]);
-
-  //   // setApps(appsResponse);
-
-  //   // const promptsExportReady = promptsResponse.dataExport.map((prompt) => {
-  //   //   return {
-  //   //     id: prompt.id,
-  //   //     prompt: prompt.title,
-  //   //     category: prompt.categoryTitle,
-  //   //     topic: prompt.topicTitle,
-  //   //   };
-  //   // });
-  //   // setPromptsExport(promptsExportReady);
-  //   setIsLoading(false);
-  // }, [topicIdParam, categoryIdParam, page]);
-
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   fetchApps();
-  // }, [fetchApps]);
-
   useEffect(() => {
     setPage(0);
   }, [location]);
@@ -312,33 +210,6 @@ export const Apps = () => {
   useEffect(() => {
     setPage(0);
   }, [filteredDetails]);
-
-  // useEffect(() => {
-  //   setCounter((prev) => prev + 1);
-  // }, []);
-  // console.log('counter', counter);
-
-  // const handleObserver = useCallback((entries) => {
-  //   const target = entries[0];
-
-  //   console.log('test12');
-  //   if (entries.length > 1) return;
-  //   if (target.isIntersecting) {
-  //     setPage((prev) => prev + 1);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   const option = {
-  //     root: null,
-  //     rootMargin: '20px',
-  //     threshold: 0,
-  //   };
-  //   const observer = new IntersectionObserver(handleObserver, option);
-  //   if (loader.current) {
-  //     observer.observe(loader.current);
-  //   }
-  // }, [handleObserver]);
 
   useEffect(() => {
     async function fetchTopics() {
@@ -590,31 +461,6 @@ export const Apps = () => {
       {/* <div className="hero"></div> */}
       <div className="hero">
         <h1 className="hero-header">Browse 200+ AI apps</h1>
-        <form className="home">
-          <label>
-            <FontAwesomeIcon className="search-icon" icon={faSearch} />
-            <input
-              type="text"
-              className="input-search-home"
-              onChange={handleSearch}
-              /* onFocus={handleClick} */
-              placeholder="I want to build..."
-            />
-          </label>
-        </form>
-        {searchTerms ? (
-          <div className="dropdown-search">
-            <ul>
-              {resultsHome.length > 0 ? (
-                dropdownList
-              ) : (
-                <span className="search-no-apps">No apps found :(</span>
-              )}
-            </ul>
-          </div>
-        ) : (
-          ''
-        )}
       </div>
       <section className={`container-topics ${showTopicsContainer && 'show'}`}>
         {topicsList}
@@ -628,7 +474,7 @@ export const Apps = () => {
           label="Topics"
           icon={<FontAwesomeIcon className="filter-icon" icon={faBookOpen} />}
         />
-         <DropDownView
+        <DropDownView
           // label="Sort"
           selectedOptionValue={sortOrder}
           className="no-line-height"

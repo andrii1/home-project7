@@ -14,7 +14,7 @@ export const Footer = () => {
           </li>
         </ul>
       </div>
-      <span>&copy;2023</span>
+      <span>&copy;2025</span>
     </div>
   );
 };
