@@ -5,10 +5,6 @@ const express = require('express');
 
 const router = express.Router({ mergeParams: true });
 
-const topicAppsRouter = require('./topicApps.router');
-
-router.use('/topics/:topicId/apps', topicAppsRouter);
-
 // controllers
 const appsController = require('../controllers/apps.controller');
 
@@ -148,6 +144,26 @@ router.get('/:id', (req, res, next) => {
     .getAppById(req.params.id)
     .then((result) => res.json(result))
     .catch(next);
+});
+
+router.patch('/:id', (req, res, next) => {
+  const { token } = req.headers;
+  appsController
+    .editApp(token, req.params.id, req.body)
+    .then((result) => res.json(result))
+    .catch(next);
+});
+
+router.post('/node', (req, res) => {
+  const { token } = req.headers;
+  appsController
+    .createAppNode(token, req.body)
+    .then((result) => res.json(result))
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(error);
+      res.status(400).send('Bad request').end();
+    });
 });
 
 module.exports = router;

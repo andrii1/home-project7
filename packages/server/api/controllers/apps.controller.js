@@ -1,8 +1,15 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* TODO: This is an example controller to illustrate a server side controller.
 Can be deleted as soon as the first real controller is added. */
 
 const knex = require('../../config/db');
 const HttpError = require('../lib/utils/http-error');
+const { normalizeUrl } = require('../lib/utils/normalizeUrl');
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // make sure this is set in your .env
+});
 
 const getOppositeOrderDirection = (direction) => {
   let lastItemDirection;
@@ -411,19 +418,165 @@ const getAppById = async (id) => {
 };
 
 // post
-const createApps = async (token, body) => {
+// const createApps = async (token, body) => {
+//   try {
+//     const userUid = token.split(' ')[1];
+//     const user = (await knex('users').where({ uid: userUid }))[0];
+//     if (!user) {
+//       throw new HttpError('User not found', 401);
+//     }
+//     await knex('apps').insert({
+//       title: body.title,
+//       description: body.description,
+//       topic_id: body.topic_id,
+//       user_id: user.id,
+//     });
+//     return {
+//       successful: true,
+//     };
+//   } catch (error) {
+//     return error.message;
+//   }
+// };
+
+const createAppNode = async (token, body) => {
   try {
     const userUid = token.split(' ')[1];
     const user = (await knex('users').where({ uid: userUid }))[0];
     if (!user) {
       throw new HttpError('User not found', 401);
     }
-    await knex('apps').insert({
-      title: body.title,
-      description: body.description,
-      topic_id: body.topic_id,
-      user_id: user.id,
+
+    const normalizedUrl = body.url ? normalizeUrl(body.url) : null;
+
+    if (body.apple_id) {
+      // Check for existing app
+      const existingApp = await knex('apps')
+        .whereRaw('LOWER(apple_id) = ?', [body.apple_id.toLowerCase()])
+        .first();
+
+      if (existingApp) {
+        return {
+          successful: true,
+          existing: true,
+          appId: existingApp.id,
+          appTitle: body.title,
+          appAppleId: existingApp.apple_id,
+        };
+      }
+    } else {
+      const existingUrl = await knex('apps')
+        .where({ url: normalizedUrl })
+        .orWhere({ title: body.title })
+        .first();
+
+      if (existingUrl) {
+        return {
+          successful: true,
+          existing: true,
+          appId: existingUrl.id,
+          appTitle: body.title,
+          url: normalizedUrl,
+        };
+      }
+    }
+
+    // const existingTopic = await knex('topics')
+    //   .whereRaw('LOWER(title) = ?', [body.topicTitle.toLowerCase()])
+    //   .first();
+
+    // let topicId;
+
+    // if (existingTopic) {
+    //   topicId = existingTopic.id;
+    // } else {
+    //   const [newTopic] = await knex('topics').insert({
+    //     title: body.topicTitle,
+    //   });
+    //   topicId = newTopic;
+    // }
+    if (body.apple_id) {
+      const url = `https://itunes.apple.com/lookup?id=${body.apple_id}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const { description } = data.results[0];
+      const urlIcon = data.results[0].artworkUrl512;
+
+      let appId;
+      if (body.url) {
+        [appId] = await knex('apps').insert({
+          title: body.title,
+          topic_id: body.topic_id,
+          apple_id: body.apple_id,
+          description,
+          url: normalizedUrl,
+          url_icon: urlIcon,
+        });
+      } else {
+        [appId] = await knex('apps').insert({
+          title: body.title,
+          topic_id: body.topic_id,
+          apple_id: body.apple_id,
+          description,
+          url_icon: urlIcon,
+        });
+      }
+
+      return {
+        successful: true,
+        appId,
+        appTitle: body.title,
+        appAppleId: body.apple_id,
+      };
+    }
+
+    // Generate a short description using OpenAI
+    const prompt = `Write a short, engaging description for app "${body.title}" with website "${body.url}".`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1000,
     });
+
+    const description = completion.choices[0].message.content.trim();
+
+    const [appId] = await knex('apps').insert({
+      title: body.title,
+      topic_id: body.topic_id,
+      url: normalizedUrl,
+      description,
+    });
+
+    return {
+      successful: true,
+      appId,
+      appTitle: body.title,
+      url: body.url,
+    };
+  } catch (error) {
+    return error.message;
+  }
+};
+
+// edit
+const editApp = async (token, updatedAppId, body) => {
+  try {
+    const userUid = token.split(' ')[1];
+    const user = (await knex('users').where({ uid: userUid }))[0];
+    if (!user) {
+      throw new HttpError('User not found', 401);
+    }
+
+    if (!updatedAppId) {
+      throw new HttpError('updatedAppId should be a number', 400);
+    }
+
+    await knex('apps').where({ id: updatedAppId }).update({
+      description: body.description,
+    });
+
     return {
       successful: true,
     };
@@ -445,5 +598,7 @@ module.exports = {
   getAppsByCategory,
   getAppById,
   getAppsAll,
-  createApps,
+  // createApps,
+  editApp,
+  createAppNode,
 };
