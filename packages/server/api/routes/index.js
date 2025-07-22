@@ -4,7 +4,6 @@ const router = express.Router();
 
 const exampleResources = require('./exampleResources.router');
 const apps = require('./apps.router');
-const deals = require('./deals.router');
 const categories = require('./categories.router');
 const topics = require('./topics.router');
 const users = require('./users.router');
@@ -14,15 +13,14 @@ const stripe = require('./stripe.router');
 const comments = require('./comments.router');
 const cloudinary = require('./cloudinary.router');
 const appsAppStore = require('./appsAppStore.router');
-const searches = require('./searches.router');
-const codes = require('./codes.router');
+// const searches = require('./searches.router');
 const keywords = require('./keywords.router');
-const analytics = require('./analytics.router');
-const positiveLikes = require('./positiveLikes.router');
-const negativeLikes = require('./negativeLikes.router');
-const threads = require('./threads.router');
-const replies = require('./replies.router');
-const ratingsForThreads = require('./ratingsForThreads.router');
+// const analytics = require('./analytics.router');
+// const positiveLikes = require('./positiveLikes.router');
+// const negativeLikes = require('./negativeLikes.router');
+// const threads = require('./threads.router');
+// const replies = require('./replies.router');
+// const ratingsForThreads = require('./ratingsForThreads.router');
 
 /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -54,7 +52,6 @@ router.use('/documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 router.use('/exampleResources', exampleResources);
 router.use('/apps', apps);
-router.use('/deals', deals);
 router.use('/categories', categories);
 router.use('/topics', topics);
 router.use('/users', users);
@@ -64,14 +61,13 @@ router.use('/stripe', stripe);
 router.use('/cloudinary', cloudinary);
 router.use('/comments', comments);
 router.use('/appsAppStore', appsAppStore);
-router.use('/searches', searches);
-router.use('/codes', codes);
+// router.use('/searches', searches);
 router.use('/keywords', keywords);
-router.use('/analytics', analytics);
-router.use('/positiveLikes', positiveLikes);
-router.use('/negativeLikes', negativeLikes);
-router.use('/threads', threads);
-router.use('/replies', replies);
-router.use('/ratingsForThreads', ratingsForThreads);
+// router.use('/analytics', analytics);
+// router.use('/positiveLikes', positiveLikes);
+// router.use('/negativeLikes', negativeLikes);
+// router.use('/threads', threads);
+// router.use('/replies', replies);
+// router.use('/ratingsForThreads', ratingsForThreads);
 
 module.exports = router;

@@ -100,36 +100,22 @@ export const Navigation = () => {
       setApps(data);
     }
 
-    async function fetchDeals() {
-      const response = await fetch(`${apiURL()}/deals/`);
-      const data = await response.json();
-      setDeals(data);
-    }
-
-    fetchDeals();
     fetchApps();
     fetchTopics();
     fetchCategories();
   }, []);
 
-  const filterDealsBySearch = (search) => {
+  const filterAppsBySearch = (search) => {
     if (search) {
-      return deals.filter(
+      return apps.filter(
         (item) =>
           item.title.toLowerCase().includes(searchTerms.toLowerCase()) ||
           item.description?.toLowerCase().includes(searchTerms.toLowerCase()) ||
-          item.appTitle.toLowerCase().includes(searchTerms.toLowerCase()) ||
+          item.description_long
+            ?.toLowerCase()
+            .includes(searchTerms.toLowerCase()) ||
           item.topicTitle.toLowerCase().includes(searchTerms.toLowerCase()) ||
           item.categoryTitle.toLowerCase().includes(searchTerms.toLowerCase()),
-      );
-    }
-    return deals;
-  };
-
-  const filterAppsBySearch = (search) => {
-    if (search) {
-      return apps.filter((item) =>
-        item.title.toLowerCase().includes(searchTerms.toLowerCase()),
       );
     }
     return apps;
@@ -153,7 +139,6 @@ export const Navigation = () => {
     return categories;
   };
 
-  const resultsHomeDeals = filterDealsBySearch(searchTerms);
   const resultsHomeApps = filterAppsBySearch(searchTerms);
   const resultsHomeTopics = filterTopicsBySearch(searchTerms);
   const resultsHomeCategories = filterCategoriesBySearch(searchTerms);
@@ -209,15 +194,6 @@ export const Navigation = () => {
     </Link>
   ));
 
-  const dropDownResultsDeals = resultsHomeDeals?.map((result) => (
-    <Link
-      to={`/deals/${result.id}`}
-      /* state={{ frontPageItem: relatedTopics }} */
-      onClick={() => toggleSearchModal()}
-    >
-      <li key={result.id}>{`${result.appTitle}: ${result.title}`}</li>
-    </Link>
-  ));
   return (
     <>
       <div className="navigation-mobile">
@@ -249,7 +225,7 @@ export const Navigation = () => {
                       Categories
                     </NavLink>
                   </li>
-                  <li>
+                  {/* <li>
                     <NavLink
                       to="/all-apps"
                       onClick={toggleHamburger}
@@ -266,7 +242,7 @@ export const Navigation = () => {
                     >
                       Community
                     </NavLink>
-                  </li>
+                  </li> */}
                   <li>
                     {!user && (
                       <NavLink
@@ -420,7 +396,7 @@ export const Navigation = () => {
                 Categories
               </NavLink>
             </li>
-            <li className="hide-on-tablet">
+            {/* <li className="hide-on-tablet">
               <NavLink to="/all-apps" className="nav-link">
                 Apps
               </NavLink>
@@ -429,7 +405,7 @@ export const Navigation = () => {
               <NavLink to="/community" className="nav-link">
                 Community
               </NavLink>
-            </li>
+            </li> */}
           </ul>
         </div>
         <div className="nav-buttons">
@@ -526,14 +502,6 @@ export const Navigation = () => {
         </form>
         {searchTerms ? (
           <div className="dropdown-search-modal">
-            <h3>Deals</h3>
-            <ul>
-              {dropDownResultsDeals.length > 0 ? (
-                dropDownResultsDeals
-              ) : (
-                <li>No deals found :(</li>
-              )}
-            </ul>
             <h3>Apps</h3>
             <ul>
               {dropDownResultsApps.length > 0 ? (

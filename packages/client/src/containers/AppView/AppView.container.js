@@ -1083,6 +1083,9 @@ export const AppView = () => {
             >
               <FontAwesomeIcon icon={faEnvelope} />
             </EmailShareButton>
+            <Toast open={openToast} overlayClass={`toast ${animation}`}>
+              <span>Copied to clipboard!</span>
+            </Toast>
           </div>
           <ContainerCta user={user} />
           {similarDealsFromApp.length > 0 && (
