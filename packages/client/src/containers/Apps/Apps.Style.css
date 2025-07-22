@@ -54,12 +54,24 @@ main {
 }
 
 .container-cards.grid {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 @media only screen and (max-width: 768px) {
   .container-cards.grid {
     grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container-cards.grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .container-cards.grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -76,7 +88,7 @@ main {
 }
 .dropdown-search {
   position: absolute;
-  top: 15.5rem;
+  top: 17rem;
   background-color: #fff;
   border: 1px solid #ffcdb2 !important;
   border-radius: 5px;
@@ -110,24 +122,46 @@ main {
   padding: 1rem;
 }
 
-.container-topics {
+.container-topics-desktop,
+.container-topics-mobile {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
 }
 
+.container-topics-mobile {
+  display: none;
+}
+
 .button-topics {
   display: none;
 }
 
+form.home {
+  display: none;
+}
+.no-line-height {
+  line-height: 1.2 !important;
+}
+
+.special-padding {
+  padding: 11.7px 20px;
+}
+
 @media only screen and (max-width: 768px) {
-  .container-topics {
+  .container-topics-mobile {
     display: none;
   }
-  .container-topics.show {
+  .container-topics-mobile.show {
     display: flex;
     animation: slide-in 500ms;
+    margin: 0 auto 2rem;
+    width: 90%;
+  }
+
+  .container-topics-desktop {
+    display: none;
   }
 
   .button-topics {
@@ -141,7 +175,7 @@ main {
   justify-content: right;
   align-items: center;
   gap: 0.5rem;
-  padding-right: 2rem;
+  /* padding-right: 2rem; */
   margin: 2rem 0rem;
 }
 @media only screen and (max-width: 768px) {
@@ -227,11 +261,14 @@ main {
 }
 
 @media only screen and (max-width: 992px) {
-  .hero {
+  .hero.apps {
+    margin: 2rem auto;
+    padding: 0rem;
+  }
+  .hero form {
     display: none;
     /* width: 90%;
     height: 100%;
-    margin: 2rem auto;
     padding: 2rem 0rem; */
   }
   .container-cards {
@@ -273,5 +310,9 @@ main {
   }
   .input-search-home {
     width: 65%;
+  }
+
+  .container-cards.small-cards {
+    width: 100%;
   }
 }

@@ -319,28 +319,23 @@ export const Apps = () => {
     </Link>
   ));
 
-  const topicsList = topics.map((topic) => {
-    if (topicIdParam) {
+  const categoriesList = categories.map((category) => {
+    if (categoryIdParam) {
       return (
-        <Link to={`/apps/topic/${topic.id}`}>
+        <Link to={`/apps/category/${category.id}`}>
           <Button
-            primary={topic.id.toString() === topicIdParam.toString() && true}
-            secondary={topic.id !== topicIdParam && true}
-            label={topic.title}
+            primary={
+              category.id.toString() === categoryIdParam.toString() && true
+            }
+            secondary={category.id !== categoryIdParam && true}
+            label={category.title}
           />
         </Link>
       );
     }
-    if (categoryIdParam) {
-      return (
-        <Link to={`/apps/topic/${topic.id}`}>
-          <Button secondary label={topic.title} />
-        </Link>
-      );
-    }
     return (
-      <Link to={`/apps/topic/${topic.id}`}>
-        <Button secondary label={topic.title} />
+      <Link to={`/apps/category/${category.id}`}>
+        <Button secondary label={category.title} />
       </Link>
     );
   });
@@ -462,8 +457,15 @@ export const Apps = () => {
       <div className="hero apps">
         <h1 className="hero-header">Browse best apps</h1>
       </div>
-      <section className={`container-topics ${showTopicsContainer && 'show'}`}>
-        {topicsList}
+      <section className="container-topics-desktop">
+        <Link to="/">
+          <Button
+            primary={!categoryIdParam}
+            secondary={categoryIdParam}
+            label="All categories"
+          />
+        </Link>
+        {categoriesList}
       </section>
       <section className="container-filters">
         <Button
