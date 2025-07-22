@@ -13,6 +13,7 @@ import Modal from '../../components/Modal/Modal.Component';
 import iconCopy from '../../assets/images/icons8-copy-24.png';
 import appStoreLogo from '../../assets/images/download-on-the-app-store-apple-logo.svg';
 import googlePlayStoreLogo from '../../assets/images/google-play-badge-logo.svg';
+import mousePointer from '../../assets/images/mouse-pointer.svg';
 import { Dropdown } from '../../components/Dropdown/Dropdown.Component';
 import TextFormTextarea from '../../components/Input/TextFormTextarea.component';
 import Toast from '../../components/Toast/Toast.Component';
@@ -527,9 +528,9 @@ export const AppView = () => {
             <h1 className="hero-header">{app?.title}</h1>
           </div>
           <img
-            className={app.url_icon ? 'appview-icon' : 'appview-image'}
+            className={`appview-icon ${!app.url_icon && 'default-icon'}`}
             alt={`${app.title}`}
-            src={app.url_icon}
+            src={app.url_icon || mousePointer}
           />
           {/* <ImageGallery items={images} /> */}
           <div className="container-deal-actions">

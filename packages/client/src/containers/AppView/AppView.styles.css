@@ -295,6 +295,11 @@ img.copy-referral-code.smaller-icon {
 .container-description p:last-child {
   margin-bottom: 0rem;
 }
+
+.default-icon {
+  height: 32rem;
+}
+
 @media only screen and (max-width: 768px) {
   .badges {
     align-items: self-start;

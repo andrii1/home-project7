@@ -21,6 +21,7 @@ import {
   faBookmark as faBookmarkSolid,
   faBookOpen,
 } from '@fortawesome/free-solid-svg-icons';
+import mousePointer from '../../assets/images/mouse-pointer.svg';
 
 export const Apps = () => {
   const { user } = useUserContext();
@@ -558,7 +559,7 @@ export const Apps = () => {
                   title={app.title}
                   description={app.description}
                   url={app.url}
-                  urlImage={app.url_icon}
+                  urlImage={app.url_icon || mousePointer}
                   topic={app.topicTitle}
                   topicId={app.topic_id}
                   pricingType={app.pricing_type}
