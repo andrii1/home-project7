@@ -13,7 +13,7 @@ export const ContainerCta = ({ user }) => {
           {user && 'Upgrade'}
         </h2>
         <p>
-          {!user && 'Add your referral codes, bookmark favorite deals'}
+          {!user && 'Add your own apps, bookmark favorite apps'}
           {user && 'Share more than 5 referral codes'}
         </p>
       </div>

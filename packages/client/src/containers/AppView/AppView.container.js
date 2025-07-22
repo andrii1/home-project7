@@ -511,31 +511,20 @@ export const AppView = () => {
   return (
     <>
       <Helmet>
-        <title>
-          {`${String(app?.title).substring(0, 50)}${
-            dealCodes.length > 0
-              ? ` - ${dealCodesInTitle
-                  .slice(0, 3)
-                  .join(', ')} - ${showNumberOfCodesInTitle(dealCodes)}`
-              : ''
-          }` || 'Top App Deals'}
-        </title>
+        <title>{`${app?.title} - apps`}</title>
         <meta
           name="description"
           content={
             keywords.length > 0
               ? keywords.map((keyword) => keyword.title).join(', ')
-              : `${app?.appTitle} referral code free, ${app?.appTitle} refer a friend, ${app?.appTitle} app discount, ${app?.appTitle} rewards, ${app?.appTitle} coupon code.`
+              : `${app?.title} review, ${app?.title} how to use, ${app?.title} tutorial, ${app?.title} overview, ${app?.title} deals.`
           }
         />
       </Helmet>
       <main>
         <section className="container-appview">
           <div className="header">
-            <h1 className="hero-header">
-              {`${app?.title}
-                `}
-            </h1>
+            <h1 className="hero-header">{app?.title}</h1>
           </div>
           <img
             className={app.url_icon ? 'appview-icon' : 'appview-image'}
@@ -547,7 +536,7 @@ export const AppView = () => {
             <div className="container-rating">
               Rating
               {user &&
-              allRatings.some((rating) => rating.deal_id === app.id) &&
+              allRatings.some((rating) => rating.app_id === app.id) &&
               ratings.some((rating) => rating.id === app.id) ? (
                 <button
                   type="button"
@@ -556,7 +545,7 @@ export const AppView = () => {
                 >
                   <FontAwesomeIcon icon={faCaretUp} />
                   {
-                    allRatings.filter((rating) => rating.deal_id === app.id)
+                    allRatings.filter((rating) => rating.app_id === app.id)
                       .length
                   }
                 </button>
@@ -568,7 +557,7 @@ export const AppView = () => {
                 >
                   <FontAwesomeIcon icon={faCaretUp} />
                   {
-                    allRatings.filter((rating) => rating.deal_id === app.id)
+                    allRatings.filter((rating) => rating.app_id === app.id)
                       .length
                   }
                 </button>
@@ -583,7 +572,7 @@ export const AppView = () => {
                 >
                   <FontAwesomeIcon icon={faCaretUp} />
                   {
-                    allRatings.filter((rating) => rating.deal_id === app.id)
+                    allRatings.filter((rating) => rating.app_id === app.id)
                       .length
                   }
                 </button>
@@ -614,7 +603,7 @@ export const AppView = () => {
                   onKeyDown={() => handleDeleteBookmarks(app.id)}
                   className="button-bookmark"
                 >
-                  Remove deal from saved &nbsp;
+                  Remove app from saved &nbsp;
                   <FontAwesomeIcon icon={faHeartSolid} size="lg" />
                 </button>
               ) : user ? (
@@ -624,7 +613,7 @@ export const AppView = () => {
                   onKeyDown={() => addFavorite(app.id)}
                   className="button-bookmark"
                 >
-                  Save this deal &nbsp;
+                  Save this app &nbsp;
                   <FontAwesomeIcon icon={faHeart} size="lg" />
                 </button>
               ) : (
@@ -642,7 +631,7 @@ export const AppView = () => {
               )}
             </div>
           </div>
-          <div className="container-codes">
+          {/* <div className="container-codes">
             {dealCodes.length > 0 ? (
               <>
                 <div className="container-title">
@@ -803,11 +792,11 @@ export const AppView = () => {
                 </span>
               </div>
             )}
-          </div>
+          </div> */}
           {!user && (
             <div className="container-details cta">
               <div>
-                <h2>🔥 Add your {app.appTitle || ''} referral code</h2>
+                <h2>🔥 Add your app!</h2>
                 <p>Create an account to get started for free</p>
               </div>
               <div>
@@ -892,7 +881,7 @@ export const AppView = () => {
 
             {app.description_long && (
               <>
-                <h3>Deal details</h3>
+                <h3>App details</h3>
                 <p className="app-description">
                   {' '}
                   <Markdown>{app.description_long}</Markdown>
@@ -916,7 +905,7 @@ export const AppView = () => {
               </div>
             )}
             <div className="container-tags">
-              <div className="badges">
+              {/* <div className="badges">
                 <p>App: </p>
                 <div>
                   <Link to={`/apps/${app.app_id}`} target="_blank">
@@ -933,7 +922,7 @@ export const AppView = () => {
                     />
                   </Link>
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="container-tags">
               <div className="badges">
