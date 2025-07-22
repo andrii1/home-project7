@@ -1,13 +1,26 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-nested-ternary */
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Button } from '../../components/Button/Button.component';
+import { ContainerCta } from '../../components/ContainerCta/ContainerCta.component';
 import { Badge } from '../../components/Badge/Badge.component';
 import { Card } from '../../components/Card/Card.component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../../components/Modal/Modal.Component';
 import iconCopy from '../../assets/images/icons8-copy-24.png';
+import appStoreLogo from '../../assets/images/download-on-the-app-store-apple-logo.svg';
+import googlePlayStoreLogo from '../../assets/images/google-play-badge-logo.svg';
+import { Dropdown } from '../../components/Dropdown/Dropdown.Component';
+import TextFormTextarea from '../../components/Input/TextFormTextarea.component';
+import Toast from '../../components/Toast/Toast.Component';
+import Markdown from 'markdown-to-jsx';
+import { Loading } from '../../components/Loading/Loading.Component';
+import { useLikes } from '../../utils/hooks/useLikes';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
+
 import {
   faEnvelope,
   faLink,
@@ -27,107 +40,54 @@ import {
   EmailShareButton,
 } from 'react-share';
 import appImage from '../../assets/images/app-placeholder.svg';
-import { faHeart } from '@fortawesome/free-regular-svg-icons';
+import { faHeart, faCopy } from '@fortawesome/free-regular-svg-icons';
 
 import { apiURL } from '../../apiURL';
 import './AppView.styles.css';
 import { useUserContext } from '../../userContext';
+import { getMostUsedWords } from '../../utils/getMostUsedWords';
 
-const searches = [
-  { id: 1, title: 'ai tool' },
-  { id: 2, title: 'avatar creator' },
-  {
-    id: 3,
-    title: 'ai music',
-  },
-];
-
-const alternativeApps = [
-  {
-    id: 1,
-    title: '10web',
-    description:
-      'Create a website using AI Website Builder,\nhost it on 10Web Hosting, and optimize it with\nPageSpeed Booster.',
-    rating: null,
-    topic_id: 6,
-    url: 'https://10web.io',
-    pricing_type: 'Paid with free trial',
-    url_x: 'https://twitter.com/10Web_io',
-    url_discord: null,
-    url_app_store: null,
-    url_google_play_store: null,
-    url_chrome_extension: null,
-    url_small_screenshot: 'Free',
-    url_large_screenshot: null,
-    user_id: null,
-    created_at: '2023-10-13T08:43:58.072Z',
-    topicTitle: 'Website builders',
-    category_id: 4,
-    categoryTitle: 'Engineering & Development',
-  },
-  {
-    id: 2,
-    title: 'TLDV',
-    description:
-      'Short for "too long; didn\'t view."\n\nThis AI platform saves you time by taking meeting notes for you.\n\nSit back and relax as tl;dv transcribes and summarizes your calls automatically.',
-    rating: null,
-    topic_id: 17,
-    url: 'https://tldv.io',
-    pricing_type: 'Paid with free plan',
-    url_x: 'https://twitter.com/tldview?lang=en',
-    url_discord: null,
-    url_app_store: null,
-    url_google_play_store: null,
-    url_chrome_extension:
-      'https://chrome.google.com/webstore/detail/record-transcribe-chatgpt/lknmjhcajhfbbglglccadlfdjbaiifig',
-    url_small_screenshot: 'Paid with a free plan',
-    url_large_screenshot: null,
-    user_id: null,
-    created_at: '2023-10-13T08:43:58.083Z',
-    topicTitle: 'Meetings',
-    category_id: 1,
-    categoryTitle: 'Work & Productivity',
-  },
-  {
-    id: 3,
-    title: 'Klap',
-    description:
-      'Turn videos into viral shorts\nGet ready-to-publish TikToks, Reels, Shorts from YouTube videos in a click',
-    rating: null,
-    topic_id: 7,
-    url: 'https://klap.app',
-    pricing_type: 'Paid',
-    url_x: 'https://twitter.com/tldview?lang=en',
-    url_discord: null,
-    url_app_store: null,
-    url_google_play_store: null,
-    url_chrome_extension: null,
-    url_small_screenshot: 'Paid with a free trial',
-    url_large_screenshot: null,
-    user_id: null,
-    created_at: '2023-10-13T08:43:58.088Z',
-    topicTitle: 'Video',
-    category_id: 2,
-    categoryTitle: 'Marketing & Sales',
-  },
-];
 export const AppView = () => {
   const { id } = useParams();
   const [openModal, setOpenModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
+  const [openToast, setOpenToast] = useState(false);
+  const [animation, setAnimation] = useState('');
   const [favorites, setFavorites] = useState([]);
+  const [topicsFromDeals, setTopicsFromDeals] = useState([]);
   const navigate = useNavigate();
   const [app, setApp] = useState({});
+  const [dealCodes, setDealCodes] = useState([]);
+  const [appAppStore, setAppAppStore] = useState({});
   const [similarApps, setSimilarApps] = useState([]);
+  const [similarDealsFromApp, setSimilarDealsFromApp] = useState([]);
   const [comments, setComments] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { user } = useUserContext();
   const [validForm, setValidForm] = useState(false);
   const [invalidForm, setInvalidForm] = useState(false);
   const [comment, setComment] = useState('');
   const [allRatings, setAllRatings] = useState([]);
   const [ratings, setRatings] = useState([]);
+  const [searches, setSearches] = useState([]);
+  const [keywords, setKeywords] = useState([]);
+  const [openAddCodeForm, setOpenAddCodeForm] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const {
+    likes: positiveLikes,
+    allLikes: allPositiveLikes,
+    addLike: addPositiveLike,
+    deleteLike: deletePositiveLike,
+  } = useLikes(user, 'positiveLikes');
+
+  const {
+    likes: negativeLikes,
+    allLikes: allNegativeLikes,
+    addLike: addNegativeLike,
+    deleteLike: deleteNegativeLike,
+  } = useLikes(user, 'negativeLikes');
+
   useEffect(() => {
     async function fetchSingleApp(appId) {
       const response = await fetch(`${apiURL()}/apps/${appId}`);
@@ -135,25 +95,86 @@ export const AppView = () => {
       setApp(appResponse[0]);
     }
 
-    fetchSingleApp(id);
+    // async function fetchCodesForADeal(dealId) {
+    //   const response = await fetch(`${apiURL()}/codes/?deal=${dealId}`);
+    //   const appResponse = await response.json();
+    //   setDealCodes(appResponse);
+    // }
+
+    // async function fetchSearchesForADeal(dealId) {
+    //   const response = await fetch(`${apiURL()}/searches/?deal=${dealId}`);
+    //   const appResponse = await response.json();
+    //   setSearches(appResponse);
+    // }
+
+    // async function fetchKeywordsForADeal(dealId) {
+    //   const response = await fetch(`${apiURL()}/keywords/?deal=${dealId}`);
+    //   const appResponse = await response.json();
+    //   setKeywords(appResponse);
+    // }
+
+    // fetchSingleApp(id);
+    // fetchCodesForADeal(id);
+    // fetchSearchesForADeal(id);
+    // fetchKeywordsForADeal(id);
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null); // Clear previous errors
+      try {
+        await fetchSingleApp(id);
+        // await fetchCodesForADeal(id);
+        // await fetchSearchesForADeal(id);
+        // await fetchKeywordsForADeal(id);
+      } catch (e) {
+        setError({ message: e.message || 'Failed to fetch data' });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [id]);
 
   useEffect(() => {
+    async function fetchAppAppStore(appleId) {
+      setLoading(true);
+      try {
+        const response = await fetch(`${apiURL()}/appsAppStore/${appleId}`);
+        const example = await response.json();
+        setAppAppStore(example.results[0]);
+      } catch (e) {
+        setError({ message: e.message || 'Failed to fetch data' });
+      }
+      setLoading(false);
+    }
+    app.appAppleId && fetchAppAppStore(app.appAppleId);
+  }, [app.appAppleId]);
+
+  useEffect(() => {
     async function fetchSimilarApps() {
-      const response = await fetch(
-        `${apiURL()}/apps?page=0&column=id&direction=desc&filteredTopics=${
-          app.topic_id
-        }`,
-      );
-      const appsResponse = await response.json();
-      const similarAppsArray = appsResponse.data.filter(
-        (item) => item.id !== app.id,
-      );
-      setSimilarApps(similarAppsArray);
+      setLoading(true);
+      try {
+        const response = await fetch(`${apiURL()}/apps`);
+        const appsResponse = await response.json();
+        const similarAppsArray = appsResponse
+          .filter((item) => item.appTopicId === app.topic_id)
+          .filter((item) => item.app_id !== app.app_id)
+          .filter((item) => item.id !== app.id);
+        setSimilarApps(similarAppsArray);
+
+        const similarDealsFromAppArray = appsResponse
+          .filter((item) => item.app_id === app.app_id)
+          .filter((item) => item.id !== app.id);
+        setSimilarDealsFromApp(similarDealsFromAppArray);
+      } catch (e) {
+        setError({ message: e.message || 'Failed to fetch data' });
+      }
+      setLoading(false);
     }
 
     fetchSimilarApps();
-  }, [app.topic_id, app.id]);
+  }, [app.topic_id, app.id, app.app_id]);
 
   const fetchCommentsByAppId = useCallback(async (appId) => {
     const response = await fetch(`${apiURL()}/comments?appId=${appId}`);
@@ -178,7 +199,7 @@ export const AppView = () => {
       },
       body: JSON.stringify({
         content: commentContent,
-        app_id: id,
+        deal_id: id,
       }),
     });
     if (response.ok) {
@@ -216,6 +237,38 @@ export const AppView = () => {
     return date.toISOString().split('T')[0];
   };
 
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const results = [];
+      const combinedText = `${app?.description} ${app?.description_long} ${app?.appDescription}`;
+      const words = getMostUsedWords(combinedText, 10);
+
+      for (const [word] of words) {
+        try {
+          const res = await fetch(
+            `${apiURL()}/apps?page=0&column=id&direction=desc&search=${encodeURIComponent(
+              word,
+            )}`,
+          );
+          const data = await res.json();
+          if (data.data.length > 1) {
+            const wordWithLink = { title: word, url: `apps/search/${word}` };
+            results.push(wordWithLink);
+          }
+        } catch (err) {
+          return;
+        }
+      }
+
+      setTopicsFromDeals(results);
+      setLoading(false);
+    }
+    if (app?.description) {
+      fetchData();
+    }
+  }, [app.description, app.description_long, app.appDescription]);
+
   const cardItems = similarApps.map((item) => {
     // const relatedTopics = topics
     //   .filter((topic) => topic.categoryId === category.id)
@@ -223,14 +276,44 @@ export const AppView = () => {
     return (
       <Card
         id={item.id}
+        cardUrl={`/deals/${item.id}`}
         title={item.title}
         description={item.description}
         url={item.url}
-        urlImage={item.url_image}
+        urlImage={item.url_image === null ? 'deal' : item.url_image}
         topic={item.topicTitle}
-        pricingType={item.pricing_type}
+        appTitle={item.appTitle}
         smallCard
       />
+    );
+  });
+
+  const cardItemsSimilarDealsFromApp = similarDealsFromApp.map((item) => {
+    return (
+      <Card
+        id={item.id}
+        cardUrl={`/apps/${item.id}`}
+        title={item.title}
+        description={item.description}
+        url={item.url}
+        urlImage={item.url_image === null ? 'deal' : item.url_image}
+        topic={item.topicTitle}
+        appTitle={item.appTitle}
+        smallCard
+      />
+    );
+  });
+
+  const searchItems = searches.map((search) => {
+    return (
+      <Link to={`../../apps/searchterm/${search.id}`} target="_blank">
+        <Button
+          size="medium"
+          secondary
+          icon={<FontAwesomeIcon icon={faArrowUpRightFromSquare} size="sm" />}
+          label={search.title}
+        />
+      </Link>
     );
   });
 
@@ -262,7 +345,7 @@ export const AppView = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        app_id: appId,
+        deal_id: appId,
       }),
     });
     if (response.ok) {
@@ -331,7 +414,7 @@ export const AppView = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        app_id: appId,
+        deal_id: appId,
       }),
     });
     if (response.ok) {
@@ -354,34 +437,175 @@ export const AppView = () => {
     }
   };
 
+  const copyToClipboard = (item) => {
+    navigator.clipboard.writeText(item);
+    setOpenToast(true);
+    setAnimation('open-animation');
+
+    setTimeout(() => {
+      setAnimation('close-animation');
+    }, 2000);
+    setTimeout(() => {
+      setOpenToast(false);
+    }, 2500);
+  };
+
+  const dealCodesInTitle = dealCodes.map((i) => {
+    return `(${i.title})`;
+  });
+
+  const showNumberOfCodesInTitle = (codes) => {
+    let title;
+    if (codes.length === 1) {
+      title = 'code';
+    } else {
+      title = 'codes';
+    }
+
+    return `${codes.length} ${title}`;
+  };
+
+  // const images = [
+  //   {
+  //     original: 'https://picsum.photos/id/1018/1000/600/',
+  //     thumbnail: 'https://picsum.photos/id/1018/250/150/',
+  //   },
+  //   {
+  //     original: 'https://picsum.photos/id/1015/300/600/',
+  //     thumbnail: 'https://picsum.photos/id/1015/150/450/',
+  //   },
+  //   {
+  //     original: 'https://picsum.photos/id/1019/1000/600/',
+  //     thumbnail: 'https://picsum.photos/id/1019/250/150/',
+  //   },
+  // ];
+
+  // if (loading) {
+  //   return (
+  //     <>
+  //       <Helmet>
+  //         <title>Loading...</title>
+  //         <meta name="description" content="Fetching deal details" />
+  //       </Helmet>
+  //       <main className="loading-container">
+  //         <Loading />
+  //       </main>
+  //     </>
+  //   );
+  // }
+
+  if (error) {
+    return (
+      <>
+        <Helmet>
+          <title>Error</title>
+          <meta name="description" content="Something went wrong" />
+        </Helmet>
+        <main className="error-container">
+          <h2>{error.message || 'Something went wrong'}</h2>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <Helmet>
-        <title>{`${String(app.title).substring(0, 50)} - AI Apps`}</title>
+        <title>
+          {`${String(app?.title).substring(0, 50)}${
+            dealCodes.length > 0
+              ? ` - ${dealCodesInTitle
+                  .slice(0, 3)
+                  .join(', ')} - ${showNumberOfCodesInTitle(dealCodes)}`
+              : ''
+          }` || 'Top App Deals'}
+        </title>
         <meta
           name="description"
-          content={`Top AI Apps for ${app.topicTitle} and ${app.categoryTitle}`}
+          content={
+            keywords.length > 0
+              ? keywords.map((keyword) => keyword.title).join(', ')
+              : `${app?.appTitle} referral code free, ${app?.appTitle} refer a friend, ${app?.appTitle} app discount, ${app?.appTitle} rewards, ${app?.appTitle} coupon code.`
+          }
         />
       </Helmet>
       <main>
         <section className="container-appview">
-          <h1 className="hero-header">{app.title}</h1>
+          <div className="header">
+            <h1 className="hero-header">
+              {`${app?.title}
+                `}
+            </h1>
+          </div>
           <img
-            className="appview-image"
-            alt={`${app.title} screenshot`}
-            src={`http://res.cloudinary.com/dgarvanzw/image/upload/q_auto,f_auto/apps_ai/${app.url_image}.png`}
+            className={app.url_icon ? 'appview-icon' : 'appview-image'}
+            alt={`${app.title}`}
+            src={app.url_icon}
           />
-
-          <div className="container-bookmark">
-            <Link to={app.url} target="_blank">
-              <Button
-                primary
-                icon={
-                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} size="sm" />
-                }
-                label={`Visit ${app.title}'s website`}
-              />
-            </Link>
+          {/* <ImageGallery items={images} /> */}
+          <div className="container-deal-actions">
+            <div className="container-rating">
+              Rating
+              {user &&
+              allRatings.some((rating) => rating.deal_id === app.id) &&
+              ratings.some((rating) => rating.id === app.id) ? (
+                <button
+                  type="button"
+                  className="button-rating"
+                  onClick={(event) => deleteRating(app.id)}
+                >
+                  <FontAwesomeIcon icon={faCaretUp} />
+                  {
+                    allRatings.filter((rating) => rating.deal_id === app.id)
+                      .length
+                  }
+                </button>
+              ) : user ? (
+                <button
+                  type="button"
+                  className="button-rating"
+                  onClick={(event) => addRating(app.id)}
+                >
+                  <FontAwesomeIcon icon={faCaretUp} />
+                  {
+                    allRatings.filter((rating) => rating.deal_id === app.id)
+                      .length
+                  }
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="button-rating"
+                  onClick={() => {
+                    setOpenModal(true);
+                    setModalTitle('Sign up to vote');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faCaretUp} />
+                  {
+                    allRatings.filter((rating) => rating.deal_id === app.id)
+                      .length
+                  }
+                </button>
+              )}
+            </div>
+            <div className="container-appview-buttons">
+              {app.appUrl && (
+                <Link to={app.appUrl} target="_blank">
+                  <Button
+                    size="large"
+                    secondary
+                    icon={
+                      <FontAwesomeIcon
+                        icon={faArrowUpRightFromSquare}
+                        size="sm"
+                      />
+                    }
+                    label={`Visit ${app.appTitle} website`}
+                  />
+                </Link>
+              )}
+            </div>
             <div>
               {user && favorites.some((x) => x.id === app.id) ? (
                 <button
@@ -390,7 +614,7 @@ export const AppView = () => {
                   onKeyDown={() => handleDeleteBookmarks(app.id)}
                   className="button-bookmark"
                 >
-                  Remove from saved{' '}
+                  Remove deal from saved &nbsp;
                   <FontAwesomeIcon icon={faHeartSolid} size="lg" />
                 </button>
               ) : user ? (
@@ -400,7 +624,8 @@ export const AppView = () => {
                   onKeyDown={() => addFavorite(app.id)}
                   className="button-bookmark"
                 >
-                  Save <FontAwesomeIcon icon={faHeart} size="lg" />
+                  Save this deal &nbsp;
+                  <FontAwesomeIcon icon={faHeart} size="lg" />
                 </button>
               ) : (
                 <button
@@ -417,147 +642,194 @@ export const AppView = () => {
               )}
             </div>
           </div>
-          <div className="container-description">
-            <div className="container-title">
-              <h3>What is {app.title}?</h3>
-              <div className="container-rating">
-                Rating
-                {user &&
-                ratings.some((rating) => rating.id === app.id) ? (
-                  <button
-                    type="button"
-                    className="button-rating"
-                    onClick={(event) => deleteRating(app.id)}
-                  >
-                    <FontAwesomeIcon icon={faCaretUp} />
-                    {
-                      allRatings.filter((rating) => rating.app_id === app.id)
-                        .length
-                    }
-                  </button>
-                ) : user ? (
-                  <button
-                    type="button"
-                    className="button-rating"
-                    onClick={(event) => addRating(app.id)}
-                  >
-                    <FontAwesomeIcon icon={faCaretUp} />
-                    {
-                      allRatings.filter((rating) => rating.app_id === app.id)
-                        .length
-                    }
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="button-rating"
-                    onClick={() => {
-                      setOpenModal(true);
-                      setModalTitle('Sign up to vote');
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faCaretUp} />
-                    {
-                      allRatings.filter((rating) => rating.app_id === app.id)
-                        .length
-                    }
-                  </button>
-                )}
-                {/* <button type="button" className="button-rating">
-                  <FontAwesomeIcon icon={faCaretUp} />
-                  10
-                </button> */}
+          <div className="container-codes">
+            {dealCodes.length > 0 ? (
+              <>
+                <div className="container-title">
+                  <h2>
+                    {app.title} -{' '}
+                    {dealCodes.length > 0
+                      ? `${showNumberOfCodesInTitle(dealCodes)}`
+                      : ''}
+                  </h2>
+                </div>
+
+                <div className="container-appview-codes-users">
+                  {dealCodes.map((code) => {
+                    const positiveLikesCount = allPositiveLikes.filter(
+                      (like) => like.code_id === code.id,
+                    ).length;
+
+                    const negativeLikesCount = allNegativeLikes.filter(
+                      (like) => like.code_id === code.id,
+                    ).length;
+
+                    return (
+                      <div className="container-codes-users">
+                        <div className="container-appview-codes">
+                          <Button
+                            size="medium"
+                            primary
+                            icon={<FontAwesomeIcon icon={faCopy} />}
+                            label={code.title}
+                            onClick={() => copyToClipboard(code.title)}
+                          />
+                          <Toast
+                            open={openToast}
+                            overlayClass={`toast ${animation}`}
+                          >
+                            <span>Copied to clipboard!</span>
+                          </Toast>
+                          {code.url && (
+                            <Link to={code.url} target="_blank">
+                              <Button
+                                size="medium"
+                                secondary
+                                icon={
+                                  <FontAwesomeIcon
+                                    icon={faArrowUpRightFromSquare}
+                                    size="sm"
+                                  />
+                                }
+                                label="Link"
+                              />
+                            </Link>
+                          )}
+                          <Link to={`../../codes/${code.id}`} target="_blank">
+                            <Button
+                              size="medium"
+                              secondary
+                              icon={
+                                <FontAwesomeIcon
+                                  icon={faArrowUpRightFromSquare}
+                                  size="sm"
+                                />
+                              }
+                              label="View"
+                            />
+                          </Link>
+                          <div className="container-rating">
+                            {user &&
+                            positiveLikes.some(
+                              (like) => like.id === code.id,
+                            ) ? (
+                              <div className="thumbs-container up">
+                                <ThumbsUp
+                                  className="thumbs"
+                                  color="green"
+                                  size={20}
+                                  onClick={() => deletePositiveLike(code.id)}
+                                />
+                                {positiveLikesCount}
+                              </div>
+                            ) : user ? (
+                              <div className="thumbs-container up">
+                                <ThumbsUp
+                                  color="green"
+                                  className="thumbs"
+                                  size={20}
+                                  onClick={() => addPositiveLike(code.id)}
+                                />
+                                {positiveLikesCount}
+                              </div>
+                            ) : (
+                              <div className="thumbs-container up">
+                                <ThumbsUp
+                                  className="thumbs"
+                                  size={20}
+                                  color="green"
+                                  onClick={() => {
+                                    setOpenModal(true);
+                                    setModalTitle('Sign up to vote');
+                                  }}
+                                />
+                                {positiveLikesCount}
+                              </div>
+                            )}
+                          </div>
+                          <div className="container-rating">
+                            {user &&
+                            negativeLikes.some(
+                              (like) => like.id === code.id,
+                            ) ? (
+                              <div className="thumbs-container down">
+                                <ThumbsDown
+                                  className="thumbs"
+                                  color="red"
+                                  size={20}
+                                  onClick={() => deleteNegativeLike(code.id)}
+                                />
+                                {negativeLikesCount}
+                              </div>
+                            ) : user ? (
+                              <div className="thumbs-container down">
+                                <ThumbsDown
+                                  color="red"
+                                  className="thumbs"
+                                  size={20}
+                                  onClick={() => addNegativeLike(code.id)}
+                                />
+                                {negativeLikesCount}
+                              </div>
+                            ) : (
+                              <div className="thumbs-container down">
+                                <ThumbsDown
+                                  className="thumbs"
+                                  size={20}
+                                  color="red"
+                                  onClick={() => {
+                                    setOpenModal(true);
+                                    setModalTitle('Sign up to vote');
+                                  }}
+                                />
+                                {negativeLikesCount}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <span className="codes-added-by">
+                          added by {code.userFullName}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="container-title">
+                <span>
+                  <i>No codes yet</i> 😢 <i>Add your code now!</i>
+                </span>
               </div>
-            </div>
-            <p>{app.description}</p>
+            )}
           </div>
-          <div className="container-details">
-            <div className="container-tags">
-              <div className="badges">
-                <p>Pricing: </p>{' '}
-                <div>
-                  <Badge label={app.pricing_type} size="small" />
-                </div>
+          {!user && (
+            <div className="container-details cta">
+              <div>
+                <h2>🔥 Add your {app.appTitle || ''} referral code</h2>
+                <p>Create an account to get started for free</p>
               </div>
-              <p>Edit app</p>
-            </div>
-            <div className="container-tags">
-              <div className="badges">
-                <p>Tagged: </p>
-                <div>
-                  <Badge secondary label={app.topicTitle} size="small" />
-                </div>
-              </div>
-              <div className="badges">
-                <p>Category: </p>
-                <div>
-                  <Badge secondary label={app.categoryTitle} size="small" />
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* <div className="container-related-searches">
-            <h3>Related searches</h3>
-            <div className="topics-div searches">
-              {searches.map((search) => (
-                <Link to={`/apps/search/${search.id}`} target="_blank">
-                  <Button secondary label={search.title} />
+              <div>
+                <Link target="_blank" to="/signup">
+                  <Button primary label="Create my account 👌" />
                 </Link>
-              ))}
+              </div>
             </div>
-          </div> */}
-          <div className="icons-apps-page">
-            <span>Share it: </span>
-            <button
-              type="button"
-              className="button-copy"
-              onClick={() => {
-                navigator.clipboard.writeText(app.title);
-              }}
-            >
-              <img src={iconCopy} alt="copy" className="icon-copy" />
-            </button>
-            <FontAwesomeIcon
-              icon={faLink}
-              className="button-copy"
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  `https://www.Apphunt.me/Apps/${app.id}`,
-                );
-              }}
-            />
-            <FacebookShareButton url={`/Apps/${app.id}`}>
-              <FontAwesomeIcon className="share-icon" icon={faFacebookF} />
-            </FacebookShareButton>
-            <TwitterShareButton
-              url={`https://www.Apphunt.me/Apps/${app.id}`}
-              title={`Check out this GPT App: '${app.title}'`}
-              hashtags={['Apps']}
-            >
-              <FontAwesomeIcon className="share-icon" icon={faTwitter} />
-            </TwitterShareButton>
-            <LinkedinShareButton url={`https://www.Apphunt.me/Apps/${app.id}`}>
-              <FontAwesomeIcon className="share-icon" icon={faLinkedinIn} />
-            </LinkedinShareButton>
-            <EmailShareButton
-              subject="Check out this GPT App!"
-              body={`This GPT App is great: '${app.title}'`}
-              url={`https://www.Apphunt.me/Apps/${app.id}`}
-            >
-              <FontAwesomeIcon icon={faEnvelope} />
-            </EmailShareButton>
-          </div>
+          )}
+
           <div className="container-comments">
+            <h2 className="h-no-margin h-no-margin-bottom">Comments</h2>
             {comments.length === 0 && (
               <div>
-                <i>No comments for this App. </i>
-                {user && <i>Add first one below.</i>}
+                <i>No comments yet. </i>
+                {user && <i>Add a first one below.</i>}
               </div>
             )}
             {comments.length > 0 &&
               comments.map((item) => (
                 <div className="form-container">
-                  <div className="comment-box submit-box">
+                  <div className="comment-box submit-box-new-comment">
                     <div>{item.content}</div>
                     <div className="comment-author-date">{`by ${
                       item.full_name
@@ -585,9 +857,9 @@ export const AppView = () => {
                 <div className="comment-box submit-box">
                   <form onSubmit={handleSubmit}>
                     <textarea
-                      className="form-input"
+                      className="form-input textarea-new-comment"
                       value={comment}
-                      placeholder="Your comment"
+                      placeholder="Your comment..."
                       onChange={commentHandler}
                     />
 
@@ -610,21 +882,238 @@ export const AppView = () => {
               </div>
             )}
           </div>
-          <div className="container-details cta">
-            <div>
-              <h2>🔥 Create a free account</h2>
-              <p>Bookmark you favorite AI apps</p>
+          <div className="container-description">
+            <div className="container-title">
+              <h2>{app.title}</h2>
             </div>
-            <div>
-              <Link to="/signup">
-                <Button primary label="Create my account 👌" />
-              </Link>
-            </div>
+            <p className="app-description main-description">
+              <Markdown>{app.description}</Markdown>
+            </p>
+
+            {app.description_long && (
+              <>
+                <h3>Deal details</h3>
+                <p className="app-description">
+                  {' '}
+                  <Markdown>{app.description_long}</Markdown>
+                </p>
+              </>
+            )}
           </div>
+          <div className="container-details container-badges">
+            {topicsFromDeals.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Related topics: </p>
+                  <div className="badges-keywords">
+                    {topicsFromDeals.map((topic, index) => (
+                      <Link to={`../../${topic.url}`}>
+                        <Button secondary label={topic.title} size="small" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="container-tags">
+              <div className="badges">
+                <p>App: </p>
+                <div>
+                  <Link to={`/apps/${app.app_id}`} target="_blank">
+                    <Button
+                      secondary
+                      label={app.appTitle}
+                      size="small"
+                      icon={
+                        <FontAwesomeIcon
+                          icon={faArrowUpRightFromSquare}
+                          size="sm"
+                        />
+                      }
+                    />
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="container-tags">
+              <div className="badges">
+                <p>Topic: </p>
+                <div>
+                  <Link to={`/deals/topic/${app.topic_id}`} target="_blank">
+                    <Button
+                      secondary
+                      label={app.topicTitle}
+                      size="small"
+                      icon={
+                        <FontAwesomeIcon
+                          icon={faArrowUpRightFromSquare}
+                          size="sm"
+                        />
+                      }
+                    />
+                  </Link>
+                </div>
+              </div>
+              <div className="badges">
+                <p>Category: </p>
+                <div>
+                  <Link
+                    to={`/deals/category/${app.category_id}`}
+                    target="_blank"
+                  >
+                    <Button
+                      secondary
+                      label={app.categoryTitle}
+                      size="small"
+                      icon={
+                        <FontAwesomeIcon
+                          icon={faArrowUpRightFromSquare}
+                          size="sm"
+                        />
+                      }
+                    />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {keywords.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Tags: </p>
+                  <div className="badges-keywords">
+                    {keywords.map((keyword) => (
+                      <Badge secondary label={keyword.title} size="small" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          {app.appUrlAppStore || app.appUrlGooglePlayStore ? (
+            <div className="container-appview-box">
+              <h2>Download {app.appTitle} app</h2>
+              <div className="container-store-logos">
+                {app.appUrlAppStore && (
+                  <Link
+                    target="_blank"
+                    to={app.appUrlAppStore}
+                    className="simple-link"
+                  >
+                    <img
+                      src={appStoreLogo}
+                      alt="App Store logo"
+                      className="logo-store"
+                    />
+                  </Link>
+                )}
+                {app.appUrlGooglePlayStore && (
+                  <Link
+                    target="_blank"
+                    to={app.appUrlGooglePlayStore}
+                    className="simple-link"
+                  >
+                    <img
+                      src={googlePlayStoreLogo}
+                      alt="Google Play store logo"
+                      className="logo-store"
+                    />
+                  </Link>
+                )}
+              </div>
+            </div>
+          ) : (
+            ''
+          )}
+          {app.appAppleId && appAppStore && (
+            <div className="container-appview-box">
+              <h2>{app?.appTitle} app</h2>
+              <p className="app-description">{appAppStore?.description}</p>
+            </div>
+          )}
+          {!app.appAppleId && app.appDescription && (
+            <div className="container-appview-box">
+              <h2>{app?.appTitle} app</h2>
+              <p className="app-description">
+                <Markdown>{app?.appDescription}</Markdown>
+              </p>
+            </div>
+          )}
+          {app.contact && (
+            <div className="container-appview-box">
+              <h2>{app.title} support</h2>
+              <div>
+                <Link to={`mailto:${app.contact}`} target="_blank">
+                  <Button
+                    secondary
+                    icon={<FontAwesomeIcon icon={faEnvelope} size="sm" />}
+                    label={`Contact ${app.appTitle} support`}
+                  />
+                </Link>
+              </div>
+            </div>
+          )}
+          {/* <div className="container-related-searches">
+            <h3>Related searches</h3>
+            <div className="topics-div searches">
+              {searches.map((search) => (
+                <Link to={`/apps/search/${search.id}`} target="_blank">
+                  <Button secondary label={search.title} />
+                </Link>
+              ))}
+            </div>
+          </div> */}
+          <div className="icons-apps-page">
+            <span>Share it: </span>
+            <FontAwesomeIcon
+              icon={faLink}
+              className="button-copy"
+              onClick={() =>
+                copyToClipboard(`https://www.topappdeals.com/deals/${app.id}`)
+              }
+            />
+            <FacebookShareButton url={`/Apps/${app.id}`}>
+              <FontAwesomeIcon className="share-icon" icon={faFacebookF} />
+            </FacebookShareButton>
+            <TwitterShareButton
+              url={`https://www.topappdeals.com/deals/${app.id}`}
+              title={`Check out this GPT App: '${app.title}'`}
+              hashtags={['Apps']}
+            >
+              <FontAwesomeIcon className="share-icon" icon={faTwitter} />
+            </TwitterShareButton>
+            <LinkedinShareButton
+              url={`https://www.topappdeals.com/deals/${app.id}`}
+            >
+              <FontAwesomeIcon className="share-icon" icon={faLinkedinIn} />
+            </LinkedinShareButton>
+            <EmailShareButton
+              subject="Check out this deal!"
+              body={`This app deal is great: '${app.title}'`}
+              url={`https://www.topappdeals.com/deals/${app.id}`}
+            >
+              <FontAwesomeIcon icon={faEnvelope} />
+            </EmailShareButton>
+          </div>
+          <ContainerCta user={user} />
+          {similarDealsFromApp.length > 0 && (
+            <div className="container-alternatives">
+              <h2>🔎 Other deals from {app.appTitle} app</h2>
+              <div className="container-cards small-cards">
+                {cardItemsSimilarDealsFromApp}
+              </div>
+            </div>
+          )}
           {similarApps.length > 0 && (
             <div className="container-alternatives">
-              <h3>🔎 Similar to {app.title}</h3>
+              <h2>🔎 Similar deals in {app.topicTitle}</h2>
               <div className="container-cards small-cards">{cardItems}</div>
+            </div>
+          )}
+          {searches.length > 0 && (
+            <div className="container-alternatives">
+              <h2>🔎 Related searches</h2>
+              <div className="container-related-searches">{searchItems}</div>
             </div>
           )}
         </section>

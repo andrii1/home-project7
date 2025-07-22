@@ -69,11 +69,7 @@ export const Card = ({
 
   return (
     <div className={listCard ? 'card-list' : 'card-category'}>
-      <Link
-        to={cardUrl}
-        target="_blank"
-        className={`card-image ${listCard ? 'list' : ''}`}
-      >
+      <Link to={cardUrl} className={`card-image ${listCard ? 'list' : ''}`}>
         <img
           className={`${listCard ? 'img-app-icon-list' : 'img-app-icon'} ${
             urlImageIcon ? 'icon-shadow' : ''
@@ -86,10 +82,10 @@ export const Card = ({
       <div className={`card-body ${listCard ? 'list' : ''}`}>
         <div className="card-header">
           <div className="card-title">
-            <Link to={cardUrl} target="_blank">
+            <Link to={cardUrl}>
               <h2>{title}</h2>
             </Link>
-            <Link to={cardUrl} target="_blank">
+            <Link to={cardUrl}>
               <FontAwesomeIcon
                 className="icon-card"
                 icon={faArrowUpRightFromSquare}
@@ -153,48 +149,6 @@ export const Card = ({
       </div>
     </div>
   );
-
-  //   return (
-  //     <div className="card-list">
-  //       <Link
-  //         to={`/apps/${id}`}
-  //         target="_blank"
-  //         className="card-image list"
-  //         style={{
-  //           backgroundImage: `url(/assets/images/finalscout-sm.png)`,
-  //           backgroundRepeat: 'no-repeat',
-  //           backgroundSize: 'cover',
-  //         }}
-  //       />
-  //       <div className="card-body list">
-  //         <div className="card-header">
-  //           <div className="card-title">
-  //             <Link to={`/apps/${id}`} target="_blank">
-  //               <h2>{title}</h2>
-  //             </Link>
-  //             <Link to={`/apps/${id}`} target="_blank">
-  //               <FontAwesomeIcon
-  //                 className="icon-card"
-  //                 icon={faArrowUpRightFromSquare}
-  //                 style={{ color: '#e5989b' }}
-  //                 size="lg"
-  //               />
-  //             </Link>
-  //           </div>
-  //           <Badge label={pricingType} size="small" />
-  //         </div>
-  //         <div className="card-description">
-  //           {`${description.split(' ').slice(0, 35).join(' ')}...`}
-  //         </div>
-  //         <div className="topics-bookmark">
-  //           <Link to={`/apps/topic/${topicId}`}>
-  //             <Button label={topic} size="small" />
-  //           </Link>
-  //           <FontAwesomeIcon icon={faHeart} size="lg" />
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
 };
 
 Card.propTypes = {

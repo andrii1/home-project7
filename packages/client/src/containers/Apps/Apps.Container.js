@@ -569,6 +569,7 @@ export const Apps = () => {
                     setOpenModal(true);
                     setModalTitle('Sign up to add bookmarks');
                   }}
+                  cardUrl={`/apps/${app.id}`}
                 />
               );
             })}

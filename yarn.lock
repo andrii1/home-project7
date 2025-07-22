@@ -9625,6 +9625,7 @@ __metadata:
     file-saver: ^2.0.5
     firebase: ^9.21.0
     lucide-react: ^0.525.0
+    markdown-to-jsx: ^7.7.12
     prop-types: ^15.8.1
     react: ^18.0.0
     react-bootstrap: ^2.7.2
@@ -16858,6 +16859,15 @@ __metadata:
   version: 1.0.4
   resolution: "markdown-escapes@npm:1.0.4"
   checksum: 6833a93d72d3f70a500658872312c6fa8015c20cc835a85ae6901fa232683fbc6ed7118ebe920fea7c80039a560f339c026597d96eee0e9de602a36921804997
+  languageName: node
+  linkType: hard
+
+"markdown-to-jsx@npm:^7.7.12":
+  version: 7.7.12
+  resolution: "markdown-to-jsx@npm:7.7.12"
+  peerDependencies:
+    react: ">= 0.14.0"
+  checksum: 4be328002d3775ae3f7446aaeeb9399702d713c5803f2f0f373a0ec664a5c369e02a2e3cb0ca4e0cc25228138dde3c0cd4046cac3d838fa0c7b596ac6aef4f70
   languageName: node
   linkType: hard
 
