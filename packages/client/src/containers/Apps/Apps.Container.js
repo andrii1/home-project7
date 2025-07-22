@@ -365,13 +365,13 @@ export const Apps = () => {
   if (topicIdParam) {
     pageTitle = `${topics
       .filter((topic) => topic.id === parseInt(topicIdParam, 10))
-      .map((item) => item.title)} - AI apps`;
+      .map((item) => item.title)} - apps`;
   } else if (categoryIdParam) {
     pageTitle = `${categories
       .filter((category) => category.id === parseInt(categoryIdParam, 10))
-      .map((item) => item.title)} - AI apps`;
+      .map((item) => item.title)} - apps`;
   } else {
-    pageTitle = 'Apps With AI - browse 200+ AI apps';
+    pageTitle = 'Apps - browse apps';
   }
 
   const sortOptions = ['Recent', 'A-Z', 'Z-A'];
@@ -456,11 +456,11 @@ export const Apps = () => {
     <main>
       <Helmet>
         <title>{pageTitle}</title>
-        <meta name="description" content="Find best AI apps for free" />
+        <meta name="description" content="Find best apps for free" />
       </Helmet>
       {/* <div className="hero"></div> */}
-      <div className="hero">
-        <h1 className="hero-header">Browse 200+ AI apps</h1>
+      <div className="hero apps">
+        <h1 className="hero-header">Browse best apps</h1>
       </div>
       <section className={`container-topics ${showTopicsContainer && 'show'}`}>
         {topicsList}
@@ -556,7 +556,7 @@ export const Apps = () => {
                   title={app.title}
                   description={app.description}
                   url={app.url}
-                  urlImage={app.url_image}
+                  urlImage={app.url_icon}
                   topic={app.topicTitle}
                   topicId={app.topic_id}
                   pricingType={app.pricing_type}

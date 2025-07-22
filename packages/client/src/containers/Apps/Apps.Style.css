@@ -16,11 +16,12 @@ main {
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  margin: 1rem 0 2rem 0;
+  margin: 3rem 0 2rem 0;
 }
 
 .hero h1 {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0rem;
+  margin-top: 0rem;
 }
 
 .hero form {
