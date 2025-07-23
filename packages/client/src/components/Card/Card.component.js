@@ -86,12 +86,12 @@ export const Card = ({
               <h2>{title}</h2>
             </Link>
             <Link to={cardUrl}>
-              <FontAwesomeIcon
+              {/* <FontAwesomeIcon
                 className="icon-card"
                 icon={faArrowUpRightFromSquare}
                 style={{ color: '#e5989b' }}
                 size="lg"
-              />
+              /> */}
             </Link>
           </div>
           {/* <Badge label={appTitle} size="small" /> */}

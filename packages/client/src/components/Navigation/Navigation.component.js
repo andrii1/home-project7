@@ -252,7 +252,7 @@ export const Navigation = () => {
                         }}
                         className="login submit nav-link"
                       >
-                        Add your referral code
+                        Add your app
                       </NavLink>
                     )}
                   </li>
