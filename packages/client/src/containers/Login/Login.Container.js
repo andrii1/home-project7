@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../userContext';
 import { Button } from '../../components/Button/Button.component';
 import './Login.Style.css';
+import { addUserToDb } from '../../utils/addUserToDb';
 
 function Login() {
   const { logInWithEmailAndPassword, signInWithGoogle, loading, user } =
@@ -15,7 +16,11 @@ function Login() {
       // maybe trigger a loading screen
       return;
     }
-    if (user) navigate('/');
+    if (user) {
+      const nameToDb = user.displayName || '';
+      addUserToDb(user, nameToDb);
+      navigate('/');
+    }
   }, [user, loading, navigate]);
   return (
     <div className="form-container signup-container">

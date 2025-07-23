@@ -307,7 +307,10 @@ export const Navigation = () => {
                     </Button>
                   )}
                   {!hamburgerUserOpen && (
-                    <ProfileImage name={name} onClick={toggleHamburgerUser} />
+                    <ProfileImage
+                      name={name || user?.displayName || user?.email}
+                      onClick={toggleHamburgerUser}
+                    />
                   )}
 
                   <div
@@ -429,7 +432,7 @@ export const Navigation = () => {
             </li> */}
             {user ? (
               <div className="container-logged-in">
-                <ProfileImage name={name} />
+                <ProfileImage name={name || user?.displayName || user?.email} />
                 <div className="dropdown-content">
                   <NavLink to="/bookmarks" className="login">
                     Bookmarks

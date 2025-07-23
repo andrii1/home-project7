@@ -1,5 +1,15 @@
 const knex = require('../../config/db');
 
+const checkIfUserExists = async (token) => {
+  try {
+    const userUid = token.split(' ')[1];
+    const user = (await knex('users').where({ uid: userUid }))[0];
+    return { exists: !!user };
+  } catch (error) {
+    return error.message;
+  }
+};
+
 // post
 const createUsers = async (body) => {
   try {
@@ -18,4 +28,5 @@ const createUsers = async (body) => {
 
 module.exports = {
   createUsers,
+  checkIfUserExists,
 };

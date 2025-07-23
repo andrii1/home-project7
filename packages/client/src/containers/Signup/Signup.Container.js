@@ -4,6 +4,7 @@ import { apiURL } from '../../apiURL';
 import { useUserContext } from '../../userContext';
 import './Signup.Style.css';
 import { Button } from '../../components/Button/Button.component';
+import { addUserToDb } from '../../utils/addUserToDb';
 
 export const Signup = () => {
   const { user, loading, registerWithEmailAndPassword, signInWithGoogle } =
@@ -13,18 +14,18 @@ export const Signup = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const addUserToDb = useCallback(async (userCreated, fullName) => {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        full_name: fullName,
-        email: userCreated.email,
-        uid: userCreated?.uid,
-      }),
-    };
-    await fetch(`${apiURL()}/users`, requestOptions);
-  }, []);
+  // const addUserToDb = useCallback(async (userCreated, fullName) => {
+  //   const requestOptions = {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       full_name: fullName,
+  //       email: userCreated.email,
+  //       uid: userCreated?.uid,
+  //     }),
+  //   };
+  //   await fetch(`${apiURL()}/users`, requestOptions);
+  // }, []);
   const register = () => {
     /* if (!name) alert('Please enter name'); add error handling */
     registerWithEmailAndPassword(name, email, password);
@@ -32,16 +33,11 @@ export const Signup = () => {
   useEffect(() => {
     if (loading) return;
     if (user) {
-      let nameToDb;
-      if (user.displayName) {
-        nameToDb = user.displayName;
-      } else {
-        nameToDb = name;
-      }
+      const nameToDb = user.displayName || name || '';
       addUserToDb(user, nameToDb);
       navigate('/');
     }
-  }, [user, name, loading, addUserToDb, navigate]);
+  }, [user, name, loading, navigate]);
   return (
     <div className="form-container signup-container">
       <div className="form-box signup-box">

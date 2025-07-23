@@ -31,7 +31,8 @@ h1 {
   font-size: 2.5rem;
 }
 
-input[type='text'] {
+input[type='text'],
+input[type='password'] {
   height: 2.5rem;
   padding: 1rem 1rem;
   min-width: 15rem;

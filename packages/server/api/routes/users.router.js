@@ -37,6 +37,15 @@ const usersController = require('../controllers/users.controller');
  *      5XX:
  *        description: Unexpected error.
  */
+
+router.get('/check', (req, res, next) => {
+  const { token } = req.headers;
+  usersController
+    .checkIfUserExists(token)
+    .then((result) => res.json(result))
+    .catch(next);
+});
+
 router.post('/', (req, res, next) => {
   usersController
     .createUsers(req.body)
