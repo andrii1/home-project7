@@ -440,6 +440,8 @@ export const Apps = () => {
     deleteFavorites();
   };
 
+  console.log('result', apps);
+
   return (
     <main>
       <Helmet>
@@ -568,8 +570,8 @@ export const Apps = () => {
                   description={app.description}
                   url={app.url}
                   urlImage={app.url_icon || mousePointer}
-                  topic={app.topicTitle}
-                  topicId={app.topic_id}
+                  topic={app.categoryTitle}
+                  topicId={app.category_id}
                   pricingType={app.pricing_type}
                   isFavorite={favorites.some((x) => x.id === app.id)}
                   addFavorite={(event) => addFavorite(app.id)}

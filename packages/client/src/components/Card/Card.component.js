@@ -112,7 +112,7 @@ export const Card = ({
             {/* <Link target="_blank" to={`/deals/app/${appId}`}>
               <Button secondary label={appTitle} size="small" />
             </Link> */}
-            <Link target="_blank" to={`/apps/topic/${topicId}`}>
+            <Link to={`/apps/category/${topicId}`}>
               <Button secondary label={topic} size="small" />
             </Link>
           </div>
