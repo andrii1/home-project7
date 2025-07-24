@@ -88,7 +88,7 @@ export const AppView = () => {
     addLike: addNegativeLike,
     deleteLike: deleteNegativeLike,
   } = useLikes(user, 'negativeLikes');
-  console.log(app, 'appresult', appAppStore);
+
   useEffect(() => {
     async function fetchSingleApp(appId) {
       const response = await fetch(`${apiURL()}/apps/${appId}`);

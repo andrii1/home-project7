@@ -440,8 +440,6 @@ export const Apps = () => {
     deleteFavorites();
   };
 
-  console.log('result', apps);
-
   return (
     <main>
       <Helmet>
