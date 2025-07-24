@@ -1,4 +1,5 @@
 const normalizeUrl = (url) => {
+  if (!url || typeof url !== 'string') return ''; // ✅ Early return for bad input
   try {
     const u = new URL(url.trim().toLowerCase());
 

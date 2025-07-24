@@ -1,10 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* TODO: This is an example controller to illustrate a server side controller.
 Can be deleted as soon as the first real controller is added. */
+const generateSlug = require('../lib/utils/generateSlug');
+const { normalizeUrl } = require('../lib/utils/normalizeUrl');
 
 const knex = require('../../config/db');
 const HttpError = require('../lib/utils/http-error');
-const { normalizeUrl } = require('../lib/utils/normalizeUrl');
 const OpenAI = require('openai');
 
 const openai = new OpenAI({
@@ -20,6 +21,28 @@ const getOppositeOrderDirection = (direction) => {
   }
   return lastItemDirection;
 };
+
+// Helper: ensure the slug is unique by checking the DB
+async function ensureUniqueSlug(baseSlug) {
+  let slug = baseSlug;
+  let counter = 1;
+
+  // eslint-disable-next-line no-await-in-loop
+  while (await slugExists(slug)) {
+    const suffix = `-${counter}`;
+    const maxBaseLength = 200 - suffix.length;
+    slug = `${baseSlug.slice(0, maxBaseLength)}${suffix}`;
+    counter += 1;
+  }
+
+  return slug;
+}
+
+// Helper: check if a slug already exists in the database
+async function slugExists(slug) {
+  const existing = await knex('tags').where({ slug }).first();
+  return !!existing;
+}
 
 const getAppsAll = async () => {
   try {
@@ -317,6 +340,48 @@ const createAppNode = async (token, body) => {
     //   });
     //   topicId = newTopic;
     // }
+
+    const promptTags = `Create 3-4 tags for this app: "${body.title}"${
+      body.url ? ` with website ${body.url}` : ''
+    }. Tag should be without hashtag, can be multiple words, which describes the app or it can be app topic. Return tags separated by comma.`;
+
+    const completionTags = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: promptTags }],
+      temperature: 0.7,
+      max_tokens: 3000,
+    });
+
+    const tagsString = completionTags.choices[0].message.content.trim();
+
+    const tagsArray = tagsString
+      .split(',')
+      .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
+      .filter(Boolean);
+
+    // if (body.tag) {
+    //   tagsArray.push(body.tag);
+    // }
+
+    const tagIds = await Promise.all(
+      tagsArray.map(async (tag) => {
+        const existingTag = await knex('tags')
+          .whereRaw('LOWER(title) = ?', [tag.toLowerCase()])
+          .first();
+
+        if (existingTag) {
+          return existingTag.id;
+        }
+        const baseSlug = generateSlug(tag);
+        const uniqueSlug = await ensureUniqueSlug(baseSlug);
+        const [tagId] = await knex('tags').insert({
+          title: tag,
+          slug: uniqueSlug,
+        }); // just use the ID
+        return tagId;
+      }),
+    );
+
     if (body.apple_id) {
       const url = `https://itunes.apple.com/lookup?id=${body.apple_id}`;
       const response = await fetch(url);
@@ -347,25 +412,39 @@ const createAppNode = async (token, body) => {
         });
       }
 
+      const insertedAppToTags = await Promise.all(
+        tagIds.map((tagId) =>
+          knex('tagsApps').insert({
+            app_id: appId,
+            tag_id: tagId,
+          }),
+        ),
+      );
+
       return {
         successful: true,
         appId,
         appTitle: body.title,
         appAppleId: body.apple_id,
+        insertedAppToTags,
       };
     }
 
     // Generate a short description using OpenAI
-    const prompt = `Write a short, engaging description for app "${body.title}" with website "${body.url}".`;
+    const prompt = `Write a short, engaging description for app "${
+      body.title
+    }"${body.url ? ` with website ${body.url}` : ''}.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 3000,
     });
 
-    const description = completion.choices[0].message.content.trim();
+    const descContent = completion.choices[0].message.content;
+
+    const description = descContent.trim();
 
     const [appId] = await knex('apps').insert({
       title: body.title,
@@ -374,11 +453,21 @@ const createAppNode = async (token, body) => {
       description,
     });
 
+    const insertedAppToTags = await Promise.all(
+      tagIds.map((tagId) =>
+        knex('tagsApps').insert({
+          app_id: appId,
+          tag_id: tagId,
+        }),
+      ),
+    );
+
     return {
       successful: true,
       appId,
       appTitle: body.title,
       url: body.url,
+      insertedAppToTags,
     };
   } catch (error) {
     return error.message;

@@ -300,6 +300,10 @@ img.copy-referral-code.smaller-icon {
   height: 32rem;
 }
 
+.submit-box-new-comment {
+  width: 100%;
+}
+
 @media only screen and (max-width: 768px) {
   .badges {
     align-items: self-start;

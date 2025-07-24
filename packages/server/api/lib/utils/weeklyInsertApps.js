@@ -31,21 +31,6 @@ async function fetchAppByAppleId(appleId) {
   return data.results[0];
 }
 
-async function createTopicWithChatGpt(category, app, appDescription) {
-  // Generate a short description using OpenAI
-  const prompt = `Generate a subcategory (or a topic) for this app: ${app}, which is in this Apple App Store category: ${category}, which has this app description: ${appDescription}. It should be 1 or 2 or 3 words maximum. Ideally 1 or 2 words.`;
-
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.7,
-    max_tokens: 100,
-  });
-
-  const topic = completion.choices[0].message.content.trim();
-  return topic;
-}
-
 async function insertCategory(title, categoryAppleId) {
   const res = await fetch(`${API_PATH}/categories`, {
     method: 'POST',
@@ -59,23 +44,10 @@ async function insertCategory(title, categoryAppleId) {
   return data; // assume it returns { id, full_name }
 }
 
-async function insertTopic(title, categoryId) {
-  const res = await fetch(`${API_PATH}/topics`, {
-    method: 'POST',
-    headers: {
-      token: `token ${USER_UID}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ title, category_id: categoryId }),
-  });
-  const data = await res.json();
-  return data; // assume it returns { id, full_name }
-}
-
-async function insertApp({ appTitle, appleId, appUrl, topicId }) {
+async function insertApp({ appTitle, appleId, appUrl, categoryId }) {
   const body = {
     title: appTitle,
-    topic_id: topicId,
+    category_id: categoryId,
   };
 
   if (appleId) {
@@ -113,18 +85,18 @@ const insertApps = async (appsParam) => {
     const { categoryId } = newCategory;
     console.log('Inserted category:', newCategory);
 
-    const createdTopic = await createTopicWithChatGpt(
-      category,
-      appTitle,
-      appDescription,
-    );
-    console.log('createdTopic', createdTopic);
+    // const createdTopic = await createTopicWithChatGpt(
+    //   category,
+    //   appTitle,
+    //   appDescription,
+    // );
+    // console.log('createdTopic', createdTopic);
 
-    const newTopic = await insertTopic(createdTopic, categoryId);
-    const { topicId } = newTopic;
-    console.log('Inserted topic:', newTopic);
+    // const newTopic = await insertTopic(createdTopic, categoryId);
+    // const { topicId } = newTopic;
+    // console.log('Inserted topic:', newTopic);
 
-    const newApp = await insertApp({ appTitle, appleId, appUrl, topicId });
+    const newApp = await insertApp({ appTitle, appleId, appUrl, categoryId });
     const { appId } = newApp;
     const newAppTitle = newApp.appTitle;
     console.log('Inserted app:', newApp);
