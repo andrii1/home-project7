@@ -82,11 +82,11 @@ export const Navigation = () => {
     //   }
     // }
 
-    async function fetchTopics() {
-      const response = await fetch(`${apiURL()}/topics/`);
-      const data = await response.json();
-      setTopics(data);
-    }
+    // async function fetchTopics() {
+    //   const response = await fetch(`${apiURL()}/topics/`);
+    //   const data = await response.json();
+    //   setTopics(data);
+    // }
 
     async function fetchCategories() {
       const response = await fetch(`${apiURL()}/categories/`);
@@ -101,7 +101,7 @@ export const Navigation = () => {
     }
 
     fetchApps();
-    fetchTopics();
+    // fetchTopics();
     fetchCategories();
   }, []);
 

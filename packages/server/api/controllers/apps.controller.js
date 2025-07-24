@@ -24,14 +24,8 @@ const getOppositeOrderDirection = (direction) => {
 const getAppsAll = async () => {
   try {
     const apps = knex('apps')
-      .select(
-        'apps.*',
-        'topics.title as topicTitle',
-        'topics.category_id as category_id',
-        'categories.title as categoryTitle',
-      )
-      .join('topics', 'apps.topic_id', '=', 'topics.id')
-      .join('categories', 'topics.category_id', '=', 'categories.id');
+      .select('apps.*', 'categories.title as categoryTitle')
+      .join('categories', 'apps.category_id', '=', 'categories.id');
     return apps;
   } catch (error) {
     return error.message;
@@ -43,14 +37,8 @@ const getApps = async (page, column, direction) => {
   try {
     const getModel = () =>
       knex('apps')
-        .select(
-          'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
-          'categories.title as categoryTitle',
-        )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id');
+        .select('apps.*', 'categories.title as categoryTitle')
+        .join('categories', 'apps.category_id', '=', 'categories.id');
     const lastItem = await getModel()
       .orderBy(column, lastItemDirection)
       .limit(1);
@@ -72,14 +60,8 @@ const getAppsPagination = async (column, direction, page, size) => {
   try {
     const getModel = () =>
       knex('apps')
-        .select(
-          'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
-          'categories.title as categoryTitle',
-        )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id')
+        .select('apps.*', 'categories.title as categoryTitle')
+        .join('categories', 'apps.category_id', '=', 'categories.id')
         .orderBy(column, direction);
     const totalCount = await getModel()
       .count('apps.id', { as: 'rows' })
@@ -104,14 +86,8 @@ const getAppsSearch = async (search, column, direction, page, size) => {
   try {
     const getModel = () =>
       knex('apps')
-        .select(
-          'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
-          'categories.title as categoryTitle',
-        )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id')
+        .select('apps.*', 'categories.title as categoryTitle')
+        .join('categories', 'apps.category_id', '=', 'categories.id')
         .orderBy(column, direction)
         .where('apps.title', 'like', `%${search}%`);
     const totalCount = await getModel()
@@ -133,118 +109,13 @@ const getAppsSearch = async (search, column, direction, page, size) => {
   }
 };
 
-const getAppsByCategoriesSearch = async (
-  search,
-  categories,
-  column,
-  direction,
-  page,
-  size,
-) => {
-  try {
-    const getModel = () =>
-      knex('apps')
-        .select(
-          'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
-          'categories.title as categoryTitle',
-        )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id')
-        .whereIn('category_id', categories)
-        .where('apps.title', 'like', `%${search}%`)
-        .orderBy(column, direction);
-    const totalCount = await getModel()
-      .count('apps.id', { as: 'rows' })
-      .groupBy('apps.id');
-    const data = await getModel()
-      .offset(page * size)
-      .limit(size)
-      .select();
-    const dataExport = await getModel().select();
-    return {
-      totalCount: totalCount.length,
-      data,
-      dataExport,
-    };
-  } catch (error) {
-    return error.message;
-  }
-};
-
 const getAppsByCategories = async (categories) => {
   try {
     const apps = await knex('apps')
-      .select(
-        'apps.*',
-        'topics.title as topicTitle',
-        'topics.category_id as category_id',
-        'categories.title as categoryTitle',
-      )
-      .join('topics', 'apps.topic_id', '=', 'topics.id')
-      .join('categories', 'topics.category_id', '=', 'categories.id')
+      .select('apps.*', 'categories.title as categoryTitle')
+      .join('categories', 'apps.category_id', '=', 'categories.id')
       .whereIn('category_id', categories);
 
-    return apps;
-  } catch (error) {
-    return error.message;
-  }
-};
-
-const getAppsByTopicsSearch = async (
-  search,
-  topics,
-  column,
-  direction,
-  page,
-  size,
-) => {
-  try {
-    const getModel = () =>
-      knex('apps')
-        .select(
-          'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
-          'categories.title as categoryTitle',
-        )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id')
-        .whereIn('topic_id', topics)
-        .where('apps.title', 'like', `%${search}%`)
-        .orderBy(column, direction);
-    const totalCount = await getModel()
-      .count('apps.id', { as: 'rows' })
-      .groupBy('apps.id');
-    const data = await getModel()
-      .offset(page * size)
-      .limit(size)
-      .select();
-    const dataExport = await getModel().select();
-    return {
-      totalCount: totalCount.length,
-      data,
-      dataExport,
-    };
-  } catch (error) {
-    return error.message;
-  }
-};
-
-const getAppsByTopics = async (topics) => {
-  try {
-    const apps = await knex('apps')
-      .select(
-        'apps.*',
-        'topics.title as topicTitle',
-        'topics.category_id as category_id',
-        'categories.title as categoryTitle',
-      )
-      .join('topics', 'apps.topic_id', '=', 'topics.id')
-      .join('categories', 'topics.category_id', '=', 'categories.id')
-      .whereIn('topic_id', topics)
-      .orderBy('id', 'asc');
     return apps;
   } catch (error) {
     return error.message;
@@ -256,49 +127,12 @@ const getAppsByCategory = async (category, page, column, direction) => {
   try {
     const getModel = () =>
       knex('apps')
-        .select(
-          'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
-          'categories.title as categoryTitle',
-        )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id')
+        .select('apps.*', 'categories.title as categoryTitle')
+        .join('categories', 'apps.category_id', '=', 'categories.id')
         .where({
-          'topics.category_id': category,
+          'apps.category_id': category,
         });
 
-    const lastItem = await getModel()
-      .orderBy(column, lastItemDirection)
-      .limit(1);
-    const data = await getModel()
-      .orderBy(column, direction)
-      .offset(page * 10)
-      .limit(10)
-      .select();
-    return {
-      lastItem: lastItem[0],
-      data,
-    };
-  } catch (error) {
-    return error.message;
-  }
-};
-
-const getAppsByTopic = async (topic, page, column, direction) => {
-  const lastItemDirection = getOppositeOrderDirection(direction);
-  try {
-    const getModel = () =>
-      knex('apps')
-        .select(
-          'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
-          'categories.title as categoryTitle',
-        )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id')
-        .where({ topic_id: topic });
     const lastItem = await getModel()
       .orderBy(column, lastItemDirection)
       .limit(1);
@@ -320,7 +154,6 @@ const getAppsBy = async ({
   page,
   column,
   direction,
-  filteredTopics,
   filteredCategories,
   filteredPricing,
   filteredDetails,
@@ -331,18 +164,13 @@ const getAppsBy = async ({
       knex('apps')
         .select(
           'apps.*',
-          'topics.title as topicTitle',
-          'topics.category_id as category_id',
+
           'categories.title as categoryTitle',
         )
-        .join('topics', 'apps.topic_id', '=', 'topics.id')
-        .join('categories', 'topics.category_id', '=', 'categories.id')
+        .join('categories', 'apps.category_id', '=', 'categories.id')
         .modify((queryBuilder) => {
-          if (filteredTopics !== undefined) {
-            queryBuilder.where('topic_id', filteredTopics);
-          }
           if (filteredCategories !== undefined) {
-            queryBuilder.where('topics.category_id', filteredCategories);
+            queryBuilder.where('apps.category_id', filteredCategories);
           }
           if (filteredPricing !== undefined) {
             queryBuilder.whereIn('apps.pricing_type', filteredPricing);
@@ -399,14 +227,8 @@ const getAppById = async (id) => {
   }
   try {
     const app = await knex('apps')
-      .select(
-        'apps.*',
-        'topics.title as topicTitle',
-        'topics.category_id as category_id',
-        'categories.title as categoryTitle',
-      )
-      .join('topics', 'apps.topic_id', '=', 'topics.id')
-      .join('categories', 'topics.category_id', '=', 'categories.id')
+      .select('apps.*', 'categories.title as categoryTitle')
+      .join('categories', 'apps.category_id', '=', 'categories.id')
       .where({ 'apps.id': id });
     if (app.length === 0) {
       throw new HttpError(`incorrect entry with the id of ${id}`, 404);
@@ -501,12 +323,14 @@ const createAppNode = async (token, body) => {
       const data = await response.json();
       const { description } = data.results[0];
       const urlIcon = data.results[0].artworkUrl512;
+      const urlAppleId = data.results[0].sellerUrl;
+      const normalizedUrlAppleId = normalizeUrl(urlAppleId);
 
       let appId;
       if (body.url) {
         [appId] = await knex('apps').insert({
           title: body.title,
-          topic_id: body.topic_id,
+          category_id: body.category_id,
           apple_id: body.apple_id,
           description,
           url: normalizedUrl,
@@ -515,9 +339,10 @@ const createAppNode = async (token, body) => {
       } else {
         [appId] = await knex('apps').insert({
           title: body.title,
-          topic_id: body.topic_id,
+          category_id: body.category_id,
           apple_id: body.apple_id,
           description,
+          url: normalizedUrlAppleId,
           url_icon: urlIcon,
         });
       }
@@ -544,7 +369,7 @@ const createAppNode = async (token, body) => {
 
     const [appId] = await knex('apps').insert({
       title: body.title,
-      topic_id: body.topic_id,
+      category_id: body.category_id,
       url: normalizedUrl,
       description,
     });
@@ -590,11 +415,7 @@ module.exports = {
   getAppsPagination,
   getAppsSearch,
   getAppsByCategories,
-  getAppsByCategoriesSearch,
-  getAppsByTopics,
-  getAppsByTopic,
   getAppsBy,
-  getAppsByTopicsSearch,
   getAppsByCategory,
   getAppById,
   getAppsAll,

@@ -26,7 +26,7 @@ import mousePointer from '../../assets/images/mouse-pointer.svg';
 export const Apps = () => {
   const { user } = useUserContext();
   const location = useLocation();
-  const { topicIdParam, categoryIdParam } = useParams();
+  const { categoryIdParam } = useParams();
   const [searchTerms, setSearchTerms] = useState();
   const [sortOrder, setSortOrder] = useState('Recent');
   const [resultsHome, setResultsHome] = useState([]);
@@ -42,7 +42,7 @@ export const Apps = () => {
   const [filteredDetails, setFilteredDetails] = useState([]);
   const [filtersSubmitted, setFiltersSubmitted] = useState(false);
   const [showFiltersContainer, setShowFiltersContainer] = useState(false);
-  const [showTopicsContainer, setShowTopicsContainer] = useState(false);
+  const [showCategoriesContainer, setShowCategoriesContainer] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [listView, setListView] = useState(false);
@@ -78,7 +78,7 @@ export const Apps = () => {
     setIsLoading(true);
     const url = `${apiURL()}/apps?page=0&column=${orderBy.column}&direction=${
       orderBy.direction
-    }${topicIdParam !== undefined ? `&filteredTopics=${topicIdParam}` : ''}${
+    }${
       categoryIdParam !== undefined
         ? `&filteredCategories=${categoryIdParam}`
         : ''
@@ -113,7 +113,6 @@ export const Apps = () => {
     fetchData();
   }, [
     categoryIdParam,
-    topicIdParam,
     orderBy.column,
     orderBy.direction,
     filteredDetails,
@@ -128,8 +127,6 @@ export const Apps = () => {
     const url = `${apiURL()}/apps?page=${page}&column=${
       orderBy.column
     }&direction=${orderBy.direction}${
-      topicIdParam !== undefined ? `&filteredTopics=${topicIdParam}` : ''
-    }${
       categoryIdParam !== undefined
         ? `&filteredCategories=${categoryIdParam}`
         : ''
@@ -185,7 +182,6 @@ export const Apps = () => {
             item.description
               .toLowerCase()
               .includes(searchTerms.toLowerCase()) ||
-            item.topicTitle.toLowerCase().includes(searchTerms.toLowerCase()) ||
             item.categoryTitle
               .toLowerCase()
               .includes(searchTerms.toLowerCase()),
@@ -213,11 +209,11 @@ export const Apps = () => {
   }, [filteredDetails]);
 
   useEffect(() => {
-    async function fetchTopics() {
-      const response = await fetch(`${apiURL()}/topics/`);
-      const topicsResponse = await response.json();
-      setTopics(topicsResponse);
-    }
+    // async function fetchTopics() {
+    //   const response = await fetch(`${apiURL()}/topics/`);
+    //   const topicsResponse = await response.json();
+    //   setTopics(topicsResponse);
+    // }
 
     async function fetchCategories() {
       const response = await fetch(`${apiURL()}/categories/`);
@@ -226,7 +222,7 @@ export const Apps = () => {
     }
 
     // fetchApps();
-    fetchTopics();
+    // fetchTopics();
     fetchCategories();
   }, []);
 
@@ -358,11 +354,7 @@ export const Apps = () => {
     setOrderBy({ column, direction });
   }, [sortOrder]);
   let pageTitle;
-  if (topicIdParam) {
-    pageTitle = `${topics
-      .filter((topic) => topic.id === parseInt(topicIdParam, 10))
-      .map((item) => item.title)} - apps`;
-  } else if (categoryIdParam) {
+  if (categoryIdParam) {
     pageTitle = `${categories
       .filter((category) => category.id === parseInt(categoryIdParam, 10))
       .map((item) => item.title)} - apps`;
@@ -472,9 +464,11 @@ export const Apps = () => {
         <Button
           secondary
           className="button-topics"
-          onClick={(event) => setShowTopicsContainer(!showTopicsContainer)}
+          onClick={(event) =>
+            setShowCategoriesContainer(!showCategoriesContainer)
+          }
           backgroundColor="#ffe5d9"
-          label="Topics"
+          label="Categories"
           icon={<FontAwesomeIcon className="filter-icon" icon={faBookOpen} />}
         />
         <DropDownView
@@ -511,6 +505,20 @@ export const Apps = () => {
             <FontAwesomeIcon icon={faList} />
           </div>
         </Button>
+      </section>
+      <section
+        className={`container-topics-mobile ${
+          showCategoriesContainer && 'show'
+        }`}
+      >
+        <Link to="/">
+          <Button
+            primary={!categoryIdParam}
+            secondary={categoryIdParam}
+            label="All categories"
+          />
+        </Link>
+        {categoriesList}
       </section>
       <section
         className={`container-details-section ${

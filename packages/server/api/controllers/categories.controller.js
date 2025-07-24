@@ -9,8 +9,7 @@ const getCategories = async () => {
     const categories = await knex('categories')
       .select('categories.*')
       .distinct('categories.id')
-      .join('topics', 'topics.category_id', '=', 'categories.id')
-      .join('apps', 'apps.topic_id', '=', 'topics.id')
+      .join('apps', 'apps.category_id', '=', 'categories.id')
       .orderBy('categories.title');
     return categories;
   } catch (error) {

@@ -667,10 +667,10 @@ export const AppView = () => {
                     />
                   </Link>
                 )}
-                {app.appUrlGooglePlayStore && (
+                {app.url_google_play_store && (
                   <Link
                     target="_blank"
-                    to={app.appUrlGooglePlayStore}
+                    to={app.url_google_play_store}
                     className="simple-link"
                   >
                     <img
