@@ -39,6 +39,7 @@ function App() {
               element={<Apps />}
             />
             <Route exact path="/apps/search/:searchParam" element={<Apps />} />
+            <Route exact path="/apps/tag/:tagSlugParam" element={<Apps />} />
             <Route exact path="/faq" element={<Faq />} />
             <Route exact path="/apps/new" element={<Submit />} />
             <Route exact path="/success" element={<StripeSuccess />} />

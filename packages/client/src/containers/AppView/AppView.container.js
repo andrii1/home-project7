@@ -76,6 +76,7 @@ export const AppView = () => {
   const [keywords, setKeywords] = useState([]);
   const [openAddCodeForm, setOpenAddCodeForm] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [tags, setTags] = useState([]);
   const {
     likes: positiveLikes,
     allLikes: allPositiveLikes,
@@ -95,6 +96,12 @@ export const AppView = () => {
       const response = await fetch(`${apiURL()}/apps/${appId}`);
       const appResponse = await response.json();
       setApp(appResponse[0]);
+    }
+
+    async function fetchTagsForApp(appId) {
+      const response = await fetch(`${apiURL()}/tags/?app=${appId}`);
+      const data = await response.json();
+      setTags(data);
     }
 
     // async function fetchCodesForADeal(dealId) {
@@ -125,6 +132,7 @@ export const AppView = () => {
       setError(null); // Clear previous errors
       try {
         await fetchSingleApp(id);
+        await fetchTagsForApp(id);
         // await fetchCodesForADeal(id);
         // await fetchSearchesForADeal(id);
         // await fetchKeywordsForADeal(id);
@@ -511,11 +519,12 @@ export const AppView = () => {
   }
 
   console.log(app);
+  console.log('tags', tags);
 
   return (
     <>
       <Helmet>
-        <title>{`${app?.title} - TryTopApps`}</title>
+        <title>{`${app?.title} - Try Top Apps`}</title>
         <meta
           name="description"
           content={
@@ -939,6 +948,24 @@ export const AppView = () => {
                     {topicsFromDeals.map((topic, index) => (
                       <Link to={`../../${topic.url}`}>
                         <Button secondary label={topic.title} size="small" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {tags.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Tags: </p>
+                  <div className="badges-keywords">
+                    {tags.map((tag) => (
+                      <Link to={`../apps/tag/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
                       </Link>
                     ))}
                   </div>

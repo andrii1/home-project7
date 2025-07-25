@@ -304,6 +304,10 @@ img.copy-referral-code.smaller-icon {
   width: 100%;
 }
 
+.app-description ul li {
+  list-style-type: disc;
+}
+
 @media only screen and (max-width: 768px) {
   .badges {
     align-items: self-start;

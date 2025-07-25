@@ -20,6 +20,7 @@ const keywords = require('./keywords.router');
 // const threads = require('./threads.router');
 // const replies = require('./replies.router');
 // const ratingsForThreads = require('./ratingsForThreads.router');
+const tags = require('./tags.router');
 
 /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -67,5 +68,6 @@ router.use('/keywords', keywords);
 // router.use('/threads', threads);
 // router.use('/replies', replies);
 // router.use('/ratingsForThreads', ratingsForThreads);
+router.use('/tags', tags);
 
 module.exports = router;

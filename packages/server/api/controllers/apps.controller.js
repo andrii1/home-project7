@@ -349,7 +349,7 @@ const createAppNode = async (token, body) => {
 
     const promptTags = `Create 3-4 tags for this app: "${body.title}"${
       body.url ? ` with website ${body.url}` : ''
-    }. Tag should be without hashtag, can be multiple words, which describes the app or it can be app topic. Return tags separated by comma.`;
+    }. Tag should be without hashtag, can be multiple words, which describes the app or it can be app topic. Tag shouldn't contain word 'app'. Return tags separated by comma.`;
 
     const completionTags = await openai.chat.completions.create({
       model: 'gpt-4o-mini',

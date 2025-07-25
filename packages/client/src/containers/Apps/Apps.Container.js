@@ -13,6 +13,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Modal from '../../components/Modal/Modal.Component';
 import { useUserContext } from '../../userContext';
 import { capitalize } from '../../utils/capitalize';
+import { getPageMeta } from '../../utils/getPageMeta';
 
 import {
   faSearch,
@@ -27,7 +28,7 @@ import mousePointer from '../../assets/images/mouse-pointer.svg';
 export const Apps = () => {
   const { user } = useUserContext();
   const location = useLocation();
-  const { categoryIdParam, searchParam } = useParams();
+  const { categoryIdParam, searchParam, tagSlugParam } = useParams();
   const [searchTerms, setSearchTerms] = useState();
   const [sortOrder, setSortOrder] = useState('Recent');
   const [resultsHome, setResultsHome] = useState([]);
@@ -36,6 +37,7 @@ export const Apps = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const [filteredTopics, setFilteredTopics] = useState([]);
   const [filteredPricingPreview, setFilteredPricingPreview] = useState([]);
   const [filteredDetailsPreview, setFilteredDetailsPreview] = useState([]);
@@ -91,7 +93,9 @@ export const Apps = () => {
       filtersSubmitted && filteredDetails.length > 0
         ? `&filteredDetails=${encodeURIComponent(filteredDetails)}`
         : ''
-    }${searchParam !== undefined ? `&search=${searchParam}` : ''}`;
+    }${searchParam !== undefined ? `&search=${searchParam}` : ''}${
+      tagSlugParam !== undefined ? `&tag=${tagSlugParam}` : ''
+    }`;
 
     async function fetchData() {
       const response = await fetch(url);
@@ -120,6 +124,7 @@ export const Apps = () => {
     filteredPricing,
     filtersSubmitted,
     searchParam,
+    tagSlugParam,
   ]);
 
   const fetchApps = async () => {
@@ -140,7 +145,9 @@ export const Apps = () => {
       filtersSubmitted && filteredDetails.length > 0
         ? `&filteredDetails=${encodeURIComponent(filteredDetails)}`
         : ''
-    }${searchParam !== undefined ? `&search=${searchParam}` : ''}`;
+    }${searchParam !== undefined ? `&search=${searchParam}` : ''}${
+      tagSlugParam !== undefined ? `&tag=${tagSlugParam}` : ''
+    }`;
 
     const response = await fetch(url);
     const json = await response.json();
@@ -223,9 +230,16 @@ export const Apps = () => {
       setCategories(categoriesResponse);
     }
 
+    async function fetchTags() {
+      const response = await fetch(`${apiURL()}/tags/`);
+      const data = await response.json();
+      setTags(data);
+    }
+
     // fetchApps();
     // fetchTopics();
     fetchCategories();
+    fetchTags();
   }, []);
 
   const handleSearch = (event) => {
@@ -355,26 +369,14 @@ export const Apps = () => {
 
     setOrderBy({ column, direction });
   }, [sortOrder]);
-  let pageTitle;
-  let metaPageTitle;
-  let metaContent;
-  let metaDescription;
-  if (categoryIdParam) {
-    metaContent = categories
-      .filter((category) => category.id === parseInt(categoryIdParam, 10))
-      .map((item) => item.title);
-    pageTitle = `${metaContent} apps`;
-    metaPageTitle = `${metaContent} apps - Try Top Apps`;
-    metaDescription = `${metaContent} best app deals, referral codes, coupons, discounts`;
-  } else if (searchParam) {
-    pageTitle = `${capitalize(searchParam)} apps`;
-    metaPageTitle = `${capitalize(searchParam)} apps - Try Top Apps`;
-    metaDescription = `Find best ${searchParam} app deals and referral codes`;
-  } else {
-    pageTitle = 'Find best apps';
-    metaPageTitle = 'Try Top Apps - find best apps';
-    metaDescription = 'Find best apps';
-  }
+
+  const { pageMetaTitle, pageMetaDescription, pageHeaderTitle } = getPageMeta({
+    categoryIdParam,
+    categories,
+    tagSlugParam,
+    tags,
+    searchParam,
+  });
 
   const sortOptions = ['Recent', 'A-Z', 'Z-A'];
 
@@ -457,12 +459,12 @@ export const Apps = () => {
   return (
     <main>
       <Helmet>
-        <title>{metaPageTitle}</title>
-        <meta name="description" content={metaDescription} />
+        <title>{pageMetaTitle}</title>
+        <meta name="description" content={pageMetaDescription} />
       </Helmet>
       {/* <div className="hero"></div> */}
       <div className="hero apps">
-        <h1 className="hero-header">{pageTitle}</h1>
+        <h1 className="hero-header">{pageHeaderTitle}</h1>
       </div>
       <section className="container-topics-desktop">
         <Link to="/">
