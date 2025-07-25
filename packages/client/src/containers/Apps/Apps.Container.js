@@ -356,19 +356,23 @@ export const Apps = () => {
     setOrderBy({ column, direction });
   }, [sortOrder]);
   let pageTitle;
+  let metaPageTitle;
   let metaContent;
   let metaDescription;
   if (categoryIdParam) {
     metaContent = categories
       .filter((category) => category.id === parseInt(categoryIdParam, 10))
       .map((item) => item.title);
-    pageTitle = `${metaContent} - app deals`;
+    pageTitle = `${metaContent} apps`;
+    metaPageTitle = `${metaContent} apps - Try Top Apps`;
     metaDescription = `${metaContent} best app deals, referral codes, coupons, discounts`;
   } else if (searchParam) {
-    pageTitle = `${capitalize(searchParam)} App Deals`;
+    pageTitle = `${capitalize(searchParam)} apps`;
+    metaPageTitle = `${capitalize(searchParam)} apps - Try Top Apps`;
     metaDescription = `Find best ${searchParam} app deals and referral codes`;
   } else {
-    pageTitle = 'Try Top Apps - best apps';
+    pageTitle = 'Find best apps';
+    metaPageTitle = 'Try Top Apps - find best apps';
     metaDescription = 'Find best apps';
   }
 
@@ -453,15 +457,12 @@ export const Apps = () => {
   return (
     <main>
       <Helmet>
-        <title>{pageTitle}</title>
+        <title>{metaPageTitle}</title>
         <meta name="description" content={metaDescription} />
       </Helmet>
       {/* <div className="hero"></div> */}
       <div className="hero apps">
-        <h1 className="hero-header">
-          {' '}
-          {categoryIdParam || searchParam ? `${pageTitle}` : 'Find best apps'}
-        </h1>
+        <h1 className="hero-header">{pageTitle}</h1>
       </div>
       <section className="container-topics-desktop">
         <Link to="/">
