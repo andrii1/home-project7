@@ -510,6 +510,8 @@ export const AppView = () => {
     );
   }
 
+  console.log(app);
+
   return (
     <>
       <Helmet>
@@ -581,8 +583,8 @@ export const AppView = () => {
               )}
             </div>
             <div className="container-appview-buttons">
-              {app.appUrl && (
-                <Link to={app.appUrl} target="_blank">
+              {app.url && (
+                <Link to={app.url} target="_blank">
                   <Button
                     size="large"
                     secondary
@@ -592,7 +594,7 @@ export const AppView = () => {
                         size="sm"
                       />
                     }
-                    label={`Visit ${app.appTitle} website`}
+                    label="Visit website"
                   />
                 </Link>
               )}
