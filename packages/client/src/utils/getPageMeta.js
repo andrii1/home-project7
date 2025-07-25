@@ -1,4 +1,4 @@
-import { capitalize } from './capitalize';
+import { capitalizeFirstWord } from './capitalizeFirstWord';
 
 export const getPageMeta = ({
   categoryIdParam: inputCategoryIdParam,
@@ -14,7 +14,7 @@ export const getPageMeta = ({
       (category) => category.id === parseInt(inputCategoryIdParam, 10),
     );
     const title = categoryTitle?.title || 'this category';
-    const capitalizedTitle = capitalize(title);
+    const capitalizedTitle = capitalizeFirstWord(title);
 
     return {
       pageMetaTitle: `${capitalizedTitle} apps - Try Top Apps`,
@@ -26,7 +26,7 @@ export const getPageMeta = ({
   if (inputTagSlugParam) {
     const tagTitle = inputTags.find((tag) => tag.slug === inputTagSlugParam);
     const title = tagTitle?.title || 'this topic';
-    const capitalizedTitle = capitalize(title);
+    const capitalizedTitle = capitalizeFirstWord(title);
     return {
       pageMetaTitle: `${capitalizedTitle} apps - Try Top Apps`,
       pageMetaDescription: `${capitalizedTitle} apps - reviews, how to use, tutorials, deals, promo codes, errors.`,
@@ -35,7 +35,7 @@ export const getPageMeta = ({
   }
 
   if (inputSearchParam) {
-    const capitalizedSearch = capitalize(inputSearchParam);
+    const capitalizedSearch = capitalizeFirstWord(inputSearchParam);
     return {
       pageMetaTitle: `${capitalizedSearch} apps - Try Top Apps`,
       pageMetaDescription: `${capitalizedSearch} apps - reviews, how to use, tutorials, deals, promo codes, errors.`,

@@ -173,6 +173,37 @@ const getAppsByCategory = async (category, page, column, direction) => {
   }
 };
 
+const getAppsByTag = async (page, column, direction, tag) => {
+  const lastItemDirection = getOppositeOrderDirection(direction);
+  try {
+    const getModel = () =>
+      knex('apps')
+        .select(
+          'apps.*',
+          'tags.id as tagId',
+          'tags.slug as tagSlug',
+          'tags.title as tagTitle',
+        )
+        .join('tagsApps', 'tagsApps.app_id', '=', 'apps.id')
+        .join('tags', 'tags.id', '=', 'tagsApps.tag_id')
+        .where('tags.slug', '=', `${tag}`);
+    const lastItem = await getModel()
+      .orderBy(column, lastItemDirection)
+      .limit(1);
+    const data = await getModel()
+      .orderBy(column, direction)
+      .offset(page * 10)
+      .limit(10)
+      .select();
+    return {
+      lastItem: lastItem[0],
+      data,
+    };
+  } catch (error) {
+    return error.message;
+  }
+};
+
 const getAppsBy = async ({
   page,
   column,
@@ -517,4 +548,5 @@ module.exports = {
   // createApps,
   editApp,
   createAppNode,
+  getAppsByTag,
 };

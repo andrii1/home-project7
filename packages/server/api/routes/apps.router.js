@@ -78,7 +78,17 @@ router.get('/', (req, res, next) => {
   //     .then((result) => res.json(result))
   //     .catch(next);
   // }
-  else if (req.query.page) {
+  else if (req.query.tag) {
+    appsController
+      .getAppsByTag(
+        req.query.page,
+        req.query.column,
+        req.query.direction,
+        req.query.tag,
+      )
+      .then((result) => res.json(result))
+      .catch(next);
+  } else if (req.query.page) {
     appsController
       .getApps(req.query.page, req.query.column, req.query.direction)
       .then((result) => res.json(result))
