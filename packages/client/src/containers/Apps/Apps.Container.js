@@ -12,6 +12,7 @@ import DropDownView from '../../components/CategoriesListDropDown/CategoriesList
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Modal from '../../components/Modal/Modal.Component';
 import { useUserContext } from '../../userContext';
+import { capitalize } from '../../utils/capitalize';
 
 import {
   faSearch,
@@ -26,7 +27,7 @@ import mousePointer from '../../assets/images/mouse-pointer.svg';
 export const Apps = () => {
   const { user } = useUserContext();
   const location = useLocation();
-  const { categoryIdParam } = useParams();
+  const { categoryIdParam, searchParam } = useParams();
   const [searchTerms, setSearchTerms] = useState();
   const [sortOrder, setSortOrder] = useState('Recent');
   const [resultsHome, setResultsHome] = useState([]);
@@ -90,7 +91,7 @@ export const Apps = () => {
       filtersSubmitted && filteredDetails.length > 0
         ? `&filteredDetails=${encodeURIComponent(filteredDetails)}`
         : ''
-    }`;
+    }${searchParam !== undefined ? `&search=${searchParam}` : ''}`;
 
     async function fetchData() {
       const response = await fetch(url);
@@ -118,6 +119,7 @@ export const Apps = () => {
     filteredDetails,
     filteredPricing,
     filtersSubmitted,
+    searchParam,
   ]);
 
   const fetchApps = async () => {
@@ -138,7 +140,7 @@ export const Apps = () => {
       filtersSubmitted && filteredDetails.length > 0
         ? `&filteredDetails=${encodeURIComponent(filteredDetails)}`
         : ''
-    }`;
+    }${searchParam !== undefined ? `&search=${searchParam}` : ''}`;
 
     const response = await fetch(url);
     const json = await response.json();
@@ -354,12 +356,20 @@ export const Apps = () => {
     setOrderBy({ column, direction });
   }, [sortOrder]);
   let pageTitle;
+  let metaContent;
+  let metaDescription;
   if (categoryIdParam) {
-    pageTitle = `${categories
+    metaContent = categories
       .filter((category) => category.id === parseInt(categoryIdParam, 10))
-      .map((item) => item.title)} - apps`;
+      .map((item) => item.title);
+    pageTitle = `${metaContent} - app deals`;
+    metaDescription = `${metaContent} best app deals, referral codes, coupons, discounts`;
+  } else if (searchParam) {
+    pageTitle = `${capitalize(searchParam)} App Deals`;
+    metaDescription = `Find best ${searchParam} app deals and referral codes`;
   } else {
-    pageTitle = 'Apps - browse apps';
+    pageTitle = 'Try Top Apps - best apps';
+    metaDescription = 'Find best apps';
   }
 
   const sortOptions = ['Recent', 'A-Z', 'Z-A'];
@@ -444,11 +454,14 @@ export const Apps = () => {
     <main>
       <Helmet>
         <title>{pageTitle}</title>
-        <meta name="description" content="Find best apps for free" />
+        <meta name="description" content={metaDescription} />
       </Helmet>
       {/* <div className="hero"></div> */}
       <div className="hero apps">
-        <h1 className="hero-header">Browse best apps</h1>
+        <h1 className="hero-header">
+          {' '}
+          {categoryIdParam || searchParam ? `${pageTitle}` : 'Find best apps'}
+        </h1>
       </div>
       <section className="container-topics-desktop">
         <Link to="/">

@@ -25,23 +25,11 @@ const appsController = require('../controllers/apps.controller');
  *        description: Unexpected error.
  */
 router.get('/', (req, res, next) => {
-  if (req.query.filteredTopics && req.query.search) {
-    const array = req.query.filteredTopics.split(',');
-    appsController
-      .getAppsByTopicsSearch(
-        req.query.search,
-        array,
-        req.query.column,
-        req.query.direction,
-        req.query.page,
-        req.query.size,
-      )
-      .then((result) => res.json(result))
-      .catch(next);
-  } else if (
+  if (
     req.query.filteredCategories ||
     req.query.filteredPricing ||
-    req.query.filteredDetails
+    req.query.filteredDetails ||
+    req.query.search
   ) {
     let arrayPricing;
     let arrayDetails;
@@ -62,6 +50,7 @@ router.get('/', (req, res, next) => {
         filteredCategories: req.query.filteredCategories,
         filteredPricing: arrayPricing,
         filteredDetails: arrayDetails,
+        search: req.query.search,
       })
       .then((result) => res.json(result))
       .catch(next);

@@ -515,7 +515,7 @@ export const AppView = () => {
   return (
     <>
       <Helmet>
-        <title>{`${app?.title} - apps`}</title>
+        <title>{`${app?.title} - TryTopApps`}</title>
         <meta
           name="description"
           content={

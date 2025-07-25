@@ -33,12 +33,12 @@ function App() {
             <Route path="/test" element={<Prompts />} />
             <Route path="/categories" element={<Categories />} />
             <Route exact path="/apps/:id" element={<AppView />} />
-            <Route exact path="/apps/topic/:topicIdParam" element={<Apps />} />
             <Route
               exact
               path="/apps/category/:categoryIdParam"
               element={<Apps />}
             />
+            <Route exact path="/apps/search/:searchParam" element={<Apps />} />
             <Route exact path="/faq" element={<Faq />} />
             <Route exact path="/apps/new" element={<Submit />} />
             <Route exact path="/success" element={<StripeSuccess />} />
