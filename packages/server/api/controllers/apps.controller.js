@@ -180,10 +180,12 @@ const getAppsByTag = async (page, column, direction, tag) => {
       knex('apps')
         .select(
           'apps.*',
+          'categories.title as categoryTitle',
           'tags.id as tagId',
           'tags.slug as tagSlug',
           'tags.title as tagTitle',
         )
+        .join('categories', 'apps.category_id', '=', 'categories.id')
         .join('tagsApps', 'tagsApps.app_id', '=', 'apps.id')
         .join('tags', 'tags.id', '=', 'tagsApps.tag_id')
         .where('tags.slug', '=', `${tag}`);
@@ -217,11 +219,7 @@ const getAppsBy = async ({
   try {
     const getModel = () =>
       knex('apps')
-        .select(
-          'apps.*',
-
-          'categories.title as categoryTitle',
-        )
+        .select('apps.*', 'categories.title as categoryTitle')
         .join('categories', 'apps.category_id', '=', 'categories.id')
         .modify((queryBuilder) => {
           if (filteredCategories !== undefined) {
