@@ -7,8 +7,6 @@ export const getPageMeta = ({
   tags: inputTags,
   searchParam: inputSearchParam,
 }) => {
-  console.log(inputCategories);
-
   if (inputCategoryIdParam) {
     const categoryTitle = inputCategories.find(
       (category) => category.id === parseInt(inputCategoryIdParam, 10),
