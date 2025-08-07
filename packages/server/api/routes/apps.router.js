@@ -30,8 +30,12 @@ router.get('/', (req, res, next) => {
     req.query.filteredPricing ||
     req.query.filteredDetails ||
     req.query.search ||
-    req.query.filteredTags ||
-    req.query.filteredFeatures
+    req.query.tags ||
+    req.query.features ||
+    req.query.userTypes ||
+    req.query.businessModels ||
+    req.query.useCases ||
+    req.query.industries
   ) {
     let arrayPricing;
     let arrayDetails;
@@ -52,9 +56,13 @@ router.get('/', (req, res, next) => {
         filteredCategories: req.query.filteredCategories,
         filteredPricing: arrayPricing,
         filteredDetails: arrayDetails,
-        filteredTags: req.query.filteredTags,
-        filteredFeatures: req.query.filteredFeatures,
         search: req.query.search,
+        tags: req.query.tags,
+        features: req.query.features,
+        userTypes: req.query.userTypes,
+        businessModels: req.query.businessModels,
+        useCases: req.query.useCases,
+        industries: req.query.industries,
       })
       .then((result) => res.json(result))
       .catch(next);

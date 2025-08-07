@@ -214,8 +214,12 @@ const getAppsBy = async ({
   filteredPricing,
   filteredDetails,
   search,
-  filteredTags,
-  filteredFeatures,
+  tags,
+  features,
+  userTypes,
+  businessModels,
+  useCases,
+  industries,
 }) => {
   const lastItemDirection = getOppositeOrderDirection(direction);
   try {
@@ -264,21 +268,53 @@ const getAppsBy = async ({
               this.where('apps.description', 'like', `%${search}%`);
             });
           }
-          if (filteredTags !== undefined) {
-            const tagArray = filteredTags.split(',');
+          if (tags !== undefined) {
+            const tagsArray = tags.split(',');
             queryBuilder.whereIn('apps.id', function () {
               this.select('app_id')
                 .from('tagsApps')
-                .whereIn('tag_id', tagArray);
+                .whereIn('tag_id', tagsArray);
             });
           }
 
-          if (filteredFeatures !== undefined) {
-            const featureArray = filteredFeatures.split(',');
+          if (features !== undefined) {
+            const featuresArray = features.split(',');
             queryBuilder.whereIn('apps.id', function () {
               this.select('app_id')
                 .from('featuresApps')
-                .whereIn('feature_id', featureArray);
+                .whereIn('feature_id', featuresArray);
+            });
+          }
+          if (userTypes !== undefined) {
+            const userTypesArray = userTypes.split(',');
+            queryBuilder.whereIn('apps.id', function () {
+              this.select('app_id')
+                .from('userTypesApps')
+                .whereIn('userType_id', userTypesArray);
+            });
+          }
+          if (businessModels !== undefined) {
+            const businessModelsArray = businessModels.split(',');
+            queryBuilder.whereIn('apps.id', function () {
+              this.select('app_id')
+                .from('businessModelsApps')
+                .whereIn('businessModel_id', businessModelsArray);
+            });
+          }
+          if (useCases !== undefined) {
+            const useCasesArray = useCases.split(',');
+            queryBuilder.whereIn('apps.id', function () {
+              this.select('app_id')
+                .from('useCasesApps')
+                .whereIn('useCase_id', useCasesArray);
+            });
+          }
+          if (industries !== undefined) {
+            const industriesArray = industries.split(',');
+            queryBuilder.whereIn('apps.id', function () {
+              this.select('app_id')
+                .from('industriesApps')
+                .whereIn('industry_id', industriesArray);
             });
           }
         });
