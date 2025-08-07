@@ -29,7 +29,9 @@ router.get('/', (req, res, next) => {
     req.query.filteredCategories ||
     req.query.filteredPricing ||
     req.query.filteredDetails ||
-    req.query.search
+    req.query.search ||
+    req.query.filteredTags ||
+    req.query.filteredFeatures
   ) {
     let arrayPricing;
     let arrayDetails;
@@ -50,6 +52,8 @@ router.get('/', (req, res, next) => {
         filteredCategories: req.query.filteredCategories,
         filteredPricing: arrayPricing,
         filteredDetails: arrayDetails,
+        filteredTags: req.query.filteredTags,
+        filteredFeatures: req.query.filteredFeatures,
         search: req.query.search,
       })
       .then((result) => res.json(result))

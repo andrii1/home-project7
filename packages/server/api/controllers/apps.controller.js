@@ -214,6 +214,8 @@ const getAppsBy = async ({
   filteredPricing,
   filteredDetails,
   search,
+  filteredTags,
+  filteredFeatures,
 }) => {
   const lastItemDirection = getOppositeOrderDirection(direction);
   try {
@@ -251,13 +253,32 @@ const getAppsBy = async ({
             filteredDetails !== undefined &&
             filteredDetails.includes('Social media contacts')
           ) {
-            queryBuilder
-              .whereNotNull('apps.url_x')
-              .orWhereNotNull('apps.url_discord');
+            queryBuilder.where(function () {
+              this.whereNotNull('apps.url_x').orWhereNotNull(
+                'apps.url_discord',
+              );
+            });
           }
           if (search !== undefined) {
             queryBuilder.where(function () {
               this.where('apps.description', 'like', `%${search}%`);
+            });
+          }
+          if (filteredTags !== undefined) {
+            const tagArray = filteredTags.split(',');
+            queryBuilder.whereIn('apps.id', function () {
+              this.select('app_id')
+                .from('tagsApps')
+                .whereIn('tag_id', tagArray);
+            });
+          }
+
+          if (filteredFeatures !== undefined) {
+            const featureArray = filteredFeatures.split(',');
+            queryBuilder.whereIn('apps.id', function () {
+              this.select('app_id')
+                .from('featuresApps')
+                .whereIn('feature_id', featureArray);
             });
           }
         });
@@ -267,8 +288,8 @@ const getAppsBy = async ({
     const data = await getModel()
       .orderBy(column, direction)
       .offset(page * 10)
-      .limit(10)
-      .select();
+      .limit(10);
+    // .select();
     return {
       lastItem: lastItem[0],
       data,
