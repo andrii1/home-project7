@@ -418,21 +418,6 @@ const createAppNode = async (token, body) => {
       }
     }
 
-    // const existingTopic = await knex('topics')
-    //   .whereRaw('LOWER(title) = ?', [body.topicTitle.toLowerCase()])
-    //   .first();
-
-    // let topicId;
-
-    // if (existingTopic) {
-    //   topicId = existingTopic.id;
-    // } else {
-    //   const [newTopic] = await knex('topics').insert({
-    //     title: body.topicTitle,
-    //   });
-    //   topicId = newTopic;
-    // }
-
     const promptTags = `Create 3-4 tags for this app: "${body.title}"${
       body.url ? ` with website ${body.url}` : ''
     }. Tag should be without hashtag, can be multiple words, which describes the app or it can be app topic. Tag shouldn't contain word 'app'. Return tags separated by comma.`;
@@ -451,9 +436,9 @@ const createAppNode = async (token, body) => {
       .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
       .filter(Boolean);
 
-    // if (body.tag) {
-    //   tagsArray.push(body.tag);
-    // }
+    if (body.tag) {
+      tagsArray.push(body.tag);
+    }
 
     const tagIds = await Promise.all(
       tagsArray.map(async (tag) => {
@@ -482,6 +467,181 @@ const createAppNode = async (token, body) => {
       const urlIcon = data.results[0].artworkUrl512;
       const urlAppleId = data.results[0].sellerUrl;
       const normalizedUrlAppleId = normalizeUrl(urlAppleId);
+
+      const promptFeatures = `Create 3-4 features for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
+
+      const promptUserTypes = `Create 1-4 user types / target audiences for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". * E.g. Individuals, Teams, Students, Startups, Enterprises etc. User type should be without hashtag, can be multiple words. User types shouldn't contain word 'user type'. Return user types separated by comma.`;
+
+      const promptBusinessModels = `Create 1-4 business models for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. SaaS, Marketplace, Directory, Tool, Plugin, API, etc. Business model should be without hashtag, can be multiple words. Business model shouldn't contain word 'business model'. Return business models separated by comma.`;
+
+      const promptUseCases = `Create 3-4 use cases for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Social media automation, Time tracking, Resume building, Text summarization, etc. Use case should be without hashtag, can be multiple words. Use case shouldn't contain word 'use case'. Return use cases separated by comma.`;
+
+      const promptIndustries = `Create 1-4 industries for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Healthcare, Legal, Real Estate, Content Creators, Developers, etc. Industry should be without hashtag, can be multiple words. Industry shouldn't contain word 'industry'. Return industries separated by comma.`;
+
+      // features
+      const completionFeatures = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: promptFeatures }],
+        temperature: 0.7,
+        max_tokens: 3000,
+      });
+
+      const featuresString =
+        completionFeatures.choices[0].message.content.trim();
+
+      const featuresArray = featuresString
+        .split(',')
+        .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
+        .filter(Boolean);
+
+      const featuresIds = await Promise.all(
+        featuresArray.map(async (feature) => {
+          const existingFeature = await knex('features')
+            .whereRaw('LOWER(title) = ?', [feature.toLowerCase()])
+            .first();
+
+          if (existingFeature) {
+            return existingFeature.id;
+          }
+
+          const [featureId] = await knex('features').insert({
+            title: feature,
+          }); // just use the ID
+          return featureId;
+        }),
+      );
+
+      // userTypes
+      const completionUserTypes = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: promptUserTypes }],
+        temperature: 0.7,
+        max_tokens: 3000,
+      });
+
+      const userTypesString =
+        completionUserTypes.choices[0].message.content.trim();
+
+      const userTypesArray = userTypesString
+        .split(',')
+        .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
+        .filter(Boolean);
+
+      const userTypesIds = await Promise.all(
+        userTypesArray.map(async (userType) => {
+          const existingUserType = await knex('userTypes')
+            .whereRaw('LOWER(title) = ?', [userType.toLowerCase()])
+            .first();
+
+          if (existingUserType) {
+            return existingUserType.id;
+          }
+
+          const [userTypeId] = await knex('userTypes').insert({
+            title: userType,
+          }); // just use the ID
+          return userTypeId;
+        }),
+      );
+
+      // businessModels
+      const completionBusinessModels = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: promptBusinessModels }],
+        temperature: 0.7,
+        max_tokens: 3000,
+      });
+
+      const businessModelsString =
+        completionBusinessModels.choices[0].message.content.trim();
+
+      const businessModelsArray = businessModelsString
+        .split(',')
+        .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
+        .filter(Boolean);
+
+      const businessModelsIds = await Promise.all(
+        businessModelsArray.map(async (businessModel) => {
+          const existingBusinessModel = await knex('businessModels')
+            .whereRaw('LOWER(title) = ?', [businessModel.toLowerCase()])
+            .first();
+
+          if (existingBusinessModel) {
+            return existingBusinessModel.id;
+          }
+
+          const [businessModelId] = await knex('businessModels').insert({
+            title: businessModel,
+          }); // just use the ID
+          return businessModelId;
+        }),
+      );
+
+      // useCases
+      const completionUseCases = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: promptUseCases }],
+        temperature: 0.7,
+        max_tokens: 3000,
+      });
+
+      const useCasesString =
+        completionUseCases.choices[0].message.content.trim();
+
+      const useCasesArray = useCasesString
+        .split(',')
+        .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
+        .filter(Boolean);
+
+      const useCasesIds = await Promise.all(
+        useCasesArray.map(async (useCase) => {
+          const existingUseCase = await knex('useCases')
+            .whereRaw('LOWER(title) = ?', [useCase.toLowerCase()])
+            .first();
+
+          if (existingUseCase) {
+            return existingUseCase.id;
+          }
+
+          const [useCaseId] = await knex('useCases').insert({
+            title: useCase,
+          }); // just use the ID
+          return useCaseId;
+        }),
+      );
+
+      // industries
+      const completionIndustries = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: promptIndustries }],
+        temperature: 0.7,
+        max_tokens: 3000,
+      });
+
+      const industriesString =
+        completionIndustries.choices[0].message.content.trim();
+
+      const industriesArray = industriesString
+        .split(',')
+        .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
+        .filter(Boolean);
+
+      const industriesIds = await Promise.all(
+        industriesArray.map(async (industry) => {
+          const existingIndustry = await knex('industries')
+            .whereRaw('LOWER(title) = ?', [industry.toLowerCase()])
+            .first();
+
+          if (existingIndustry) {
+            return existingIndustry.id;
+          }
+
+          const [industryId] = await knex('industries').insert({
+            title: industry,
+          }); // just use the ID
+          return industryId;
+        }),
+      );
 
       let appId;
       if (body.url) {
@@ -513,12 +673,62 @@ const createAppNode = async (token, body) => {
         ),
       );
 
+      const insertedAppToFeatures = await Promise.all(
+        featuresIds.map((featureId) =>
+          knex('featuresApps').insert({
+            app_id: appId,
+            feature_id: featureId,
+          }),
+        ),
+      );
+
+      const insertedAppToUserTypes = await Promise.all(
+        userTypesIds.map((userTypeId) =>
+          knex('userTypesApps').insert({
+            app_id: appId,
+            userType_id: userTypeId,
+          }),
+        ),
+      );
+
+      const insertedAppToBusinessModels = await Promise.all(
+        businessModelsIds.map((businessModelId) =>
+          knex('businessModelsApps').insert({
+            app_id: appId,
+            businessModel_id: businessModelId,
+          }),
+        ),
+      );
+
+      const insertedAppToUseCases = await Promise.all(
+        useCasesIds.map((useCaseId) =>
+          knex('useCasesApps').insert({
+            app_id: appId,
+            useCase_id: useCaseId,
+          }),
+        ),
+      );
+
+      const insertedAppToIndustries = await Promise.all(
+        industriesIds.map((industryId) =>
+          knex('industriesApps').insert({
+            app_id: appId,
+            industry_id: industryId,
+          }),
+        ),
+      );
+
       return {
         successful: true,
         appId,
         appTitle: body.title,
         appAppleId: body.apple_id,
         insertedAppToTags,
+        insertedAppToFeatures,
+        insertedAppToUserTypes,
+        insertedAppToBusinessModels,
+        insertedAppToUseCases,
+        insertedAppToIndustries,
       };
     }
 
