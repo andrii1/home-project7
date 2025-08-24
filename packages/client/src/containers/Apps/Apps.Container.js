@@ -24,6 +24,7 @@ import {
   faBookOpen,
 } from '@fortawesome/free-solid-svg-icons';
 import mousePointer from '../../assets/images/mouse-pointer.svg';
+import { logInWithEmailAndPassword } from '../../firebase';
 
 export const Apps = () => {
   const { user } = useUserContext();
@@ -38,6 +39,7 @@ export const Apps = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredTopics, setFilteredTopics] = useState([]);
   const [filteredPricingPreview, setFilteredPricingPreview] = useState([]);
   const [filteredDetailsPreview, setFilteredDetailsPreview] = useState([]);
@@ -326,6 +328,20 @@ export const Apps = () => {
     setFilteredPricing([]);
   };
 
+  const filterHandlerCategories = (categoryId) => {
+    if (!filteredCategories.includes(categoryId)) {
+      setFilteredCategories([...filteredCategories, parseInt(categoryId, 10)]);
+    } else {
+      setFilteredCategories(
+        filteredCategories.filter(
+          (filteredCategory) => filteredCategory !== parseInt(categoryId, 10),
+        ),
+      );
+    }
+  };
+
+  console.log(filteredCategories, 'categories');
+
   const dropdownList = resultsHome.map((app) => (
     <Link key={app.id} to={`/apps/${app.id}`}>
       <li>{app.title}</li>
@@ -333,23 +349,13 @@ export const Apps = () => {
   ));
 
   const categoriesList = categories.map((category) => {
-    if (categoryIdParam) {
-      return (
-        <Link to={`/apps/category/${category.id}`}>
-          <Button
-            primary={
-              category.id.toString() === categoryIdParam.toString() && true
-            }
-            secondary={category.id !== categoryIdParam && true}
-            label={category.title}
-          />
-        </Link>
-      );
-    }
     return (
-      <Link to={`/apps/category/${category.id}`}>
-        <Button secondary label={category.title} />
-      </Link>
+      <Button
+        onClick={() => filterHandlerCategories(category.id)}
+        primary={filteredCategories.includes(category.id)}
+        secondary={!filteredCategories.includes(category.id)}
+        label={category.title}
+      />
     );
   });
 
