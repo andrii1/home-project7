@@ -473,13 +473,12 @@ export const Apps = () => {
         <h1 className="hero-header">{pageHeaderTitle}</h1>
       </div>
       <section className="container-topics-desktop">
-        <Link to="/">
-          <Button
-            primary={!categoryIdParam}
-            secondary={categoryIdParam}
-            label="All categories"
-          />
-        </Link>
+        <Button
+          primary={!filteredCategories.length > 0}
+          secondary={filteredCategories.length > 0}
+          label="All categories"
+          onClick={() => setFilteredCategories([])}
+        />
         {categoriesList}
       </section>
       <section className="container-filters">
@@ -533,13 +532,13 @@ export const Apps = () => {
           showCategoriesContainer && 'show'
         }`}
       >
-        <Link to="/">
-          <Button
-            primary={!categoryIdParam}
-            secondary={categoryIdParam}
-            label="All categories"
-          />
-        </Link>
+        <Button
+          primary={!filteredCategories.length > 0}
+          secondary={filteredCategories.length > 0}
+          label="All categories"
+          onClick={() => setFilteredCategories([])}
+        />
+
         {categoriesList}
       </section>
       <section
