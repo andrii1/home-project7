@@ -29,6 +29,7 @@ function App() {
           <Navigation />
           <Routes>
             <Route path="/" element={<Apps />} />
+            <Route path="/apps" element={<Apps />} />
             <Route path="/landing" element={<LandingPage />} />
             <Route path="/test" element={<Prompts />} />
             <Route path="/categories" element={<Categories />} />

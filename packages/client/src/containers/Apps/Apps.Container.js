@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import {
+  Link,
+  useParams,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import './Apps.Style.css';
 import { apiURL } from '../../apiURL';
@@ -72,11 +78,27 @@ export const Apps = () => {
     { title: 'Android app available', checked: false },
     { title: 'Social media contacts', checked: false },
   ]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const navigate = useNavigate();
 
   const toggleModal = () => {
     setOpenModal(false);
     document.body.style.overflow = 'visible';
   };
+
+  useEffect(() => {
+    const categoriesFromUrl = searchParams.get('categories');
+    if (categoriesFromUrl) {
+      setFilteredCategories(categoriesFromUrl.split(',').map(Number));
+    } else {
+      setFilteredCategories([]);
+    }
+
+    // ✅ reset page & apps when categories change
+    // setPage(0);
+    // setApps({ data: [], lastItem: null, hasMore: true });
+  }, [searchParams]);
 
   // first fetch
   useEffect(() => {
@@ -84,8 +106,8 @@ export const Apps = () => {
     const url = `${apiURL()}/apps?page=0&column=${orderBy.column}&direction=${
       orderBy.direction
     }${
-      categoryIdParam !== undefined
-        ? `&filteredCategories=${categoryIdParam}`
+      filteredCategories.length > 0
+        ? `&categories=${filteredCategories.join(',')}`
         : ''
     }${
       filtersSubmitted && filteredPricing.length > 0
@@ -113,13 +135,14 @@ export const Apps = () => {
         lastItem: json.lastItem,
         hasMore,
       });
-      setPage((prevPage) => prevPage + 1);
+      // setPage((prevPage) => prevPage + 1);
+      setPage(1);
       setIsLoading(false);
     }
 
     fetchData();
   }, [
-    categoryIdParam,
+    filteredCategories,
     orderBy.column,
     orderBy.direction,
     filteredDetails,
@@ -129,6 +152,8 @@ export const Apps = () => {
     tagSlugParam,
   ]);
 
+  console.log(apps, 'apps1');
+
   const fetchApps = async () => {
     setIsLoading(true);
     setError(null);
@@ -136,8 +161,8 @@ export const Apps = () => {
     const url = `${apiURL()}/apps?page=${page}&column=${
       orderBy.column
     }&direction=${orderBy.direction}${
-      categoryIdParam !== undefined
-        ? `&filteredCategories=${categoryIdParam}`
+      filteredCategories.length > 0
+        ? `&categories=${filteredCategories.join(',')}`
         : ''
     }${
       filtersSubmitted && filteredPricing.length > 0
@@ -180,6 +205,7 @@ export const Apps = () => {
     }
     return urlFilters;
   }, [filteredTopics]);
+
   useEffect(() => {
     async function fetchAppsSearch() {
       const responseApps = await fetch(`${apiURL()}/apps/`);
@@ -329,15 +355,40 @@ export const Apps = () => {
   };
 
   const filterHandlerCategories = (categoryId) => {
+    let newCategories;
     if (!filteredCategories.includes(categoryId)) {
-      setFilteredCategories([...filteredCategories, parseInt(categoryId, 10)]);
+      newCategories = [...filteredCategories, parseInt(categoryId, 10)];
     } else {
-      setFilteredCategories(
-        filteredCategories.filter(
-          (filteredCategory) => filteredCategory !== parseInt(categoryId, 10),
-        ),
+      newCategories = filteredCategories.filter(
+        (c) => c !== parseInt(categoryId, 10),
       );
     }
+
+    setFilteredCategories(newCategories);
+
+    // // update URL
+    // if (newCategories.length > 0) {
+    //   searchParams.set('categories', newCategories.join(','));
+    // } else {
+    //   searchParams.delete('categories');
+    // }
+    // setSearchParams(searchParams);
+
+    const params = new URLSearchParams();
+    if (newCategories.length > 0) {
+      params.set('categories', newCategories.join(','));
+    } else {
+      params.delete('categories');
+    }
+
+    navigate(`/apps?${params.toString()}`, { replace: true });
+  };
+
+  const filterHandlerAllCategories = () => {
+    setFilteredCategories([]);
+    const params = new URLSearchParams(location.search);
+    params.delete('categories');
+    navigate(`/apps?${params.toString()}`, { replace: true });
   };
 
   console.log(filteredCategories, 'categories');
@@ -477,7 +528,7 @@ export const Apps = () => {
           primary={!filteredCategories.length > 0}
           secondary={filteredCategories.length > 0}
           label="All categories"
-          onClick={() => setFilteredCategories([])}
+          onClick={filterHandlerAllCategories}
         />
         {categoriesList}
       </section>
@@ -536,7 +587,7 @@ export const Apps = () => {
           primary={!filteredCategories.length > 0}
           secondary={filteredCategories.length > 0}
           label="All categories"
-          onClick={() => setFilteredCategories([])}
+          onClick={filterHandlerAllCategories}
         />
 
         {categoriesList}
