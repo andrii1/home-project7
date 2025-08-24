@@ -46,6 +46,12 @@ export const Apps = () => {
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
+  const [filteredTags, setFilteredTags] = useState([]);
+  const [filteredFeatures, setFilteredFeatures] = useState([]);
+  const [filteredUserTypes, setFilteredUserTypes] = useState([]);
+  const [filteredBusinessModels, setFilteredBusinessModels] = useState([]);
+  const [filteredUseCases, setFilteredUseCases] = useState([]);
+  const [filteredIndustries, setFilteredIndustries] = useState([]);
   const [filteredTopics, setFilteredTopics] = useState([]);
   const [filteredPricingPreview, setFilteredPricingPreview] = useState([]);
   const [filteredDetailsPreview, setFilteredDetailsPreview] = useState([]);
@@ -198,13 +204,13 @@ export const Apps = () => {
     setPage((prev) => prev + 1);
   };
 
-  const setupUrlFilters = useCallback(async () => {
-    let urlFilters = '';
-    if (filteredTopics.length > 0) {
-      urlFilters = `?filteredTopics=${filteredTopics}`;
-    }
-    return urlFilters;
-  }, [filteredTopics]);
+  // const setupUrlFilters = useCallback(async () => {
+  //   let urlFilters = '';
+  //   if (filteredTopics.length > 0) {
+  //     urlFilters = `?filteredTopics=${filteredTopics}`;
+  //   }
+  //   return urlFilters;
+  // }, [filteredTopics]);
 
   useEffect(() => {
     async function fetchAppsSearch() {
@@ -354,32 +360,69 @@ export const Apps = () => {
     setFilteredPricing([]);
   };
 
-  const filterHandlerCategories = (categoryId) => {
-    let newCategories;
-    if (!filteredCategories.includes(categoryId)) {
-      newCategories = [...filteredCategories, parseInt(categoryId, 10)];
-    } else {
-      newCategories = filteredCategories.filter(
-        (c) => c !== parseInt(categoryId, 10),
-      );
+  const filterHandler = (type, id) => {
+    let currentValues;
+    let setter;
+
+    switch (type) {
+      case 'categories':
+        currentValues = filteredCategories;
+        setter = setFilteredCategories;
+        break;
+      case 'tags':
+        currentValues = filteredTags;
+        setter = setFilteredTags;
+        break;
+      case 'features':
+        currentValues = filteredFeatures;
+        setter = setFilteredFeatures;
+        break;
+      case 'userTypes':
+        currentValues = filteredUserTypes;
+        setter = setFilteredUserTypes;
+        break;
+      case 'businessModels':
+        currentValues = filteredBusinessModels;
+        setter = setFilteredBusinessModels;
+        break;
+      case 'useCases':
+        currentValues = filteredUseCases;
+        setter = setFilteredUseCases;
+        break;
+      case 'industries':
+        currentValues = filteredIndustries;
+        setter = setFilteredIndustries;
+        break;
+      default:
+        return;
     }
 
-    setFilteredCategories(newCategories);
+    const newValues = currentValues.includes(id)
+      ? currentValues.filter((v) => v !== id)
+      : [...currentValues, id];
 
-    // // update URL
-    // if (newCategories.length > 0) {
-    //   searchParams.set('categories', newCategories.join(','));
-    // } else {
-    //   searchParams.delete('categories');
-    // }
-    // setSearchParams(searchParams);
+    setter(newValues);
+
+    // Prepare all filters in an object
+    const allFilters = {
+      categories: type === 'categories' ? newValues : filteredCategories,
+      tags: type === 'tags' ? newValues : filteredTags,
+      features: type === 'features' ? newValues : filteredFeatures,
+      userTypes: type === 'userTypes' ? newValues : filteredUserTypes,
+      businessModels:
+        type === 'businessModels' ? newValues : filteredBusinessModels,
+      useCases: type === 'useCases' ? newValues : filteredUseCases,
+      industries: type === 'industries' ? newValues : filteredIndustries,
+    };
 
     const params = new URLSearchParams();
-    if (newCategories.length > 0) {
-      params.set('categories', newCategories.join(','));
-    } else {
-      params.delete('categories');
-    }
+
+    // Only add non-empty arrays to the URL
+    Object.entries(allFilters).forEach(([key, value]) => {
+      if (value.length > 0) {
+        params.set(key, value.join(','));
+      }
+    });
 
     navigate(`/apps?${params.toString()}`, { replace: true });
   };
@@ -402,7 +445,7 @@ export const Apps = () => {
   const categoriesList = categories.map((category) => {
     return (
       <Button
-        onClick={() => filterHandlerCategories(category.id)}
+        onClick={() => filterHandler('categories', category.id)}
         primary={filteredCategories.includes(category.id)}
         secondary={!filteredCategories.includes(category.id)}
         label={category.title}
