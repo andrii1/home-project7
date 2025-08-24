@@ -244,7 +244,7 @@ const getAppsBy = async ({
   page,
   column,
   direction,
-  filteredCategories,
+  categories,
   filteredPricing,
   filteredDetails,
   search,
@@ -262,8 +262,9 @@ const getAppsBy = async ({
         .select('apps.*', 'categories.title as categoryTitle')
         .join('categories', 'apps.category_id', '=', 'categories.id')
         .modify((queryBuilder) => {
-          if (filteredCategories !== undefined) {
-            queryBuilder.where('apps.category_id', filteredCategories);
+          if (categories !== undefined) {
+            const categoriesArray = categories.split(',');
+            queryBuilder.whereIn('apps.category_id', categoriesArray);
           }
           if (filteredPricing !== undefined) {
             queryBuilder.whereIn('apps.pricing_type', filteredPricing);

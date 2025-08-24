@@ -26,7 +26,7 @@ const appsController = require('../controllers/apps.controller');
  */
 router.get('/', (req, res, next) => {
   if (
-    req.query.filteredCategories ||
+    req.query.categories ||
     req.query.filteredPricing ||
     req.query.filteredDetails ||
     req.query.search ||
@@ -39,6 +39,7 @@ router.get('/', (req, res, next) => {
   ) {
     let arrayPricing;
     let arrayDetails;
+
     if (req.query.filteredPricing !== undefined) {
       const decoded = decodeURIComponent(req.query.filteredPricing);
       arrayPricing = decoded.split(',');
@@ -47,13 +48,14 @@ router.get('/', (req, res, next) => {
       const decoded = decodeURIComponent(req.query.filteredDetails);
       arrayDetails = decoded.split(',');
     }
+
     // const array = req.query.filteredTopics.split(',');
     appsController
       .getAppsBy({
         page: req.query.page,
         column: req.query.column,
         direction: req.query.direction,
-        filteredCategories: req.query.filteredCategories,
+        categories: req.query.categories,
         filteredPricing: arrayPricing,
         filteredDetails: arrayDetails,
         search: req.query.search,
