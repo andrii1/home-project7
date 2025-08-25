@@ -672,7 +672,6 @@ export const Apps = () => {
           }
           backgroundColor="#ffe5d9"
           label="Categories"
-          icon={<FontAwesomeIcon className="filter-icon" icon={faBookOpen} />}
         />
         <Button
           secondary
