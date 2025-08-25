@@ -80,26 +80,27 @@ export const Apps = () => {
     column: 'id',
     direction: 'desc',
   });
-  const [pricingOptionsChecked, setPricingOptionsChecked] = useState([
+  const [pricingOptionsChecked, setPricingOptionsChecked] = useState(
     PRICING_OPTIONS.map((opt) => ({ ...opt, checked: false })),
-  ]);
-  const [platformsOptionsChecked, setPlatformsOptionsChecked] = useState([
+  );
+  const [platformsOptionsChecked, setPlatformsOptionsChecked] = useState(
     PLATFORMS_OPTIONS.map((opt) => ({ ...opt, checked: false })),
-  ]);
-  const [socialMediaOptionsChecked, setSocialMediaOptionsChecked] = useState([
+  );
+  const [socialMediaOptionsChecked, setSocialMediaOptionsChecked] = useState(
     SOCIAL_MEDIA.map((opt) => ({ ...opt, checked: false })),
-  ]);
-  const [otherOptionsChecked, setOtherOptionsChecked] = useState([
+  );
+  const [otherOptionsChecked, setOtherOptionsChecked] = useState(
     OTHER.map((opt) => ({ ...opt, checked: false })),
-  ]);
+  );
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('Categories');
   const [showTagsContainer, setShowTagsContainer] = useState(false);
   const [showSearchContainer, setShowSearchContainer] = useState(false);
   const [searchTrending, setSearchTrending] = useState([]);
-
   const navigate = useNavigate();
+
+  console.log(pricingOptionsChecked, 'pricing');
 
   const toggleModal = () => {
     setOpenModal(false);
@@ -130,7 +131,7 @@ export const Apps = () => {
         : ''
     }${
       filtersSubmitted && filteredPricing.length > 0
-        ? `&filteredPricing=${encodeURIComponent(filteredPricing)}`
+        ? `&pricing=${filteredPricing.join(',')}`
         : ''
     }${
       filtersSubmitted && filteredDetails.length > 0
@@ -183,7 +184,7 @@ export const Apps = () => {
         : ''
     }${
       filtersSubmitted && filteredPricing.length > 0
-        ? `&filteredPricing=${encodeURIComponent(filteredPricing)}`
+        ? `&pricing=${encodeURIComponent(filteredPricing)}`
         : ''
     }${
       filtersSubmitted && filteredDetails.length > 0
@@ -325,6 +326,8 @@ export const Apps = () => {
     setFilteredPricing(filteredPricingPreview);
     setFilteredDetails(filteredDetailsPreview);
   };
+
+  console.log(filteredPricing, 'filter');
 
   const clearFiltersHandler = (event) => {
     const newItemsDetails = platformsOptionsChecked.map((item) => {

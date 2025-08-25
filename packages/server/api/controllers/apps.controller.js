@@ -295,8 +295,9 @@ const getAppsBy = async ({
             queryBuilder.whereIn('apps.category_id', categoriesArray);
           }
           if (pricing !== undefined) {
+            const pricingArray = pricing.split(',');
             queryBuilder.where(function () {
-              pricing.forEach((pricingItem) => {
+              pricingArray.forEach((pricingItem) => {
                 const filterFn = pricingFiltersMap[pricingItem];
                 if (filterFn) filterFn(this);
               });

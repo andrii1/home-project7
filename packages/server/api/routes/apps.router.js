@@ -39,18 +39,6 @@ router.get('/', (req, res, next) => {
     req.query.useCases ||
     req.query.industries
   ) {
-    let arrayPricing;
-    let arrayDetails;
-
-    if (req.query.filteredPricing !== undefined) {
-      const decoded = decodeURIComponent(req.query.filteredPricing);
-      arrayPricing = decoded.split(',');
-    }
-    if (req.query.filteredDetails !== undefined) {
-      const decoded = decodeURIComponent(req.query.filteredDetails);
-      arrayDetails = decoded.split(',');
-    }
-
     // const array = req.query.filteredTopics.split(',');
     appsController
       .getAppsBy({
@@ -58,7 +46,7 @@ router.get('/', (req, res, next) => {
         column: req.query.column,
         direction: req.query.direction,
         categories: req.query.categories,
-        pricing: arrayPricing,
+        pricing: req.query.pricing,
         platforms: req.query.platforms,
         socials: req.query.socials,
         other: req.query.other,
