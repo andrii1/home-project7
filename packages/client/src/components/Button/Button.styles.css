@@ -22,8 +22,8 @@
 }
 
 .storybook-button--tertiary {
-  color: #e5989b;
-  background-color: #000;
+  color: #fff;
+  background-color: #6d6875;
   box-shadow: rgb(0 0 0 / 15%) 0 0 0 1px inset;
 }
 
@@ -45,9 +45,11 @@
   padding: 12px 24px;
 }
 
-.storybook-button:disabled,
-.storybook-button[disabled] {
-  border: 1px solid #999999;
-  background-color: #cccccc;
-  color: #666666;
+.storybook-button.dark {
+  color: #b5838d;
+  box-shadow: #b5838d 0 0 0 1px inset;
+}
+
+.storybook-button.tab {
+  border-radius: 0.313rem;
 }

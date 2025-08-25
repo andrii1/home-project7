@@ -32,6 +32,8 @@ import {
 import mousePointer from '../../assets/images/mouse-pointer.svg';
 import { logInWithEmailAndPassword } from '../../firebase';
 
+const tabs = ['Categories', 'Tags', 'Searches'];
+
 export const Apps = () => {
   const { user } = useUserContext();
   const location = useLocation();
@@ -85,6 +87,9 @@ export const Apps = () => {
     { title: 'Social media contacts', checked: false },
   ]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState('Categories');
+  const [showTagsContainer, setShowTagsContainer] = useState(false);
+  const [showSearchContainer, setShowSearchContainer] = useState(false);
 
   const navigate = useNavigate();
 
@@ -556,6 +561,20 @@ export const Apps = () => {
     deleteFavorites();
   };
 
+  const tabsGroup = tabs.map((tab) => {
+    return (
+      <Button
+        tertiary={activeTab === tab}
+        secondary={activeTab !== tab}
+        label={tab}
+        className="tab"
+        onClick={() => {
+          setActiveTab(tab);
+        }}
+      />
+    );
+  });
+
   return (
     <main>
       <Helmet>
@@ -566,6 +585,7 @@ export const Apps = () => {
       <div className="hero apps">
         <h1 className="hero-header">{pageHeaderTitle}</h1>
       </div>
+      <div className="tabs-group">{tabsGroup}</div>
       <section className="container-topics-desktop">
         <Button
           primary={!filteredCategories.length > 0}
@@ -585,6 +605,28 @@ export const Apps = () => {
           backgroundColor="#ffe5d9"
           label="Categories"
           icon={<FontAwesomeIcon className="filter-icon" icon={faBookOpen} />}
+        />
+        <Button
+          secondary
+          className="button-topics"
+          onClick={(event) => {
+            setShowTagsContainer(!showTagsContainer);
+            setShowCategoriesContainer(false);
+            setShowSearchContainer(false);
+          }}
+          backgroundColor="#ffe5d9"
+          label="Tags"
+        />
+        <Button
+          secondary
+          className="button-topics"
+          onClick={(event) => {
+            setShowSearchContainer(!showSearchContainer);
+            setShowCategoriesContainer(false);
+            setShowTagsContainer(false);
+          }}
+          backgroundColor="#ffe5d9"
+          label="Searches"
         />
         <DropDownView
           // label="Sort"

@@ -57,9 +57,19 @@ main {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.tabs-group {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
 @media only screen and (max-width: 768px) {
   .container-cards.grid {
     grid-template-columns: repeat(1, 1fr);
+  }
+  .tabs-group {
+    display: none !important;
   }
 }
 
