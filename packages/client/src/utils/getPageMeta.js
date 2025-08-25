@@ -1,15 +1,15 @@
 import { capitalizeFirstWord } from './capitalizeFirstWord';
 
 export const getPageMeta = ({
-  categoryIdParam: inputCategoryIdParam,
+  filteredCategories,
   categories: inputCategories,
-  tagSlugParam: inputTagSlugParam,
+  filteredTags,
   tags: inputTags,
   searchParam: inputSearchParam,
 }) => {
-  if (inputCategoryIdParam) {
+  if (filteredCategories.length > 0) {
     const categoryTitle = inputCategories.find(
-      (category) => category.id === parseInt(inputCategoryIdParam, 10),
+      (category) => category.id === parseInt(filteredCategories, 10),
     );
     const title = categoryTitle?.title || 'this category';
     const capitalizedTitle = capitalizeFirstWord(title);
@@ -21,8 +21,8 @@ export const getPageMeta = ({
     };
   }
 
-  if (inputTagSlugParam) {
-    const tagTitle = inputTags.find((tag) => tag.slug === inputTagSlugParam);
+  if (filteredTags.length > 0) {
+    const tagTitle = inputTags.find((tag) => tag.slug === filteredTags);
     const title = tagTitle?.title || 'this topic';
     const capitalizedTitle = capitalizeFirstWord(title);
     return {

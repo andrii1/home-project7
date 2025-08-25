@@ -471,9 +471,9 @@ export const Apps = () => {
   }, [sortOrder]);
 
   const { pageMetaTitle, pageMetaDescription, pageHeaderTitle } = getPageMeta({
-    categoryIdParam,
+    filteredCategories,
     categories,
-    tagSlugParam,
+    filteredTags,
     tags,
     searchParam,
   });
