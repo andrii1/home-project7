@@ -90,6 +90,7 @@ export const Apps = () => {
   const [activeTab, setActiveTab] = useState('Categories');
   const [showTagsContainer, setShowTagsContainer] = useState(false);
   const [showSearchContainer, setShowSearchContainer] = useState(false);
+  const [searchTrending, setSearchTrending] = useState([]);
 
   const navigate = useNavigate();
 
@@ -458,6 +459,45 @@ export const Apps = () => {
     );
   });
 
+  const tagsList = tags.map((tag) => {
+    return (
+      <Button
+        onClick={() => filterHandler('tags', tag.id)}
+        primary={filteredTags.includes(tag.id)}
+        secondary={!filteredTags.includes(tag.id)}
+        label={tag.title}
+      />
+    );
+  });
+
+  useEffect(() => {
+    async function fetchTrendingSearch() {
+      const response = await fetch(`${apiURL()}/analytics?search=true`);
+      const dataSearchAnalytics = await response.json();
+
+      const result = dataSearchAnalytics
+        .sort((a, b) => {
+          return b.activeUsers - a.activeUsers;
+        })
+        .slice(0, 20);
+      setSearchTrending(result);
+    }
+
+    fetchTrendingSearch();
+  }, []);
+
+  const searchList = searchTrending.map((searchItem) => {
+    return (
+      <Button
+        primary={
+          searchItem.searchId.toString() === searchParam.toString() && true
+        }
+        secondary={searchItem.searchId !== searchParam && true}
+        label={capitalize(searchItem.searchId)}
+      />
+    );
+  });
+
   useEffect(() => {
     let column;
     let direction;
@@ -586,15 +626,43 @@ export const Apps = () => {
         <h1 className="hero-header">{pageHeaderTitle}</h1>
       </div>
       <div className="tabs-group">{tabsGroup}</div>
-      <section className="container-topics-desktop">
-        <Button
-          primary={!filteredCategories.length > 0}
-          secondary={filteredCategories.length > 0}
-          label="All categories"
-          onClick={filterHandlerAllCategories}
-        />
-        {categoriesList}
-      </section>
+      {activeTab === 'Categories' && (
+        <section className="container-topics-desktop">
+          <Button
+            primary={!filteredCategories.length > 0}
+            secondary={filteredCategories.length > 0}
+            label="All categories"
+            onClick={filterHandlerAllCategories}
+          />
+          {categoriesList}
+        </section>
+      )}
+      {activeTab === 'Tags' && (
+        <section className="container-topics-desktop">
+          <Button
+            primary={!filteredTags.length > 0}
+            secondary={filteredTags.length > 0}
+            label="All tags"
+          />
+          {tagsList}
+          <Link to="/tags">
+            <Button tertiary label="See all tags..." />
+          </Link>
+        </section>
+      )}
+      {activeTab === 'Searches' && (
+        <section className="container-topics-desktop">
+          <Link to="/">
+            <Button
+              primary={!searchParam}
+              secondary={searchParam}
+              label="All searches"
+            />
+          </Link>
+
+          {searchList}
+        </section>
+      )}
       <section className="container-filters">
         <Button
           secondary
