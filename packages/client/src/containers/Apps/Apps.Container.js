@@ -20,6 +20,12 @@ import Modal from '../../components/Modal/Modal.Component';
 import { useUserContext } from '../../userContext';
 import { capitalize } from '../../utils/capitalize';
 import { getPageMeta } from '../../utils/getPageMeta';
+import {
+  PRICING_OPTIONS,
+  PLATFORMS_OPTIONS,
+  SOCIAL_MEDIA,
+  OTHER,
+} from '../../lib/constants/filters';
 
 import {
   faSearch,
@@ -75,17 +81,18 @@ export const Apps = () => {
     direction: 'desc',
   });
   const [pricingOptionsChecked, setPricingOptionsChecked] = useState([
-    { title: 'Free', checked: false },
-    { title: 'Paid with a free plan', checked: false },
-    { title: 'Paid with a free trial', checked: false },
-    { title: 'Paid', checked: false },
+    PRICING_OPTIONS.map((opt) => ({ ...opt, checked: false })),
   ]);
-  const [detailsOptionsChecked, setDetailsOptionsChecked] = useState([
-    { title: 'Browser extension', checked: false },
-    { title: 'iOS app available', checked: false },
-    { title: 'Android app available', checked: false },
-    { title: 'Social media contacts', checked: false },
+  const [platformsOptionsChecked, setPlatformsOptionsChecked] = useState([
+    PLATFORMS_OPTIONS.map((opt) => ({ ...opt, checked: false })),
   ]);
+  const [socialMediaOptionsChecked, setSocialMediaOptionsChecked] = useState([
+    SOCIAL_MEDIA.map((opt) => ({ ...opt, checked: false })),
+  ]);
+  const [otherOptionsChecked, setOtherOptionsChecked] = useState([
+    OTHER.map((opt) => ({ ...opt, checked: false })),
+  ]);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('Categories');
   const [showTagsContainer, setShowTagsContainer] = useState(false);
@@ -163,8 +170,6 @@ export const Apps = () => {
     searchParam,
     tagSlugParam,
   ]);
-
-  console.log(apps, 'apps1');
 
   const fetchApps = async () => {
     setIsLoading(true);
