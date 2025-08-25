@@ -292,61 +292,30 @@ export const Apps = () => {
   };
 
   const filterHandlerPricing = (event) => {
-    if (event.target.checked) {
-      setFilteredPricingPreview([
-        ...filteredPricingPreview,
-        event.target.value,
-      ]);
+    const { checked, value: key } = event.target;
 
-      const newItems = pricingOptionsChecked.map((item) => {
-        if (item.title === event.target.value) {
-          return { ...item, checked: true };
-        }
-        return item;
-      });
-      setPricingOptionsChecked(newItems);
-    } else {
-      setFilteredPricingPreview(
-        filteredPricingPreview.filter(
-          (filterTopic) => filterTopic !== event.target.value,
+    if (checked) {
+      // Add to preview
+      setFilteredPricingPreview((prev) => [...prev, key]);
+
+      // Update state
+      setPricingOptionsChecked((prev) =>
+        prev.map((item) =>
+          item.key === key ? { ...item, checked: true } : item,
         ),
       );
-      const newItems = pricingOptionsChecked.map((item) => {
-        if (item.title === event.target.value) {
-          return { ...item, checked: false };
-        }
-        return item;
-      });
-      setPricingOptionsChecked(newItems);
-    }
-  };
-
-  const filterHandlerDetails = (event) => {
-    if (event.target.checked) {
-      setFilteredDetailsPreview([
-        ...filteredDetailsPreview,
-        event.target.value,
-      ]);
-      const newItems = detailsOptionsChecked.map((item) => {
-        if (item.title === event.target.value) {
-          return { ...item, checked: true };
-        }
-        return item;
-      });
-      setDetailsOptionsChecked(newItems);
     } else {
-      setFilteredDetailsPreview(
-        filteredDetailsPreview.filter(
-          (filterTopic) => filterTopic !== event.target.value,
+      // Remove from preview
+      setFilteredPricingPreview((prev) =>
+        prev.filter((filterTopic) => filterTopic !== key),
+      );
+
+      // Update state
+      setPricingOptionsChecked((prev) =>
+        prev.map((item) =>
+          item.key === key ? { ...item, checked: false } : item,
         ),
       );
-      const newItems = detailsOptionsChecked.map((item) => {
-        if (item.title === event.target.value) {
-          return { ...item, checked: false };
-        }
-        return item;
-      });
-      setDetailsOptionsChecked(newItems);
     }
   };
 
@@ -358,10 +327,10 @@ export const Apps = () => {
   };
 
   const clearFiltersHandler = (event) => {
-    const newItemsDetails = detailsOptionsChecked.map((item) => {
+    const newItemsDetails = platformsOptionsChecked.map((item) => {
       return { ...item, checked: false };
     });
-    setDetailsOptionsChecked(newItemsDetails);
+    setPlatformsOptionsChecked(newItemsDetails);
 
     const newItemsPricing = pricingOptionsChecked.map((item) => {
       return { ...item, checked: false };
@@ -531,14 +500,14 @@ export const Apps = () => {
   const sortOptions = ['Recent', 'A-Z', 'Z-A'];
 
   const pricingList = pricingOptionsChecked.map((item) => (
-    <li key={item}>
+    <li key={item.key}>
       <input
-        checked={item.checked}
         type="checkbox"
-        value={item.label}
+        value={item.key} // send key instead of label
+        checked={item.checked}
         onChange={filterHandlerPricing}
       />{' '}
-      {item.title}
+      {item.label} {/* show human-friendly label */}
     </li>
   ));
 
@@ -761,10 +730,10 @@ export const Apps = () => {
                 <h3>Pricing</h3>
                 <ul>{pricingList}</ul>
               </div>
-              <div>
+              {/* <div>
                 <h3>Details</h3>
                 <ul>{detailsList}</ul>
-              </div>
+              </div> */}
             </div>
             <div className="container-buttons">
               <Button type="submit" primary label="Apply filters" />

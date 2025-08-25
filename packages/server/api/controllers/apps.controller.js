@@ -3,7 +3,6 @@
 Can be deleted as soon as the first real controller is added. */
 const generateSlug = require('../lib/utils/generateSlug');
 const { normalizeUrl } = require('../lib/utils/normalizeUrl');
-
 const knex = require('../../config/db');
 const HttpError = require('../lib/utils/http-error');
 const OpenAI = require('openai');
@@ -249,7 +248,7 @@ const pricingFiltersMap = {
   TRIAL: (qb) => qb.orWhere('apps.pricing_trial_available', true),
 };
 
-export const platformsFiltersMap = {
+const platformsFiltersMap = {
   EXT: (qb) => qb.orWhereNotNull('apps.url_chrome_extension'),
   IOS: (qb) => qb.orWhereNotNull('apps.url_apple_id'),
   ANDROID: (qb) => qb.orWhereNotNull('apps.url_google_play_store'),
@@ -257,12 +256,12 @@ export const platformsFiltersMap = {
   MAC: (qb) => qb.orWhereNotNull('apps.url_mac'),
 };
 
-export const socialMediaFiltersMap = {
-  TWITTER: (qb) => qb.orWhereNotNull('apps.url_x'), // or 'apps.url_twitter' if that's your column
+const socialMediaFiltersMap = {
+  TWITTER: (qb) => qb.orWhereNotNull('apps.url_x'),
   DISCORD: (qb) => qb.orWhereNotNull('apps.url_discord'),
 };
 
-export const otherFiltersMap = {
+const otherFiltersMap = {
   OS: (qb) => qb.orWhere('apps.is_open_source', true),
   AI: (qb) => qb.orWhere('apps.is_ai_powered', true),
 };

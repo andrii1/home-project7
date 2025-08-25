@@ -29,7 +29,7 @@ router.get('/', (req, res, next) => {
     req.query.categories ||
     req.query.pricing ||
     req.query.platforms ||
-    req.query.social ||
+    req.query.socials ||
     req.query.other ||
     req.query.search ||
     req.query.tags ||
@@ -59,9 +59,9 @@ router.get('/', (req, res, next) => {
         direction: req.query.direction,
         categories: req.query.categories,
         pricing: arrayPricing,
-        platforms: arrayDetails,
-        socials: socials,
-        other: other,
+        platforms: req.query.platforms,
+        socials: req.query.socials,
+        other: req.query.other,
         search: req.query.search,
         tags: req.query.tags,
         features: req.query.features,
