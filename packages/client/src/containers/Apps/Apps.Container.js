@@ -535,24 +535,24 @@ export const Apps = () => {
       <input
         checked={item.checked}
         type="checkbox"
-        value={item.title}
+        value={item.label}
         onChange={filterHandlerPricing}
       />{' '}
       {item.title}
     </li>
   ));
 
-  const detailsList = detailsOptionsChecked.map((item) => (
-    <li key={item}>
-      <input
-        checked={item.checked}
-        type="checkbox"
-        value={item.title}
-        onChange={filterHandlerDetails}
-      />{' '}
-      {item.title}
-    </li>
-  ));
+  // const detailsList = detailsOptionsChecked.map((item) => (
+  //   <li key={item}>
+  //     <input
+  //       checked={item.checked}
+  //       type="checkbox"
+  //       value={item.title}
+  //       onChange={filterHandlerDetails}
+  //     />{' '}
+  //     {item.title}
+  //   </li>
+  // ));
   const fetchFavorites = useCallback(async () => {
     const url = `${apiURL()}/favorites`;
     const response = await fetch(url, {

@@ -240,13 +240,42 @@ const getAppsByTag = async (page, column, direction, tag) => {
   }
 };
 
+const pricingFiltersMap = {
+  FREE: (qb) => qb.orWhere('apps.pricing_free', true),
+  FREEMIUM: (qb) => qb.orWhere('apps.pricing_freemium', true),
+  PAID: (qb) => qb.orWhere('apps.pricing_paid', true),
+  SUB: (qb) => qb.orWhere('apps.pricing_subscription', true),
+  ONE: (qb) => qb.orWhere('apps.pricing_one_time', true),
+  TRIAL: (qb) => qb.orWhere('apps.pricing_trial_available', true),
+};
+
+export const platformsFiltersMap = {
+  EXT: (qb) => qb.orWhereNotNull('apps.url_chrome_extension'),
+  IOS: (qb) => qb.orWhereNotNull('apps.url_apple_id'),
+  ANDROID: (qb) => qb.orWhereNotNull('apps.url_google_play_store'),
+  WIN: (qb) => qb.orWhereNotNull('apps.url_windows'),
+  MAC: (qb) => qb.orWhereNotNull('apps.url_mac'),
+};
+
+export const socialMediaFiltersMap = {
+  TWITTER: (qb) => qb.orWhereNotNull('apps.url_x'), // or 'apps.url_twitter' if that's your column
+  DISCORD: (qb) => qb.orWhereNotNull('apps.url_discord'),
+};
+
+export const otherFiltersMap = {
+  OS: (qb) => qb.orWhere('apps.is_open_source', true),
+  AI: (qb) => qb.orWhere('apps.is_ai_powered', true),
+};
+
 const getAppsBy = async ({
   page,
   column,
   direction,
   categories,
-  filteredPricing,
-  filteredDetails,
+  pricing,
+  platforms,
+  socials,
+  other,
   search,
   tags,
   features,
@@ -266,38 +295,42 @@ const getAppsBy = async ({
             const categoriesArray = categories.split(',');
             queryBuilder.whereIn('apps.category_id', categoriesArray);
           }
-          if (filteredPricing !== undefined) {
-            queryBuilder.whereIn('apps.pricing_type', filteredPricing);
-          }
-          if (
-            filteredDetails !== undefined &&
-            filteredDetails.includes('Browser extension')
-          ) {
-            queryBuilder.whereNotNull('apps.url_chrome_extension');
-          }
-          if (
-            filteredDetails !== undefined &&
-            filteredDetails.includes('iOS app available')
-          ) {
-            queryBuilder.whereNotNull('apps.url_app_store');
-          }
-          if (
-            filteredDetails !== undefined &&
-            filteredDetails.includes('Android app available')
-          ) {
-            queryBuilder.whereNotNull('apps.url_google_play_store');
-          }
-
-          if (
-            filteredDetails !== undefined &&
-            filteredDetails.includes('Social media contacts')
-          ) {
+          if (pricing !== undefined) {
             queryBuilder.where(function () {
-              this.whereNotNull('apps.url_x').orWhereNotNull(
-                'apps.url_discord',
-              );
+              pricing.forEach((pricingItem) => {
+                const filterFn = pricingFiltersMap[pricingItem];
+                if (filterFn) filterFn(this);
+              });
             });
           }
+
+          if (platforms !== undefined) {
+            queryBuilder.where(function () {
+              platforms.forEach((platform) => {
+                const filterFn = platformsFiltersMap[platform];
+                if (filterFn) filterFn(this);
+              });
+            });
+          }
+
+          if (socials !== undefined) {
+            queryBuilder.where(function () {
+              socials.forEach((social) => {
+                const filterFn = socialMediaFiltersMap[social];
+                if (filterFn) filterFn(this);
+              });
+            });
+          }
+
+          if (other !== undefined) {
+            queryBuilder.where(function () {
+              other.forEach((otherItem) => {
+                const filterFn = otherFiltersMap[otherItem];
+                if (filterFn) filterFn(this);
+              });
+            });
+          }
+
           if (search !== undefined) {
             queryBuilder.where(function () {
               this.where('apps.description', 'like', `%${search}%`);

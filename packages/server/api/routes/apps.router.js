@@ -27,8 +27,10 @@ const appsController = require('../controllers/apps.controller');
 router.get('/', (req, res, next) => {
   if (
     req.query.categories ||
-    req.query.filteredPricing ||
-    req.query.filteredDetails ||
+    req.query.pricing ||
+    req.query.platforms ||
+    req.query.social ||
+    req.query.other ||
     req.query.search ||
     req.query.tags ||
     req.query.features ||
@@ -56,8 +58,10 @@ router.get('/', (req, res, next) => {
         column: req.query.column,
         direction: req.query.direction,
         categories: req.query.categories,
-        filteredPricing: arrayPricing,
-        filteredDetails: arrayDetails,
+        pricing: arrayPricing,
+        platforms: arrayDetails,
+        socials: socials,
+        other: other,
         search: req.query.search,
         tags: req.query.tags,
         features: req.query.features,
