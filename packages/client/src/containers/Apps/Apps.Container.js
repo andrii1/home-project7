@@ -47,7 +47,6 @@ export const Apps = () => {
   const [searchTerms, setSearchTerms] = useState();
   const [sortOrder, setSortOrder] = useState('Recent');
   const [resultsHome, setResultsHome] = useState([]);
-
   const [topics, setTopics] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -62,9 +61,13 @@ export const Apps = () => {
   const [filteredIndustries, setFilteredIndustries] = useState([]);
   const [filteredTopics, setFilteredTopics] = useState([]);
   const [filteredPricingPreview, setFilteredPricingPreview] = useState([]);
-  const [filteredDetailsPreview, setFilteredDetailsPreview] = useState([]);
+  const [filteredPlatformsPreview, setFilteredPlatformsPreview] = useState([]);
+  const [filteredSocialsPreview, setFilteredSocialsPreview] = useState([]);
+  const [filteredOtherPreview, setFilteredOtherPreview] = useState([]);
   const [filteredPricing, setFilteredPricing] = useState([]);
-  const [filteredDetails, setFilteredDetails] = useState([]);
+  const [filteredPlatforms, setFilteredPlatforms] = useState([]);
+  const [filteredSocials, setFilteredSocials] = useState([]);
+  const [filteredOther, setFilteredOther] = useState([]);
   const [filtersSubmitted, setFiltersSubmitted] = useState(false);
   const [showFiltersContainer, setShowFiltersContainer] = useState(false);
   const [showCategoriesContainer, setShowCategoriesContainer] = useState(false);
@@ -123,23 +126,48 @@ export const Apps = () => {
   // first fetch
   useEffect(() => {
     setIsLoading(true);
-    const url = `${apiURL()}/apps?page=0&column=${orderBy.column}&direction=${
-      orderBy.direction
-    }${
-      filteredCategories.length > 0
-        ? `&categories=${filteredCategories.join(',')}`
-        : ''
-    }${
-      filtersSubmitted && filteredPricing.length > 0
-        ? `&pricing=${filteredPricing.join(',')}`
-        : ''
-    }${
-      filtersSubmitted && filteredDetails.length > 0
-        ? `&filteredDetails=${encodeURIComponent(filteredDetails)}`
-        : ''
-    }${searchParam !== undefined ? `&search=${searchParam}` : ''}${
-      tagSlugParam !== undefined ? `&tag=${tagSlugParam}` : ''
-    }`;
+    const params = new URLSearchParams({
+      page: 0,
+      column: orderBy.column,
+      direction: orderBy.direction,
+    });
+
+    // Categories
+    if (filteredCategories.length > 0) {
+      params.append('categories', filteredCategories.join(','));
+    }
+
+    // Pricing
+    if (filtersSubmitted && filteredPricing.length > 0) {
+      params.append('pricing', filteredPricing.join(','));
+    }
+
+    // Platforms
+    if (filtersSubmitted && filteredPlatforms.length > 0) {
+      params.append('platforms', filteredPlatforms.join(','));
+    }
+
+    // Socials
+    if (filtersSubmitted && filteredSocials.length > 0) {
+      params.append('socials', filteredSocials.join(','));
+    }
+
+    // Other
+    if (filtersSubmitted && filteredOther.length > 0) {
+      params.append('other', filteredOther.join(','));
+    }
+
+    // Search
+    if (searchParam !== undefined) {
+      params.append('search', searchParam);
+    }
+
+    // Tag
+    if (tagSlugParam !== undefined) {
+      params.append('tag', tagSlugParam);
+    }
+
+    const url = `${apiURL()}/apps?${params.toString()}`;
 
     async function fetchData() {
       const response = await fetch(url);
@@ -165,34 +193,79 @@ export const Apps = () => {
     filteredCategories,
     orderBy.column,
     orderBy.direction,
-    filteredDetails,
     filteredPricing,
     filtersSubmitted,
     searchParam,
     tagSlugParam,
+    filteredPlatforms,
+    filteredSocials,
+    filteredOther,
   ]);
 
   const fetchApps = async () => {
     setIsLoading(true);
     setError(null);
 
-    const url = `${apiURL()}/apps?page=${page}&column=${
-      orderBy.column
-    }&direction=${orderBy.direction}${
-      filteredCategories.length > 0
-        ? `&categories=${filteredCategories.join(',')}`
-        : ''
-    }${
-      filtersSubmitted && filteredPricing.length > 0
-        ? `&pricing=${encodeURIComponent(filteredPricing)}`
-        : ''
-    }${
-      filtersSubmitted && filteredDetails.length > 0
-        ? `&filteredDetails=${encodeURIComponent(filteredDetails)}`
-        : ''
-    }${searchParam !== undefined ? `&search=${searchParam}` : ''}${
-      tagSlugParam !== undefined ? `&tag=${tagSlugParam}` : ''
-    }`;
+    const params = new URLSearchParams({
+      page,
+      column: orderBy.column,
+      direction: orderBy.direction,
+    });
+
+    // Categories
+    if (filteredCategories.length > 0) {
+      params.append('categories', filteredCategories.join(','));
+    }
+
+    // Pricing
+    if (filtersSubmitted && filteredPricing.length > 0) {
+      params.append('pricing', filteredPricing.join(','));
+    }
+
+    // Platforms
+    if (filtersSubmitted && filteredPlatforms.length > 0) {
+      params.append('platforms', filteredPlatforms.join(','));
+    }
+
+    // Socials
+    if (filtersSubmitted && filteredSocials.length > 0) {
+      params.append('socials', filteredSocials.join(','));
+    }
+
+    // Other
+    if (filtersSubmitted && filteredOther.length > 0) {
+      params.append('other', filteredOther.join(','));
+    }
+
+    // Search
+    if (searchParam !== undefined) {
+      params.append('search', searchParam);
+    }
+
+    // Tag
+    if (tagSlugParam !== undefined) {
+      params.append('tag', tagSlugParam);
+    }
+
+    const url = `${apiURL()}/apps?${params.toString()}`;
+
+    // const url = `${apiURL()}/apps?page=${page}&column=${
+    //   orderBy.column
+    // }&direction=${orderBy.direction}${
+    //   filteredCategories.length > 0
+    //     ? `&categories=${filteredCategories.join(',')}`
+    //     : ''
+    // }${
+    //   filtersSubmitted && filteredPricing.length > 0
+    //     ? `&pricing=${encodeURIComponent(filteredPricing)}`
+    //     : ''
+    // }${
+    //   filtersSubmitted && filteredDetails.length > 0
+    //     ? `&filteredDetails=${encodeURIComponent(filteredDetails)}`
+    //     : ''
+    // }${searchParam !== undefined ? `&search=${searchParam}` : ''}${
+    //   tagSlugParam !== undefined ? `&tag=${tagSlugParam}` : ''
+    // }`;
 
     const response = await fetch(url);
     const json = await response.json();
@@ -259,9 +332,9 @@ export const Apps = () => {
     setPage(0);
   }, [filteredPricing]);
 
-  useEffect(() => {
-    setPage(0);
-  }, [filteredDetails]);
+  // useEffect(() => {
+  //   setPage(0);
+  // }, [filteredDetails]);
 
   useEffect(() => {
     // async function fetchTopics() {
@@ -320,14 +393,40 @@ export const Apps = () => {
     }
   };
 
+  const filterHandlerPlatforms = (event) => {
+    const { checked, value: key } = event.target;
+
+    if (checked) {
+      // Add to preview
+      setFilteredPlatformsPreview((prev) => [...prev, key]);
+
+      // Update state
+      setPlatformsOptionsChecked((prev) =>
+        prev.map((item) =>
+          item.key === key ? { ...item, checked: true } : item,
+        ),
+      );
+    } else {
+      // Remove from preview
+      setFilteredPlatformsPreview((prev) =>
+        prev.filter((filterTopic) => filterTopic !== key),
+      );
+
+      // Update state
+      setPlatformsOptionsChecked((prev) =>
+        prev.map((item) =>
+          item.key === key ? { ...item, checked: false } : item,
+        ),
+      );
+    }
+  };
+
   const submitHandler = (event) => {
     event.preventDefault();
     setFiltersSubmitted(true);
     setFilteredPricing(filteredPricingPreview);
-    setFilteredDetails(filteredDetailsPreview);
+    setFilteredPlatforms(filteredPlatformsPreview);
   };
-
-  console.log(filteredPricing, 'filter');
 
   const clearFiltersHandler = (event) => {
     const newItemsDetails = platformsOptionsChecked.map((item) => {
@@ -339,7 +438,7 @@ export const Apps = () => {
       return { ...item, checked: false };
     });
     setPricingOptionsChecked(newItemsPricing);
-    setFilteredDetails([]);
+    setFilteredPlatforms([]);
     setFilteredPricing([]);
   };
 
@@ -417,8 +516,6 @@ export const Apps = () => {
     navigate(`/apps?${params.toString()}`, { replace: true });
   };
 
-  console.log(filteredCategories, 'categories');
-
   const dropdownList = resultsHome.map((app) => (
     <Link key={app.id} to={`/apps/${app.id}`}>
       <li>{app.title}</li>
@@ -435,6 +532,8 @@ export const Apps = () => {
       />
     );
   });
+
+  console.log(filteredPlatforms, 'platforms');
 
   const tagsList = tags.map((tag) => {
     return (
@@ -509,6 +608,18 @@ export const Apps = () => {
         value={item.key} // send key instead of label
         checked={item.checked}
         onChange={filterHandlerPricing}
+      />{' '}
+      {item.label} {/* show human-friendly label */}
+    </li>
+  ));
+
+  const platformsList = platformsOptionsChecked.map((item) => (
+    <li key={item.key}>
+      <input
+        type="checkbox"
+        value={item.key} // send key instead of label
+        checked={item.checked}
+        onChange={filterHandlerPlatforms}
       />{' '}
       {item.label} {/* show human-friendly label */}
     </li>
@@ -733,10 +844,10 @@ export const Apps = () => {
                 <h3>Pricing</h3>
                 <ul>{pricingList}</ul>
               </div>
-              {/* <div>
-                <h3>Details</h3>
-                <ul>{detailsList}</ul>
-              </div> */}
+              <div>
+                <h3>Platforms</h3>
+                <ul>{platformsList}</ul>
+              </div>
             </div>
             <div className="container-buttons">
               <Button type="submit" primary label="Apply filters" />

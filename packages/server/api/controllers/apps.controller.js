@@ -250,7 +250,7 @@ const pricingFiltersMap = {
 
 const platformsFiltersMap = {
   EXT: (qb) => qb.orWhereNotNull('apps.url_chrome_extension'),
-  IOS: (qb) => qb.orWhereNotNull('apps.url_apple_id'),
+  IOS: (qb) => qb.orWhereNotNull('apps.apple_id'),
   ANDROID: (qb) => qb.orWhereNotNull('apps.url_google_play_store'),
   WIN: (qb) => qb.orWhereNotNull('apps.url_windows'),
   MAC: (qb) => qb.orWhereNotNull('apps.url_mac'),
@@ -305,8 +305,9 @@ const getAppsBy = async ({
           }
 
           if (platforms !== undefined) {
+            const platformsArray = platforms.split(',');
             queryBuilder.where(function () {
-              platforms.forEach((platform) => {
+              platformsArray.forEach((platform) => {
                 const filterFn = platformsFiltersMap[platform];
                 if (filterFn) filterFn(this);
               });
@@ -314,8 +315,9 @@ const getAppsBy = async ({
           }
 
           if (socials !== undefined) {
+            const socialsArray = socials.split(',');
             queryBuilder.where(function () {
-              socials.forEach((social) => {
+              socialsArray.forEach((social) => {
                 const filterFn = socialMediaFiltersMap[social];
                 if (filterFn) filterFn(this);
               });
@@ -323,8 +325,9 @@ const getAppsBy = async ({
           }
 
           if (other !== undefined) {
+            const otherArray = other.split(',');
             queryBuilder.where(function () {
-              other.forEach((otherItem) => {
+              otherArray.forEach((otherItem) => {
                 const filterFn = otherFiltersMap[otherItem];
                 if (filterFn) filterFn(this);
               });
