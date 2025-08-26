@@ -424,15 +424,40 @@ export const Apps = () => {
   const submitHandler = (event) => {
     event.preventDefault();
     setFiltersSubmitted(true);
+
+    // Finalize preview states
     setFilteredPricing(filteredPricingPreview);
     setFilteredPlatforms(filteredPlatformsPreview);
+
+    // Build all filters including pricing & platforms
+    const allFilters = {
+      categories: filteredCategories,
+      tags: filteredTags,
+      features: filteredFeatures,
+      userTypes: filteredUserTypes,
+      businessModels: filteredBusinessModels,
+      useCases: filteredUseCases,
+      industries: filteredIndustries,
+      pricing: filteredPricingPreview, // added
+      platforms: filteredPlatformsPreview, // added
+    };
+
+    const params = new URLSearchParams();
+
+    Object.entries(allFilters).forEach(([key, value]) => {
+      if (value.length > 0) {
+        params.set(key, value.join(','));
+      }
+    });
+
+    navigate(`/apps?${params.toString()}`, { replace: true });
   };
 
   const clearFiltersHandler = (event) => {
-    const newItemsDetails = platformsOptionsChecked.map((item) => {
+    const newItemsPlatforms = platformsOptionsChecked.map((item) => {
       return { ...item, checked: false };
     });
-    setPlatformsOptionsChecked(newItemsDetails);
+    setPlatformsOptionsChecked(newItemsPlatforms);
 
     const newItemsPricing = pricingOptionsChecked.map((item) => {
       return { ...item, checked: false };
@@ -495,6 +520,8 @@ export const Apps = () => {
         type === 'businessModels' ? newValues : filteredBusinessModels,
       useCases: type === 'useCases' ? newValues : filteredUseCases,
       industries: type === 'industries' ? newValues : filteredIndustries,
+      pricing: filteredPricing, // added
+      platforms: filteredPlatforms, // added
     };
 
     const params = new URLSearchParams();
