@@ -844,7 +844,7 @@ export const Apps = () => {
                   {filter.values.map((item) => {
                     // find the matching option for display
                     const option = filter.options.find(
-                      (opt) => String(opt.key) === String(item),
+                      (opt) => String(opt.key ?? opt.id) === String(item),
                     );
                     const displayLabel = option?.title || option?.label || item;
 
