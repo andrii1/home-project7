@@ -839,10 +839,7 @@ export const Apps = () => {
           {filterConfig.map(
             (filter) =>
               filter.values.length > 0 && (
-                <div
-                  key={filter.key}
-                  className="flex items-center gap-2 flex-wrap"
-                >
+                <div key={filter.key} className="active-filter-item">
                   <span className="font-semibold">{filter.label}:</span>
                   {filter.values.map((item) => {
                     // find the matching option for display

@@ -218,6 +218,12 @@ form.home {
   margin-bottom: 0.5rem;
 }
 
+.active-filter-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 @keyframes slide-in {
   from {
     transform: translateY(-20%);
