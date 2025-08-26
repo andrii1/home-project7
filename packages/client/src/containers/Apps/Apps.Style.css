@@ -179,17 +179,25 @@ form.home {
   }
 }
 
-.container-filters {
+.container-filters,
+.container-active-filters {
   display: flex;
   flex-wrap: wrap;
-  justify-content: right;
   align-items: center;
   gap: 0.5rem;
   /* padding-right: 2rem; */
   margin: 2rem 0rem;
 }
+
+.container-filters {
+  justify-content: right;
+}
+.container-active-filters {
+  justify-content: center;
+}
 @media only screen and (max-width: 768px) {
-  .container-filters {
+  .container-filters,
+  .container-active-filters {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

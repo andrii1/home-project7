@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/forbid-prop-types */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -17,14 +19,6 @@ const MultiSelectDropdown = ({
   const [search, setSearch] = useState('');
 
   const toggleDropdown = () => setIsOpen(!isOpen);
-
-  const handleSelect = (val) => {
-    if (selected.includes(val)) {
-      onChange(selected.filter((s) => s !== val));
-    } else {
-      onChange([...selected, val]);
-    }
-  };
 
   const filteredOptions = options.filter((opt) =>
     opt[labelKey].toLowerCase().includes(search.toLowerCase()),

@@ -151,6 +151,31 @@ export const Apps = () => {
       params.append('tags', filteredTags.join(','));
     }
 
+    // Features
+    if (filteredFeatures.length > 0) {
+      params.append('features', filteredFeatures.join(','));
+    }
+
+    // User types
+    if (filteredUserTypes.length > 0) {
+      params.append('userTypes', filteredUserTypes.join(','));
+    }
+
+    // Business models
+    if (filteredBusinessModels.length > 0) {
+      params.append('businessModels', filteredBusinessModels.join(','));
+    }
+
+    // useCases
+    if (filteredUseCases.length > 0) {
+      params.append('useCases', filteredUseCases.join(','));
+    }
+
+    // Industries
+    if (filteredIndustries.length > 0) {
+      params.append('industries', filteredIndustries.join(','));
+    }
+
     // Pricing
     if (filteredPricing.length > 0) {
       params.append('pricing', filteredPricing.join(','));
@@ -208,6 +233,11 @@ export const Apps = () => {
     filteredPlatforms,
     filteredSocials,
     filteredOther,
+    filteredFeatures,
+    filteredUserTypes,
+    filteredBusinessModels,
+    filteredUseCases,
+    filteredIndustries,
   ]);
 
   const fetchApps = async () => {
@@ -228,6 +258,31 @@ export const Apps = () => {
     // Tags
     if (filteredTags.length > 0) {
       params.append('tags', filteredTags.join(','));
+    }
+
+    // Features
+    if (filteredFeatures.length > 0) {
+      params.append('features', filteredFeatures.join(','));
+    }
+
+    // User types
+    if (filteredUserTypes.length > 0) {
+      params.append('userTypes', filteredUserTypes.join(','));
+    }
+
+    // Business models
+    if (filteredBusinessModels.length > 0) {
+      params.append('businessModels', filteredBusinessModels.join(','));
+    }
+
+    // useCases
+    if (filteredUseCases.length > 0) {
+      params.append('useCases', filteredUseCases.join(','));
+    }
+
+    // Industries
+    if (filteredIndustries.length > 0) {
+      params.append('industries', filteredIndustries.join(','));
     }
 
     // Pricing
@@ -376,10 +431,6 @@ export const Apps = () => {
     fetchIndustries();
   }, []);
 
-  const handleSearch = (event) => {
-    setSearchTerms(event.target.value);
-  };
-
   const filterHandler = (type, id) => {
     let currentValues;
     let setter;
@@ -495,12 +546,6 @@ export const Apps = () => {
     params.delete('categories');
     navigate(`/apps?${params.toString()}`, { replace: true });
   };
-
-  const dropdownList = resultsHome.map((app) => (
-    <Link key={app.id} to={`/apps/${app.id}`}>
-      <li>{app.title}</li>
-    </Link>
-  ));
 
   const categoriesList = categories.map((category) => {
     return (
@@ -787,6 +832,8 @@ export const Apps = () => {
     },
   ];
 
+  console.log(filteredFeatures, 'features');
+
   return (
     <main>
       <Helmet>
@@ -836,7 +883,7 @@ export const Apps = () => {
         </section>
       )}
       {hasActiveFilters && (
-        <section className="container-filters">
+        <section className="container-active-filters">
           {/* Active filter chips */}
           {filterConfig.map(
             (filter) =>
@@ -955,15 +1002,55 @@ export const Apps = () => {
         <div className="container-details filters">
           <div className="container-form">
             <div>
-              <h3>Tags</h3>
+              <h3>Features</h3>
               <MultiSelectDropdown
-                options={tags}
-                selected={filteredTags}
+                options={features}
+                selected={filteredFeatures}
                 onChange={filterHandler}
-                placeholder="Choose tags"
+                placeholder="Select features"
                 valueKey="id"
                 labelKey="title"
-                title="tags"
+                title="features"
+              />
+              <h3>User types</h3>
+              <MultiSelectDropdown
+                options={userTypes}
+                selected={filteredUserTypes}
+                onChange={filterHandler}
+                placeholder="Select user types"
+                valueKey="id"
+                labelKey="title"
+                title="userTypes"
+              />
+              <h3>Business Models</h3>
+              <MultiSelectDropdown
+                options={businessModels}
+                selected={filteredBusinessModels}
+                onChange={filterHandler}
+                placeholder="Select business models"
+                valueKey="id"
+                labelKey="title"
+                title="businessModels"
+              />
+              <h3>Use cases</h3>
+              <MultiSelectDropdown
+                options={useCases}
+                selected={filteredUseCases}
+                onChange={filterHandler}
+                placeholder="Select use cases"
+                valueKey="id"
+                labelKey="title"
+                title="useCases"
+              />
+              <h3>Industries</h3>
+              <MultiSelectDropdown
+                options={industries}
+                selected={filteredIndustries}
+                onChange={filterHandler}
+                placeholder="Select industries"
+                valueKey="id"
+                labelKey="title"
+                title="industries"
               />
             </div>
             <div>
