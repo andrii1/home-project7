@@ -614,14 +614,6 @@ export const Apps = () => {
     setOrderBy({ column, direction });
   }, [sortOrder]);
 
-  const { pageMetaTitle, pageMetaDescription, pageHeaderTitle } = getPageMeta({
-    filteredCategories,
-    categories,
-    filteredTags,
-    tags,
-    searchParam,
-  });
-
   const sortOptions = ['Recent', 'A-Z', 'Z-A'];
 
   const pricingList = PRICING_OPTIONS.map((item) => (
@@ -832,7 +824,10 @@ export const Apps = () => {
     },
   ];
 
-  console.log(filteredFeatures, 'features');
+  const { pageMetaTitle, pageMetaDescription, pageHeaderTitle } = getPageMeta({
+    filterConfig,
+    searchParam,
+  });
 
   return (
     <main>

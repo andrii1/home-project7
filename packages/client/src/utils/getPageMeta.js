@@ -4,94 +4,57 @@ const formatTitles = (titles) => {
   if (titles.length <= 3) {
     return titles.join(', ');
   }
-
-  // Show first 3 + "and more"
-  return `${titles.slice(0, 3).join(', ')} and more`;
+  return `${titles.slice(0, 3).join(', ')}...`;
 };
 
-const buildMeta = (filtered, input, matchField, matchBy) => {
-  const titles = filtered
-    .map((val) => {
-      return input.find((item) => item[matchField] === matchBy(val))?.title;
-    })
-    .filter(Boolean);
+const buildMetaFromFilters = (filterConfig) => {
+  const allTitles = [];
 
-  const shortTitle = formatTitles(titles);
-  const capitalizedShort = capitalizeFirstWord(shortTitle);
+  filterConfig.forEach(({ values, options }) => {
+    if (!values || values.length === 0 || !options || options.length === 0)
+      return;
 
-  return {
-    pageMetaTitle: `${capitalizedShort} apps - Try Top Apps`,
-    pageMetaDescription: `${capitalizedShort} apps - reviews, how to use, tutorials, deals, promo codes, errors.`,
-    pageHeaderTitle: `${capitalizedShort} apps`,
-  };
+    // detect whether options use `id` or `key`
+    const matchField = options[0]?.id !== undefined ? 'id' : 'key';
+
+    values.forEach((val) => {
+      let match;
+
+      if (matchField === 'id') {
+        const parsedVal = isNaN(val) ? val : parseInt(val, 10);
+        match = options.find((item) => item.id === parsedVal);
+        if (match?.title) {
+          allTitles.push(match.title);
+        }
+      } else {
+        match = options.find((item) => String(item.key) === String(val));
+        if (match?.label) {
+          allTitles.push(match.label);
+        }
+      }
+    });
+  });
+
+  return allTitles;
 };
 
-export const getPageMeta = ({
-  filteredCategories,
-  categories,
-  filteredTags,
-  tags,
-  filteredFeatures,
-  features,
-  filteredUserTypes,
-  userTypes,
-  filteredBusinessModels,
-  businessModels,
-  filteredUseCases,
-  useCases,
-  filteredIndustries,
-  industries,
-  searchParam,
-}) => {
-  if (filteredCategories !== undefined && filteredCategories.length > 0) {
-    return buildMeta(filteredCategories, categories, 'id', (val) =>
-      parseInt(val, 10),
-    );
-  }
+export const getPageMeta = ({ filterConfig, searchParam }) => {
+  const allTitles = buildMetaFromFilters(filterConfig);
 
-  if (filteredTags !== undefined && filteredTags.length > 0) {
-    return buildMeta(filteredTags, tags, 'slug', (val) => val);
-  }
-
-  if (filteredFeatures !== undefined && filteredFeatures.length > 0) {
-    return buildMeta(filteredFeatures, features, 'id', (val) =>
-      parseInt(val, 10),
-    );
-  }
-
-  if (filteredUserTypes !== undefined && filteredUserTypes.length > 0) {
-    return buildMeta(filteredUserTypes, userTypes, 'id', (val) =>
-      parseInt(val, 10),
-    );
-  }
-
-  if (
-    filteredBusinessModels !== undefined &&
-    filteredBusinessModels.length > 0
-  ) {
-    return buildMeta(filteredBusinessModels, businessModels, 'id', (val) =>
-      parseInt(val, 10),
-    );
-  }
-
-  if (filteredUseCases !== undefined && filteredUseCases.length > 0) {
-    return buildMeta(filteredUseCases, useCases, 'id', (val) =>
-      parseInt(val, 10),
-    );
-  }
-
-  if (filteredIndustries !== undefined && filteredIndustries.length > 0) {
-    return buildMeta(filteredIndustries, industries, 'id', (val) =>
-      parseInt(val, 10),
-    );
-  }
-
+  // If search is present, add it as well
   if (searchParam) {
-    const capitalizedSearch = capitalizeFirstWord(searchParam);
+    allTitles.push(capitalizeFirstWord(searchParam));
+  }
+
+  if (allTitles.length > 0) {
+    const shortTitle = formatTitles(allTitles);
+    const capitalizedShort = capitalizeFirstWord(shortTitle);
+    const capitalizedLong = capitalizeFirstWord(allTitles.join(', '));
+
     return {
-      pageMetaTitle: `${capitalizedSearch} apps - Try Top Apps`,
-      pageMetaDescription: `${capitalizedSearch} apps - reviews, how to use, tutorials, deals, promo codes, errors.`,
-      pageHeaderTitle: `${capitalizedSearch} apps`,
+      pageMetaTitle: `${capitalizedLong} apps - Try Top Apps`,
+      pageMetaDescription: `${capitalizedLong} apps - reviews, how to use, tutorials, deals, promo codes, errors.`,
+      pageHeaderTitle: `${capitalizedShort} apps`,
     };
   }
 
