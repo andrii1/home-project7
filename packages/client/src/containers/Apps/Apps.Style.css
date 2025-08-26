@@ -213,7 +213,7 @@ form.home {
   margin-top: 1rem;
 }
 
-.filters li {
+.filters ul li {
   list-style-type: none !important;
   margin-bottom: 0.5rem;
 }

@@ -37,6 +37,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import mousePointer from '../../assets/images/mouse-pointer.svg';
 import { logInWithEmailAndPassword } from '../../firebase';
+import MultiSelectDropdown from '../../components/MultiSelectDropdown/MultiSelectDropdown.component';
 
 const tabs = ['Categories', 'Tags', 'Searches'];
 
@@ -362,6 +363,11 @@ export const Apps = () => {
     // fetchTopics();
     fetchCategories();
     fetchTags();
+    fetchFeatures();
+    fetchUserTypes();
+    fetchBusinessModels();
+    fetchUseCases();
+    fetchIndustries();
   }, []);
 
   const handleSearch = (event) => {
@@ -947,20 +953,31 @@ export const Apps = () => {
         <div className="container-details filters">
           <div className="container-form">
             <div>
+              <h3>Tags</h3>
+              <MultiSelectDropdown
+                options={tags}
+                selected={filteredTags}
+                onChange={setFilteredTags}
+                placeholder="Choose tags"
+                valueKey="id"
+                labelKey="title"
+              />
+            </div>
+            <div>
               <h3>Pricing</h3>
-              <ul>{pricingList}</ul>
+              <ul className="filter-list">{pricingList}</ul>
             </div>
             <div>
               <h3>Platforms</h3>
-              <ul>{platformsList}</ul>
+              <ul className="filter-list">{platformsList}</ul>
             </div>
             <div>
               <h3>Socials</h3>
-              <ul>{socialsList}</ul>
+              <ul className="filter-list">{socialsList}</ul>
             </div>
             <div>
               <h3>Other</h3>
-              <ul>{otherList}</ul>
+              <ul className="filter-list">{otherList}</ul>
             </div>
           </div>
         </div>
