@@ -326,41 +326,45 @@ export const Apps = () => {
     async function fetchTags() {
       const response = await fetch(`${apiURL()}/tags/`);
       const data = await response.json();
-      setTags(data);
+      const sorted = data.sort((a, b) => a.title.localeCompare(b.title));
+      setTags(sorted);
     }
 
     async function fetchFeatures() {
       const response = await fetch(`${apiURL()}/features/`);
       const data = await response.json();
-      setFeatures(data);
+      const sorted = data.sort((a, b) => a.title.localeCompare(b.title));
+      setFeatures(sorted);
     }
 
     async function fetchUserTypes() {
       const response = await fetch(`${apiURL()}/userTypes/`);
       const data = await response.json();
-      setUserTypes(data);
+      const sorted = data.sort((a, b) => a.title.localeCompare(b.title));
+      setUserTypes(sorted);
     }
 
     async function fetchBusinessModels() {
       const response = await fetch(`${apiURL()}/businessModels/`);
       const data = await response.json();
-      setBusinessModels(data);
+      const sorted = data.sort((a, b) => a.title.localeCompare(b.title));
+      setBusinessModels(sorted);
     }
 
     async function fetchUseCases() {
       const response = await fetch(`${apiURL()}/useCases/`);
       const data = await response.json();
-      setUseCases(data);
+      const sorted = data.sort((a, b) => a.title.localeCompare(b.title));
+      setUseCases(sorted);
     }
 
     async function fetchIndustries() {
       const response = await fetch(`${apiURL()}/industries/`);
       const data = await response.json();
-      setIndustries(data);
+      const sorted = data.sort((a, b) => a.title.localeCompare(b.title));
+      setIndustries(sorted);
     }
 
-    // fetchApps();
-    // fetchTopics();
     fetchCategories();
     fetchTags();
     fetchFeatures();
