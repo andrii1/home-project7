@@ -11,6 +11,7 @@ const MultiSelectDropdown = ({
   placeholder,
   valueKey = 'key', // field used as the value
   labelKey = 'label', // field used as the display text
+  title,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -57,7 +58,7 @@ const MultiSelectDropdown = ({
                     <input
                       type="checkbox"
                       checked={selected.includes(value)}
-                      onChange={() => handleSelect(value)}
+                      onChange={() => onChange(title, value)}
                     />
                     {label}
                   </label>
@@ -78,6 +79,7 @@ MultiSelectDropdown.propTypes = {
   placeholder: PropTypes.string,
   valueKey: PropTypes.string,
   labelKey: PropTypes.string,
+  title: PropTypes.string.isRequired,
 };
 
 MultiSelectDropdown.defaultProps = {

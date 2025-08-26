@@ -35,7 +35,7 @@ import {
   faBookmark as faBookmarkSolid,
   faBookOpen,
 } from '@fortawesome/free-solid-svg-icons';
-import { ListFilter } from 'lucide-react';
+import { ListFilter, X } from 'lucide-react';
 
 import mousePointer from '../../assets/images/mouse-pointer.svg';
 import { logInWithEmailAndPassword } from '../../firebase';
@@ -858,6 +858,7 @@ export const Apps = () => {
                         onClick={() => filterHandler(filter.key, item)}
                         secondary
                         label={displayLabel}
+                        icon={<X size={18} />}
                       />
                     );
                   })}
@@ -958,10 +959,11 @@ export const Apps = () => {
               <MultiSelectDropdown
                 options={tags}
                 selected={filteredTags}
-                onChange={setFilteredTags}
+                onChange={filterHandler}
                 placeholder="Choose tags"
                 valueKey="id"
                 labelKey="title"
+                title="tags"
               />
             </div>
             <div>
