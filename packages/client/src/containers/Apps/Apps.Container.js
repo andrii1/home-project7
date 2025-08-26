@@ -853,9 +853,7 @@ export const Apps = () => {
                         key={item}
                         backgroundColor="#eee"
                         type="button"
-                        onClick={() =>
-                          filter.setter(filter.values.filter((v) => v !== item))
-                        }
+                        onClick={() => filterHandler(filter.key, item)}
                         secondary
                         label={displayLabel}
                       />
