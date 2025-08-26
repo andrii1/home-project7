@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import './MultiSelectDropdown.Style.css';
+import { capitalize } from '../../utils/capitalize';
 
 const MultiSelectDropdown = ({
   options,
@@ -34,7 +35,7 @@ const MultiSelectDropdown = ({
         {selected.length > 0
           ? `${selected.length} selected`
           : placeholder || 'Select...'}
-        <span className="multi-dropdown-arrow">{isOpen ? '👆' : '👇'}</span>
+        <span className="multi-dropdown-arrow">{isOpen ? '▲' : '▼'}</span>
       </div>
 
       {isOpen && (
@@ -49,7 +50,7 @@ const MultiSelectDropdown = ({
           <ul className="multi-dropdown-list">
             {filteredOptions.map((item) => {
               const value = item[valueKey];
-              const label = item[labelKey];
+              const label = capitalize(item[labelKey]);
               return (
                 <li key={value} className="multi-dropdown-item">
                   <label>
