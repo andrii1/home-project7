@@ -64,16 +64,10 @@ export const Apps = () => {
   const [filteredBusinessModels, setFilteredBusinessModels] = useState([]);
   const [filteredUseCases, setFilteredUseCases] = useState([]);
   const [filteredIndustries, setFilteredIndustries] = useState([]);
-  const [filteredTopics, setFilteredTopics] = useState([]);
-  const [filteredPricingPreview, setFilteredPricingPreview] = useState([]);
-  const [filteredPlatformsPreview, setFilteredPlatformsPreview] = useState([]);
-  const [filteredSocialsPreview, setFilteredSocialsPreview] = useState([]);
-  const [filteredOtherPreview, setFilteredOtherPreview] = useState([]);
   const [filteredPricing, setFilteredPricing] = useState([]);
   const [filteredPlatforms, setFilteredPlatforms] = useState([]);
   const [filteredSocials, setFilteredSocials] = useState([]);
   const [filteredOther, setFilteredOther] = useState([]);
-  const [filtersSubmitted, setFiltersSubmitted] = useState(false);
   const [showFiltersContainer, setShowFiltersContainer] = useState(false);
   const [showCategoriesContainer, setShowCategoriesContainer] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -149,6 +143,11 @@ export const Apps = () => {
       params.append('categories', filteredCategories.join(','));
     }
 
+    // Tags
+    if (filteredTags.length > 0) {
+      params.append('tags', filteredTags.join(','));
+    }
+
     // Pricing
     if (filteredPricing.length > 0) {
       params.append('pricing', filteredPricing.join(','));
@@ -172,11 +171,6 @@ export const Apps = () => {
     // Search
     if (searchParam !== undefined) {
       params.append('search', searchParam);
-    }
-
-    // Tag
-    if (tagSlugParam !== undefined) {
-      params.append('tag', tagSlugParam);
     }
 
     const url = `${apiURL()}/apps?${params.toString()}`;
@@ -206,9 +200,8 @@ export const Apps = () => {
     orderBy.column,
     orderBy.direction,
     filteredPricing,
-    filtersSubmitted,
     searchParam,
-    tagSlugParam,
+    filteredTags,
     filteredPlatforms,
     filteredSocials,
     filteredOther,
@@ -227,6 +220,11 @@ export const Apps = () => {
     // Categories
     if (filteredCategories.length > 0) {
       params.append('categories', filteredCategories.join(','));
+    }
+
+    // Tags
+    if (filteredTags.length > 0) {
+      params.append('tags', filteredTags.join(','));
     }
 
     // Pricing
@@ -252,11 +250,6 @@ export const Apps = () => {
     // Search
     if (searchParam !== undefined) {
       params.append('search', searchParam);
-    }
-
-    // Tag
-    if (tagSlugParam !== undefined) {
-      params.append('tag', tagSlugParam);
     }
 
     const url = `${apiURL()}/apps?${params.toString()}`;
