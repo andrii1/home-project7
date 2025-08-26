@@ -15,12 +15,12 @@ export const PLATFORMS_OPTIONS = [
   { key: 'MAC', label: 'Mac app' },
 ];
 
-export const SOCIAL_MEDIA = [
+export const SOCIALS_OPTIONS = [
   { key: 'TWITTER', label: 'Twitter' },
   { key: 'DISCORD', label: 'Discord' },
 ];
 
-export const OTHER = [
+export const OTHER_OPTIONS = [
   { key: 'OS', label: 'Is Open Source?' },
   { key: 'AI', label: 'Is AI powered?' },
 ];
