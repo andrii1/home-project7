@@ -35,6 +35,8 @@ import {
   faBookmark as faBookmarkSolid,
   faBookOpen,
 } from '@fortawesome/free-solid-svg-icons';
+import { ListFilter } from 'lucide-react';
+
 import mousePointer from '../../assets/images/mouse-pointer.svg';
 import { logInWithEmailAndPassword } from '../../firebase';
 import MultiSelectDropdown from '../../components/MultiSelectDropdown/MultiSelectDropdown.component';
@@ -917,7 +919,7 @@ export const Apps = () => {
           onClick={(event) => setShowFiltersContainer(!showFiltersContainer)}
           backgroundColor="#ffe5d9"
           label="Filters"
-          icon={<FontAwesomeIcon className="filter-icon" icon={faFilter} />}
+          icon={<ListFilter size={18} />}
         />
         <Button
           secondary
