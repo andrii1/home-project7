@@ -21,6 +21,11 @@ const keywords = require('./keywords.router');
 // const replies = require('./replies.router');
 // const ratingsForThreads = require('./ratingsForThreads.router');
 const tags = require('./tags.router');
+const features = require('./features.router');
+const userTypes = require('./userTypes.router');
+const businessModels = require('./businessModels.router');
+const useCases = require('./useCases.router');
+const industries = require('./industries.router');
 
 /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -69,5 +74,10 @@ router.use('/keywords', keywords);
 // router.use('/replies', replies);
 // router.use('/ratingsForThreads', ratingsForThreads);
 router.use('/tags', tags);
+router.use('/features', features);
+router.use('/userTypes', userTypes);
+router.use('/businessModels', businessModels);
+router.use('/useCases', useCases);
+router.use('/industries', industries);
 
 module.exports = router;
