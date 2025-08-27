@@ -1,8 +1,10 @@
+/* eslint-disable one-var */
 /* eslint-disable no-console */
 /* eslint-disable import/no-extraneous-dependencies */
 /* TODO: This is an example controller to illustrate a server side controller.
 Can be deleted as soon as the first real controller is added. */
 const generateSlug = require('../lib/utils/generateSlug');
+const capitalize = require('../lib/utils/capitalize');
 const { normalizeUrl } = require('../lib/utils/normalizeUrl');
 const knex = require('../../config/db');
 const HttpError = require('../lib/utils/http-error');
@@ -22,6 +24,12 @@ const getOppositeOrderDirection = (direction) => {
   }
   return lastItemDirection;
 };
+
+function toMySQLTimestamp(datetimeStr) {
+  if (!datetimeStr) return null;
+  const d = new Date(datetimeStr);
+  return d.toISOString().slice(0, 19).replace('T', ' '); // "YYYY-MM-DD HH:MM:SS"
+}
 
 // Helper: ensure the slug is unique by checking the DB
 async function ensureUniqueSlug(baseSlug) {
@@ -79,6 +87,17 @@ async function createItems(prompt, table) {
   return itemsIds;
 }
 
+function safeJsonParse(text) {
+  try {
+    // Remove ```json or ``` and trailing ```
+    const cleaned = text.replace(/```json\s*|```/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch (err) {
+    console.error('Failed to parse JSON from OpenAI:', err, text);
+    return null;
+  }
+}
+
 async function useChatGptForData(prompt) {
   try {
     const completion = await openai.chat.completions.create({
@@ -87,15 +106,10 @@ async function useChatGptForData(prompt) {
       temperature: 0,
     });
 
-    let data;
-    try {
-      data = JSON.parse(completion.choices[0].message.content);
-    } catch (err) {
-      console.error('Failed to parse JSON from OpenAI:', err);
-      data = {};
-    }
+    const rawText = completion.choices[0].message.content;
+    const data = safeJsonParse(rawText) || {}; // ✅ parse safely
 
-    return data; // ✅ return the structured result
+    return data;
   } catch (error) {
     console.error('OpenAI API error:', error);
     return {}; // fallback if API call fails
@@ -476,19 +490,16 @@ const createAppNode = async (token, body) => {
   try {
     const userUid = token.split(' ')[1];
     const user = (await knex('users').where({ uid: userUid }))[0];
-    if (!user) {
-      throw new HttpError('User not found', 401);
-    }
+    if (!user) throw new HttpError('User not found', 401);
 
     const normalizedUrl = body.url ? normalizeUrl(body.url) : null;
 
+    // === Check for existing apps ===
     if (body.apple_id) {
-      // Check for existing app
       const existingApp = await knex('apps')
         .whereRaw('LOWER(apple_id) = ?', [body.apple_id.toLowerCase()])
         .first();
-
-      if (existingApp) {
+      if (existingApp)
         return {
           successful: true,
           existing: true,
@@ -496,14 +507,12 @@ const createAppNode = async (token, body) => {
           appTitle: body.title,
           appAppleId: existingApp.apple_id,
         };
-      }
     } else {
       const existingUrl = await knex('apps')
         .where({ url: normalizedUrl })
         .orWhere({ title: body.title })
         .first();
-
-      if (existingUrl) {
+      if (existingUrl)
         return {
           successful: true,
           existing: true,
@@ -511,71 +520,57 @@ const createAppNode = async (token, body) => {
           appTitle: body.title,
           url: normalizedUrl,
         };
-      }
     }
 
-    let promptFeatures;
-    let promptUserTypes;
-    let promptBusinessModels;
-    let promptUseCases;
-    let promptIndustries;
-
-    // ids
-    let featuresIds;
-    let userTypesIds;
-    let businessModelsIds;
-    let useCasesIds;
-    let industriesIds;
-
+    // === Tags ===
     const promptTags = `Create 3-4 tags for this app: "${body.title}"${
       body.url ? ` with website ${body.url}` : ''
-    }. Tag should be without hashtag, can be multiple words, which describes the app or it can be app topic. Tag shouldn't contain word 'app'. Return tags separated by comma.`;
-
-    const completionTags = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: promptTags }],
-      temperature: 0.7,
-      max_tokens: 3000,
-    });
-
-    const tagsString = completionTags.choices[0].message.content.trim();
+    }. Tag should be without hashtag, multiple words allowed, and not contain 'app'. Return tags separated by comma.`;
+    const tagsString = (
+      await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: promptTags }],
+        temperature: 0.7,
+        max_tokens: 3000,
+      })
+    ).choices[0].message.content.trim();
 
     const tagsArray = tagsString
       .split(',')
-      .map((tag) => (typeof tag === 'string' ? tag.trim() : null))
+      .map((t) => t.trim())
       .filter(Boolean);
-
-    if (body.tag) {
-      tagsArray.push(body.tag);
-    }
+    if (body.tag) tagsArray.push(body.tag);
 
     const tagIds = await Promise.all(
       tagsArray.map(async (tag) => {
         const existingTag = await knex('tags')
           .whereRaw('LOWER(title) = ?', [tag.toLowerCase()])
           .first();
-
-        if (existingTag) {
-          return existingTag.id;
-        }
-        const baseSlug = generateSlug(tag);
-        const uniqueSlug = await ensureUniqueSlug(baseSlug);
+        if (existingTag) return existingTag.id;
+        const uniqueSlug = await ensureUniqueSlug(generateSlug(tag));
         const [tagId] = await knex('tags').insert({
           title: tag,
           slug: uniqueSlug,
-        }); // just use the ID
+        });
         return tagId;
       }),
     );
 
+    // === Prepare app info ===
+    let description,
+      urlIcon,
+      appUrl,
+      appExtra = {};
+
     if (body.apple_id) {
-      const url = `https://itunes.apple.com/lookup?id=${body.apple_id}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      const { description } = data.results[0];
-      const urlIcon = data.results[0].artworkUrl512;
-      const urlAppleId = data.results[0].sellerUrl;
-      const normalizedUrlAppleId = normalizeUrl(urlAppleId);
+      const lookupData = await (
+        await fetch(`https://itunes.apple.com/lookup?id=${body.apple_id}`)
+      ).json();
+      const appInfo = lookupData.results[0];
+      description = appInfo.description;
+      urlIcon = appInfo.artworkUrl512;
+      const normalizedUrlAppleId = normalizeUrl(appInfo.sellerUrl);
+
       const app = await store.app({ id: body.apple_id });
       const {
         price,
@@ -588,20 +583,42 @@ const createAppNode = async (token, body) => {
         free,
       } = app;
 
-      promptFeatures = `Create 3-4 features for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
+      appUrl = body.url ? normalizedUrl : normalizedUrlAppleId;
+      appExtra = {
+        apple_id: body.apple_id,
+        url_icon: urlIcon,
+        price,
+        currency,
+        developer,
+        developerId,
+        developerUrl,
+        released: toMySQLTimestamp(released),
+        languages,
+        pricing_free: free,
+        pricing_paid: !free,
+      };
+    } else {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: `Write a short, engaging description for app "${
+              body.title
+            }"${body.url ? ` with website ${body.url}` : ''}.`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 3000,
+      });
+      description = completion.choices[0].message.content.trim();
+      appUrl = normalizedUrl;
+    }
 
-      promptUserTypes = `Create 1-4 user types / target audiences for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". * E.g. Individuals, Teams, Students, Startups, Enterprises etc. User type should be without hashtag, can be multiple words. User types shouldn't contain word 'user type'. Return user types separated by comma.`;
-
-      promptBusinessModels = `Create 1-4 business models for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. SaaS, Marketplace, Directory, Tool, Plugin, API, etc. Business model should be without hashtag, can be multiple words. Business model shouldn't contain word 'business model'. Return business models separated by comma.`;
-
-      promptUseCases = `Create 3-4 use cases for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Social media automation, Time tracking, Resume building, Text summarization, etc. Use case should be without hashtag, can be multiple words. Use case shouldn't contain word 'use case'. Return use cases separated by comma.`;
-
-      promptIndustries = `Create 1-4 industries for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Healthcare, Legal, Real Estate, Content Creators, Developers, etc. Industry should be without hashtag, can be multiple words. Industry shouldn't contain word 'industry'. Return industries separated by comma.`;
-
-      const promptPricing = `Given the app "${body.title}"${
-        body.url ? ` with website ${urlAppleId}` : ''
-      }${
-        description ? ` and description: "${description}"` : ''
+    // === Pricing + Attributes ===
+    const pricingData = await useChatGptForData(
+      `Given the app "${body.title}"${appUrl ? ` with website ${appUrl}` : ''}${
+        description ? ` and description: \"${description}\"` : ''
       }, determine its pricing model.
 
 Return JSON with keys:
@@ -614,169 +631,15 @@ Return JSON with keys:
   "pricing_url": "official pricing page URL if available, otherwise null"
 }
 
-Respond ONLY with valid JSON.`;
+Respond ONLY with valid JSON.`,
+    );
 
-      const promptAttributes = `Based on the app "${body.title}"${
-        body.url ? ` with website ${urlAppleId}` : ''
-      }${description ? ` and description: "${description}"` : ''}, determine if:
-
-- It is AI-powered (uses artificial intelligence or machine learning in its features).
-- It is open-source software.
-
-Return JSON with keys:
-{
-  "is_ai_powered": true/false,
-  "is_open_source": true/false
-}
-
-Respond ONLY with valid JSON.`;
-
-      // features
-      featuresIds = await createItems(promptFeatures, 'features');
-
-      // userTypes
-      userTypesIds = await createItems(promptUserTypes, 'userTypes');
-
-      // businessModels
-      businessModelsIds = await createItems(
-        promptBusinessModels,
-        'businessModels',
-      );
-
-      // useCases
-      useCasesIds = await createItems(promptUseCases, 'useCases');
-
-      // industries
-      industriesIds = await createItems(promptIndustries, 'industries');
-
-      const pricingData = await useChatGptForData(promptPricing);
-      const attributesData = await useChatGptForData(promptAttributes);
-
-      const appUrl = body.url ? normalizedUrl : normalizedUrlAppleId;
-
-      const [appId] = await knex('apps').insert({
-        title: body.title,
-        category_id: body.category_id,
-        apple_id: body.apple_id,
-        description,
-        url: appUrl,
-        url_icon: urlIcon,
-        price,
-        currency,
-        developer,
-        developerId,
-        developerUrl,
-        released,
-        languages,
-        pricing_free: free,
-        pricing_paid: !free,
-        ...pricingData,
-        ...attributesData,
-      });
-
-      const insertedAppToTags = await Promise.all(
-        tagIds.map((tagId) =>
-          knex('tagsApps').insert({
-            app_id: appId,
-            tag_id: tagId,
-          }),
-        ),
-      );
-
-      const insertedAppToFeatures = await Promise.all(
-        featuresIds.map((featureId) =>
-          knex('featuresApps').insert({
-            app_id: appId,
-            feature_id: featureId,
-          }),
-        ),
-      );
-
-      const insertedAppToUserTypes = await Promise.all(
-        userTypesIds.map((userTypeId) =>
-          knex('userTypesApps').insert({
-            app_id: appId,
-            userType_id: userTypeId,
-          }),
-        ),
-      );
-
-      const insertedAppToBusinessModels = await Promise.all(
-        businessModelsIds.map((businessModelId) =>
-          knex('businessModelsApps').insert({
-            app_id: appId,
-            businessModel_id: businessModelId,
-          }),
-        ),
-      );
-
-      const insertedAppToUseCases = await Promise.all(
-        useCasesIds.map((useCaseId) =>
-          knex('useCasesApps').insert({
-            app_id: appId,
-            useCase_id: useCaseId,
-          }),
-        ),
-      );
-
-      const insertedAppToIndustries = await Promise.all(
-        industriesIds.map((industryId) =>
-          knex('industriesApps').insert({
-            app_id: appId,
-            industry_id: industryId,
-          }),
-        ),
-      );
-
-      return {
-        successful: true,
-        appId,
-        appTitle: body.title,
-        appAppleId: body.apple_id,
-        insertedAppToTags,
-        insertedAppToFeatures,
-        insertedAppToUserTypes,
-        insertedAppToBusinessModels,
-        insertedAppToUseCases,
-        insertedAppToIndustries,
-      };
-    }
-
-    // Generate a short description using OpenAI
-    const prompt = `Write a short, engaging description for app "${
-      body.title
-    }"${body.url ? ` with website ${body.url}` : ''}.`;
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: 3000,
-    });
-
-    const descContent = completion.choices[0].message.content;
-
-    const description = descContent.trim();
-
-    const promptPricing = `Given the app "${body.title}"${
-      body.url ? ` with website ${body.url}` : ''
-    }, determine its pricing model.
-
-Return JSON with keys:
-{
-  "pricing_freemium": true/false,
-  "pricing_subscription": true/false,
-  "pricing_one_time": true/false,
-  "pricing_trial_available": true/false,
-  "pricing_details": "short human-readable text about pricing, e.g. '$9/mo or $89/year'",
-  "pricing_url": "official pricing page URL if available, otherwise null"
-}
-
-Respond ONLY with valid JSON.`;
-
-    const promptAttributes = `Based on the app "${body.title}"${
-      body.url ? ` with website ${body.url}` : ''
-    }, determine if:
+    const attributesData = await useChatGptForData(
+      `Based on the app "${body.title}"${
+        appUrl ? ` with website ${appUrl}` : ''
+      }${
+        description ? ` and description: \"${description}\"` : ''
+      }, determine if:
 
 - It is AI-powered (uses artificial intelligence or machine learning in its features).
 - It is open-source software.
@@ -787,127 +650,86 @@ Return JSON with keys:
   "is_open_source": true/false
 }
 
-Respond ONLY with valid JSON.`;
+Respond ONLY with valid JSON.`,
+    );
 
-    const pricingData = await useChatGptForData(promptPricing);
-    const attributesData = await useChatGptForData(promptAttributes);
-
+    // === Insert app ===
     const [appId] = await knex('apps').insert({
       title: body.title,
       category_id: body.category_id,
-      url: normalizedUrl,
+      url: appUrl,
       description,
+      ...appExtra,
       ...pricingData,
       ...attributesData,
     });
 
-    promptFeatures = `Create 3-4 features for this app: "${body.title}"${
-      body.url ? ` with website ${body.url}` : ''
-    }. E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
+    // === Prompt builder ===
+    const buildPrompt = (type, title, url, descriptionParam) => {
+      const examples = {
+        features:
+          'E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access',
+        userTypes: 'E.g. Individuals, Teams, Students, Startups, Enterprises',
+        businessModels: 'E.g. SaaS, Marketplace, Directory, Tool, Plugin, API',
+        useCases:
+          'E.g. Social media automation, Time tracking, Resume building, Text summarization',
+        industries:
+          'E.g. Healthcare, Legal, Real Estate, Content Creators, Developers',
+      };
 
-    promptUserTypes = `Create 1-4 user types / target audiences for this app: "${
-      body.title
-    }"${
-      body.url ? ` with website ${body.url}` : ''
-    }. * E.g. Individuals, Teams, Students, Startups, Enterprises etc. User type should be without hashtag, can be multiple words. User types shouldn't contain word 'user type'. Return user types separated by comma.`;
+      let base = `for this app: \"${title}\"`;
+      if (url) base += ` with website ${url}`;
+      if (descriptionParam) base += ` and description: \"${descriptionParam}\"`;
 
-    promptBusinessModels = `Create 1-4 business models for this app: "${
-      body.title
-    }"${
-      body.url ? ` with website ${body.url}` : ''
-    }. E.g. SaaS, Marketplace, Directory, Tool, Plugin, API, etc. Business model should be without hashtag, can be multiple words. Business model shouldn't contain word 'business model'. Return business models separated by comma.`;
+      return `Create ${type} ${base}. ${examples[type]}. ${capitalize(
+        type,
+      )} should be without hashtag, can be multiple words. Return ${type} separated by comma.`;
+    };
 
-    promptUseCases = `Create 3-4 use cases for this app: "${body.title}"${
-      body.url ? ` with website ${body.url}` : ''
-    }. E.g. Social media automation, Time tracking, Resume building, Text summarization, etc. Use case should be without hashtag, can be multiple words. Use case shouldn't contain word 'use case'. Return use cases separated by comma.`;
-
-    promptIndustries = `Create 1-4 industries for this app: "${body.title}"${
-      body.url ? ` with website ${body.url}` : ''
-    }. E.g. Healthcare, Legal, Real Estate, Content Creators, Developers, etc. Industry should be without hashtag, can be multiple words. Industry shouldn't contain word 'industry'. Return industries separated by comma.`;
-
-    // features
-    featuresIds = await createItems(promptFeatures, 'features');
-
-    // userTypes
-    userTypesIds = await createItems(promptUserTypes, 'userTypes');
-
-    // businessModels
-    businessModelsIds = await createItems(
-      promptBusinessModels,
+    // === Features, UserTypes, BusinessModels, UseCases, Industries ===
+    const featuresIds = await createItems(
+      buildPrompt('features', body.title, appUrl, description),
+      'features',
+    );
+    const userTypesIds = await createItems(
+      buildPrompt('userTypes', body.title, appUrl, description),
+      'userTypes',
+    );
+    const businessModelsIds = await createItems(
+      buildPrompt('businessModels', body.title, appUrl, description),
       'businessModels',
     );
-
-    // useCases
-    useCasesIds = await createItems(promptUseCases, 'useCases');
-
-    // industries
-    industriesIds = await createItems(promptIndustries, 'industries');
-
-    const insertedAppToTags = await Promise.all(
-      tagIds.map((tagId) =>
-        knex('tagsApps').insert({
-          app_id: appId,
-          tag_id: tagId,
-        }),
-      ),
+    const useCasesIds = await createItems(
+      buildPrompt('useCases', body.title, appUrl, description),
+      'useCases',
+    );
+    const industriesIds = await createItems(
+      buildPrompt('industries', body.title, appUrl, description),
+      'industries',
     );
 
-    const insertedAppToFeatures = await Promise.all(
-      featuresIds.map((featureId) =>
-        knex('featuresApps').insert({
-          app_id: appId,
-          feature_id: featureId,
-        }),
-      ),
+    // === Relations ===
+    const insertRelations = async (table, key, ids) =>
+      Promise.all(
+        ids.map((id) => knex(table).insert({ app_id: appId, [key]: id })),
+      );
+    await insertRelations('tagsApps', 'tag_id', tagIds);
+    await insertRelations('featuresApps', 'feature_id', featuresIds);
+    await insertRelations('userTypesApps', 'userType_id', userTypesIds);
+    await insertRelations(
+      'businessModelsApps',
+      'businessModel_id',
+      businessModelsIds,
     );
-
-    const insertedAppToUserTypes = await Promise.all(
-      userTypesIds.map((userTypeId) =>
-        knex('userTypesApps').insert({
-          app_id: appId,
-          userType_id: userTypeId,
-        }),
-      ),
-    );
-
-    const insertedAppToBusinessModels = await Promise.all(
-      businessModelsIds.map((businessModelId) =>
-        knex('businessModelsApps').insert({
-          app_id: appId,
-          businessModel_id: businessModelId,
-        }),
-      ),
-    );
-
-    const insertedAppToUseCases = await Promise.all(
-      useCasesIds.map((useCaseId) =>
-        knex('useCasesApps').insert({
-          app_id: appId,
-          useCase_id: useCaseId,
-        }),
-      ),
-    );
-
-    const insertedAppToIndustries = await Promise.all(
-      industriesIds.map((industryId) =>
-        knex('industriesApps').insert({
-          app_id: appId,
-          industry_id: industryId,
-        }),
-      ),
-    );
+    await insertRelations('useCasesApps', 'useCase_id', useCasesIds);
+    await insertRelations('industriesApps', 'industry_id', industriesIds);
 
     return {
       successful: true,
       appId,
       appTitle: body.title,
-      url: body.url,
-      insertedAppToTags,
-      insertedAppToFeatures,
-      insertedAppToUserTypes,
-      insertedAppToBusinessModels,
-      insertedAppToUseCases,
-      insertedAppToIndustries,
+      url: appUrl,
+      appAppleId: body.apple_id || null,
     };
   } catch (error) {
     return error.message;
