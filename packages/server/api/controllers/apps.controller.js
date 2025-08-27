@@ -6,6 +6,7 @@ const { normalizeUrl } = require('../lib/utils/normalizeUrl');
 const knex = require('../../config/db');
 const HttpError = require('../lib/utils/http-error');
 const OpenAI = require('openai');
+const store = require('app-store-scraper');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // make sure this is set in your .env
@@ -551,6 +552,17 @@ const createAppNode = async (token, body) => {
       const urlIcon = data.results[0].artworkUrl512;
       const urlAppleId = data.results[0].sellerUrl;
       const normalizedUrlAppleId = normalizeUrl(urlAppleId);
+      const app = await store.app({ id: body.apple_id });
+      const {
+        price,
+        currency,
+        developer,
+        developerId,
+        developerUrl,
+        released,
+        languages,
+        free,
+      } = app;
 
       promptFeatures = `Create 3-4 features for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
 
@@ -580,26 +592,24 @@ const createAppNode = async (token, body) => {
       // industries
       industriesIds = await createItems(promptIndustries, 'industries');
 
-      let appId;
-      if (body.url) {
-        [appId] = await knex('apps').insert({
-          title: body.title,
-          category_id: body.category_id,
-          apple_id: body.apple_id,
-          description,
-          url: normalizedUrl,
-          url_icon: urlIcon,
-        });
-      } else {
-        [appId] = await knex('apps').insert({
-          title: body.title,
-          category_id: body.category_id,
-          apple_id: body.apple_id,
-          description,
-          url: normalizedUrlAppleId,
-          url_icon: urlIcon,
-        });
-      }
+      const appUrl = body.url ? normalizedUrl : normalizedUrlAppleId;
+
+      const [appId] = await knex('apps').insert({
+        title: body.title,
+        category_id: body.category_id,
+        apple_id: body.apple_id,
+        description,
+        url: appUrl,
+        url_icon: urlIcon,
+        price,
+        currency,
+        developer,
+        developerId,
+        developerUrl,
+        released,
+        languages,
+        pricing_free: free,
+      });
 
       const insertedAppToTags = await Promise.all(
         tagIds.map((tagId) =>
