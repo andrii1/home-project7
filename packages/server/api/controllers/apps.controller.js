@@ -519,7 +519,6 @@ const createAppNode = async (token, body) => {
     let promptBusinessModels;
     let promptUseCases;
     let promptIndustries;
-    let promptPricing;
 
     // ids
     let featuresIds;
@@ -599,7 +598,7 @@ const createAppNode = async (token, body) => {
 
       promptIndustries = `Create 1-4 industries for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Healthcare, Legal, Real Estate, Content Creators, Developers, etc. Industry should be without hashtag, can be multiple words. Industry shouldn't contain word 'industry'. Return industries separated by comma.`;
 
-      promptPricing = `Given the app "${body.title}"${
+      const promptPricing = `Given the app "${body.title}"${
         body.url ? ` with website ${urlAppleId}` : ''
       }${
         description ? ` and description: "${description}"` : ''
@@ -759,7 +758,7 @@ Respond ONLY with valid JSON.`;
 
     const description = descContent.trim();
 
-    promptPricing = `Given the app "${body.title}"${
+    const promptPricing = `Given the app "${body.title}"${
       body.url ? ` with website ${body.url}` : ''
     }, determine its pricing model.
 
