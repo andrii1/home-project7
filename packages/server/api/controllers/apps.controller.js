@@ -564,7 +564,11 @@ const createAppNode = async (token, body) => {
         free,
       } = app;
 
-      promptFeatures = `Create 3-4 features for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
+      promptFeatures = `Create 3-4 features for this app: "${
+        body.title
+      }" with website ${urlAppleId ? urlAppleId : body.url ? body.url : ''} ${
+        description ? ` and description: "${description}"` : ''
+      }". E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
 
       promptUserTypes = `Create 1-4 user types / target audiences for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". * E.g. Individuals, Teams, Students, Startups, Enterprises etc. User type should be without hashtag, can be multiple words. User types shouldn't contain word 'user type'. Return user types separated by comma.`;
 
