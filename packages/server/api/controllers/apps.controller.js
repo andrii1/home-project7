@@ -374,10 +374,18 @@ const getAppsBy = async ({
           }
 
           if (search !== undefined) {
+            const searchArray = search.split(',');
             queryBuilder.where(function () {
-              this.where('apps.description', 'like', `%${search}%`);
+              searchArray.forEach((term) => {
+                this.orWhere('apps.title', 'like', `%${term}%`).orWhere(
+                  'apps.description',
+                  'like',
+                  `%${term}%`,
+                );
+              });
             });
           }
+
           if (tags !== undefined) {
             const tagsArray = tags.split(',');
             queryBuilder.whereIn('apps.id', function () {

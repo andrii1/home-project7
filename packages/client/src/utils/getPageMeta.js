@@ -38,12 +38,15 @@ const buildMetaFromFilters = (filterConfig) => {
   return allTitles;
 };
 
-export const getPageMeta = ({ filterConfig, searchParam }) => {
+export const getPageMeta = ({ filterConfig }) => {
   const allTitles = buildMetaFromFilters(filterConfig);
 
-  // If search is present, add it as well
-  if (searchParam) {
-    allTitles.push(capitalizeFirstWord(searchParam));
+  // Add all filtered search terms
+  const searchFilter = filterConfig.find((f) => f.key === 'search');
+  if (searchFilter && searchFilter.values.length > 0) {
+    searchFilter.values.forEach((term) => {
+      allTitles.push(capitalizeFirstWord(term));
+    });
   }
 
   if (allTitles.length > 0) {

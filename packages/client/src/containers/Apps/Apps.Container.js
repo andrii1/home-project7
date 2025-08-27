@@ -46,7 +46,7 @@ const tabs = ['Categories', 'Tags', 'Searches'];
 export const Apps = () => {
   const { user } = useUserContext();
   const location = useLocation();
-  const { searchParam } = useParams();
+  // const { searchParam } = useParams();
   const [searchTerms, setSearchTerms] = useState();
   const [sortOrder, setSortOrder] = useState('Recent');
   const [resultsHome, setResultsHome] = useState([]);
@@ -71,6 +71,7 @@ export const Apps = () => {
   const [filteredPlatforms, setFilteredPlatforms] = useState([]);
   const [filteredSocials, setFilteredSocials] = useState([]);
   const [filteredOther, setFilteredOther] = useState([]);
+  const [filteredSearch, setFilteredSearch] = useState([]);
   const [showFiltersContainer, setShowFiltersContainer] = useState(false);
   const [showCategoriesContainer, setShowCategoriesContainer] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -112,6 +113,7 @@ export const Apps = () => {
       platforms: setFilteredPlatforms,
       socials: setFilteredSocials,
       other: setFilteredOther,
+      search: setFilteredSearch,
     };
 
     Object.entries(urlToSetterMap).forEach(([key, setter]) => {
@@ -131,6 +133,8 @@ export const Apps = () => {
     // setPage(0);
     // setApps({ data: [], lastItem: null, hasMore: true });
   }, [searchParams]);
+
+  console.log(filteredSearch, 'search');
 
   // first fetch
   useEffect(() => {
@@ -197,11 +201,12 @@ export const Apps = () => {
     }
 
     // Search
-    if (searchParam !== undefined) {
-      params.append('search', searchParam);
+    if (filteredSearch.length > 0) {
+      params.append('search', filteredSearch.join(','));
     }
 
     const url = `${apiURL()}/apps?${params.toString()}`;
+    console.log('Fetching URL:', url);
 
     async function fetchData() {
       const response = await fetch(url);
@@ -228,7 +233,6 @@ export const Apps = () => {
     orderBy.column,
     orderBy.direction,
     filteredPricing,
-    searchParam,
     filteredTags,
     filteredPlatforms,
     filteredSocials,
@@ -238,6 +242,8 @@ export const Apps = () => {
     filteredBusinessModels,
     filteredUseCases,
     filteredIndustries,
+    searchParams,
+    filteredSearch,
   ]);
 
   const fetchApps = async () => {
@@ -306,8 +312,13 @@ export const Apps = () => {
     }
 
     // Search
-    if (searchParam !== undefined) {
-      params.append('search', searchParam);
+    // if (search && search.trim() !== '') {
+    //   params.append('search', search.trim());
+    // }
+
+    // Search
+    if (filteredSearch.length > 0) {
+      params.append('search', filteredSearch.join(','));
     }
 
     const url = `${apiURL()}/apps?${params.toString()}`;
@@ -334,28 +345,28 @@ export const Apps = () => {
     setPage((prev) => prev + 1);
   };
 
-  useEffect(() => {
-    async function fetchAppsSearch() {
-      const responseApps = await fetch(`${apiURL()}/apps/`);
+  // useEffect(() => {
+  //   async function fetchAppsSearch() {
+  //     const responseApps = await fetch(`${apiURL()}/apps/`);
 
-      const responseAppsJson = await responseApps.json();
+  //     const responseAppsJson = await responseApps.json();
 
-      if (searchTerms) {
-        const filteredSearch = responseAppsJson.filter(
-          (item) =>
-            item.title.toLowerCase().includes(searchTerms.toLowerCase()) ||
-            item.description
-              .toLowerCase()
-              .includes(searchTerms.toLowerCase()) ||
-            item.categoryTitle
-              .toLowerCase()
-              .includes(searchTerms.toLowerCase()),
-        );
-        setResultsHome(filteredSearch);
-      }
-    }
-    fetchAppsSearch();
-  }, [searchTerms]);
+  //     if (searchTerms) {
+  //       const filteredSearch = responseAppsJson.filter(
+  //         (item) =>
+  //           item.title.toLowerCase().includes(searchTerms.toLowerCase()) ||
+  //           item.description
+  //             .toLowerCase()
+  //             .includes(searchTerms.toLowerCase()) ||
+  //           item.categoryTitle
+  //             .toLowerCase()
+  //             .includes(searchTerms.toLowerCase()),
+  //       );
+  //       setResultsHome(filteredSearch);
+  //     }
+  //   }
+  //   fetchAppsSearch();
+  // }, [searchTerms]);
 
   useEffect(() => {
     setPage(0);
@@ -431,6 +442,23 @@ export const Apps = () => {
     fetchIndustries();
   }, []);
 
+  // const filterHandler = (type, id) => {
+  //   const params = new URLSearchParams(location.search);
+  //   const existing = params.get(type)?.split(',') || [];
+
+  //   const newValues = existing.includes(String(id))
+  //     ? existing.filter((v) => v !== String(id))
+  //     : [...existing, id];
+
+  //   if (newValues.length > 0) {
+  //     params.set(type, newValues.join(','));
+  //   } else {
+  //     params.delete(type);
+  //   }
+
+  //   navigate(`/apps?${params.toString()}`, { replace: true });
+  // };
+
   const filterHandler = (type, id) => {
     let currentValues;
     let setter;
@@ -480,6 +508,10 @@ export const Apps = () => {
         currentValues = filteredOther;
         setter = setFilteredOther;
         break;
+      case 'search':
+        currentValues = filteredSearch;
+        setter = setFilteredSearch;
+        break;
       default:
         return;
     }
@@ -504,6 +536,7 @@ export const Apps = () => {
       platforms: type === 'platforms' ? newValues : filteredPlatforms,
       socials: type === 'socials' ? newValues : filteredSocials,
       other: type === 'other' ? newValues : filteredOther,
+      search: type === 'search' ? newValues : filteredSearch,
     };
 
     const params = new URLSearchParams();
@@ -531,6 +564,7 @@ export const Apps = () => {
     setFilteredPlatforms([]);
     setFilteredSocials([]);
     setFilteredOther([]);
+    setFilteredSearch([]);
 
     // Reset the URL (remove all query params)
     navigate('/apps', { replace: true });
@@ -588,10 +622,9 @@ export const Apps = () => {
   const searchList = searchTrending.map((searchItem) => {
     return (
       <Button
-        primary={
-          searchItem.searchId.toString() === searchParam.toString() && true
-        }
-        secondary={searchItem.searchId !== searchParam && true}
+        onClick={() => filterHandler('search', search)}
+        primary={searchItem.searchId.toString() === search.toString() && true}
+        secondary={searchItem.searchId !== search && true}
         label={capitalize(searchItem.searchId)}
       />
     );
@@ -742,7 +775,8 @@ export const Apps = () => {
     filteredPricing.length > 0 ||
     filteredPlatforms.length > 0 ||
     filteredSocials.length > 0 ||
-    filteredOther.length > 0;
+    filteredOther.length > 0 ||
+    filteredSearch.length > 0;
 
   const filterConfig = [
     {
@@ -822,11 +856,17 @@ export const Apps = () => {
       setter: setFilteredOther,
       options: OTHER_OPTIONS,
     },
+    {
+      key: 'search',
+      label: 'Search',
+      values: filteredSearch,
+      setter: setFilteredSearch,
+      options: [],
+    },
   ];
 
   const { pageMetaTitle, pageMetaDescription, pageHeaderTitle } = getPageMeta({
     filterConfig,
-    searchParam,
   });
 
   return (
@@ -868,8 +908,8 @@ export const Apps = () => {
         <section className="container-topics-desktop">
           <Link to="/">
             <Button
-              primary={!searchParam}
-              secondary={searchParam}
+              primary={!filteredSearch.length > 0}
+              secondary={filteredSearch.length > 0}
               label="All searches"
             />
           </Link>
@@ -899,7 +939,7 @@ export const Apps = () => {
                         type="button"
                         onClick={() => filterHandler(filter.key, item)}
                         secondary
-                        label={displayLabel}
+                        label={capitalize(displayLabel)}
                         icon={<X size={18} />}
                       />
                     );
