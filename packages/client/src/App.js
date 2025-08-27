@@ -29,11 +29,12 @@ function App() {
           <Navigation />
           <Routes>
             <Route path="/" element={<Apps />} />
-            <Route path="/apps" element={<Apps />} />
+            {/* <Route path="/apps" element={<Apps />} /> */}
             <Route path="/landing" element={<LandingPage />} />
             <Route path="/test" element={<Prompts />} />
             <Route path="/categories" element={<Categories />} />
             <Route exact path="/apps/:id" element={<AppView />} />
+            <Route path="/apps/*" element={<Apps />} />
             <Route
               exact
               path="/apps/category/:categoryIdParam"

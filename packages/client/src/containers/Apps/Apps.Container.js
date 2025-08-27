@@ -134,8 +134,6 @@ export const Apps = () => {
     // setApps({ data: [], lastItem: null, hasMore: true });
   }, [searchParams]);
 
-  console.log(filteredSearch, 'search');
-
   // first fetch
   useEffect(() => {
     setIsLoading(true);
@@ -206,7 +204,6 @@ export const Apps = () => {
     }
 
     const url = `${apiURL()}/apps?${params.toString()}`;
-    console.log('Fetching URL:', url);
 
     async function fetchData() {
       const response = await fetch(url);
@@ -442,114 +439,114 @@ export const Apps = () => {
     fetchIndustries();
   }, []);
 
-  // const filterHandler = (type, id) => {
-  //   const params = new URLSearchParams(location.search);
-  //   const existing = params.get(type)?.split(',') || [];
-
-  //   const newValues = existing.includes(String(id))
-  //     ? existing.filter((v) => v !== String(id))
-  //     : [...existing, id];
-
-  //   if (newValues.length > 0) {
-  //     params.set(type, newValues.join(','));
-  //   } else {
-  //     params.delete(type);
-  //   }
-
-  //   navigate(`/apps?${params.toString()}`, { replace: true });
-  // };
-
   const filterHandler = (type, id) => {
-    let currentValues;
-    let setter;
+    const params = new URLSearchParams(location.search);
+    const existing = params.get(type)?.split(',') || [];
 
-    switch (type) {
-      case 'categories':
-        currentValues = filteredCategories;
-        setter = setFilteredCategories;
-        break;
-      case 'tags':
-        currentValues = filteredTags;
-        setter = setFilteredTags;
-        break;
-      case 'features':
-        currentValues = filteredFeatures;
-        setter = setFilteredFeatures;
-        break;
-      case 'userTypes':
-        currentValues = filteredUserTypes;
-        setter = setFilteredUserTypes;
-        break;
-      case 'businessModels':
-        currentValues = filteredBusinessModels;
-        setter = setFilteredBusinessModels;
-        break;
-      case 'useCases':
-        currentValues = filteredUseCases;
-        setter = setFilteredUseCases;
-        break;
-      case 'industries':
-        currentValues = filteredIndustries;
-        setter = setFilteredIndustries;
-        break;
-      case 'pricing':
-        currentValues = filteredPricing;
-        setter = setFilteredPricing;
-        break;
-      case 'platforms':
-        currentValues = filteredPlatforms;
-        setter = setFilteredPlatforms;
-        break;
-      case 'socials':
-        currentValues = filteredSocials;
-        setter = setFilteredSocials;
-        break;
-      case 'other':
-        currentValues = filteredOther;
-        setter = setFilteredOther;
-        break;
-      case 'search':
-        currentValues = filteredSearch;
-        setter = setFilteredSearch;
-        break;
-      default:
-        return;
+    const newValues = existing.includes(String(id))
+      ? existing.filter((v) => v !== String(id))
+      : [...existing, id];
+
+    if (newValues.length > 0) {
+      params.set(type, newValues.join(','));
+    } else {
+      params.delete(type);
     }
-
-    const newValues = currentValues.includes(id)
-      ? currentValues.filter((v) => v !== id)
-      : [...currentValues, id];
-
-    setter(newValues);
-
-    // Prepare all filters in an object
-    const allFilters = {
-      categories: type === 'categories' ? newValues : filteredCategories,
-      tags: type === 'tags' ? newValues : filteredTags,
-      features: type === 'features' ? newValues : filteredFeatures,
-      userTypes: type === 'userTypes' ? newValues : filteredUserTypes,
-      businessModels:
-        type === 'businessModels' ? newValues : filteredBusinessModels,
-      useCases: type === 'useCases' ? newValues : filteredUseCases,
-      industries: type === 'industries' ? newValues : filteredIndustries,
-      pricing: type === 'pricing' ? newValues : filteredPricing,
-      platforms: type === 'platforms' ? newValues : filteredPlatforms,
-      socials: type === 'socials' ? newValues : filteredSocials,
-      other: type === 'other' ? newValues : filteredOther,
-      search: type === 'search' ? newValues : filteredSearch,
-    };
-
-    const params = new URLSearchParams();
-
-    // Only add non-empty arrays to the URL
-    Object.entries(allFilters).forEach(([key, value]) => {
-      if (value.length > 0) {
-        params.set(key, value.join(','));
-      }
-    });
 
     navigate(`/apps?${params.toString()}`, { replace: true });
   };
+
+  // const filterHandler = (type, id) => {
+  //   let currentValues;
+  //   let setter;
+
+  //   switch (type) {
+  //     case 'categories':
+  //       currentValues = filteredCategories;
+  //       setter = setFilteredCategories;
+  //       break;
+  //     case 'tags':
+  //       currentValues = filteredTags;
+  //       setter = setFilteredTags;
+  //       break;
+  //     case 'features':
+  //       currentValues = filteredFeatures;
+  //       setter = setFilteredFeatures;
+  //       break;
+  //     case 'userTypes':
+  //       currentValues = filteredUserTypes;
+  //       setter = setFilteredUserTypes;
+  //       break;
+  //     case 'businessModels':
+  //       currentValues = filteredBusinessModels;
+  //       setter = setFilteredBusinessModels;
+  //       break;
+  //     case 'useCases':
+  //       currentValues = filteredUseCases;
+  //       setter = setFilteredUseCases;
+  //       break;
+  //     case 'industries':
+  //       currentValues = filteredIndustries;
+  //       setter = setFilteredIndustries;
+  //       break;
+  //     case 'pricing':
+  //       currentValues = filteredPricing;
+  //       setter = setFilteredPricing;
+  //       break;
+  //     case 'platforms':
+  //       currentValues = filteredPlatforms;
+  //       setter = setFilteredPlatforms;
+  //       break;
+  //     case 'socials':
+  //       currentValues = filteredSocials;
+  //       setter = setFilteredSocials;
+  //       break;
+  //     case 'other':
+  //       currentValues = filteredOther;
+  //       setter = setFilteredOther;
+  //       break;
+  //     case 'search':
+  //       currentValues = filteredSearch;
+  //       setter = setFilteredSearch;
+  //       break;
+  //     default:
+  //       return;
+  //   }
+
+  //   const newValues = currentValues.includes(id)
+  //     ? currentValues.filter((v) => v !== id)
+  //     : [...currentValues, id];
+
+  //   setter(newValues);
+
+  //   // Prepare all filters in an object
+  //   const allFilters = {
+  //     categories: type === 'categories' ? newValues : filteredCategories,
+  //     tags: type === 'tags' ? newValues : filteredTags,
+  //     features: type === 'features' ? newValues : filteredFeatures,
+  //     userTypes: type === 'userTypes' ? newValues : filteredUserTypes,
+  //     businessModels:
+  //       type === 'businessModels' ? newValues : filteredBusinessModels,
+  //     useCases: type === 'useCases' ? newValues : filteredUseCases,
+  //     industries: type === 'industries' ? newValues : filteredIndustries,
+  //     pricing: type === 'pricing' ? newValues : filteredPricing,
+  //     platforms: type === 'platforms' ? newValues : filteredPlatforms,
+  //     socials: type === 'socials' ? newValues : filteredSocials,
+  //     other: type === 'other' ? newValues : filteredOther,
+  //     search: type === 'search' ? newValues : filteredSearch,
+  //   };
+
+  //   const params = new URLSearchParams();
+
+  //   // Only add non-empty arrays to the URL
+  //   Object.entries(allFilters).forEach(([key, value]) => {
+  //     if (value.length > 0) {
+  //       params.set(key, value.join(','));
+  //     }
+  //   });
+
+  //   navigate(`/apps?${params.toString()}`, { replace: true });
+  // };
 
   const clearFiltersHandler = () => {
     // Reset all filter states
@@ -622,9 +619,9 @@ export const Apps = () => {
   const searchList = searchTrending.map((searchItem) => {
     return (
       <Button
-        onClick={() => filterHandler('search', search)}
-        primary={searchItem.searchId.toString() === search.toString() && true}
-        secondary={searchItem.searchId !== search && true}
+        onClick={() => filterHandler('search', searchItem.searchId)}
+        primary={filteredTags.includes(searchItem.searchId)}
+        secondary={!filteredTags.includes(searchItem.searchId)}
         label={capitalize(searchItem.searchId)}
       />
     );
