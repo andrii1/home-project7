@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable import/no-extraneous-dependencies */
 /* TODO: This is an example controller to illustrate a server side controller.
 Can be deleted as soon as the first real controller is added. */
@@ -76,6 +77,29 @@ async function createItems(prompt, table) {
     }),
   );
   return itemsIds;
+}
+
+async function useChatGptForData(prompt) {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0,
+    });
+
+    let data;
+    try {
+      data = JSON.parse(completion.choices[0].message.content);
+    } catch (err) {
+      console.error('Failed to parse JSON from OpenAI:', err);
+      data = {};
+    }
+
+    return data; // ✅ return the structured result
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    return {}; // fallback if API call fails
+  }
 }
 
 const getAppsAll = async () => {
@@ -495,6 +519,7 @@ const createAppNode = async (token, body) => {
     let promptBusinessModels;
     let promptUseCases;
     let promptIndustries;
+    let promptPricing;
 
     // ids
     let featuresIds;
@@ -564,11 +589,7 @@ const createAppNode = async (token, body) => {
         free,
       } = app;
 
-      promptFeatures = `Create 3-4 features for this app: "${
-        body.title
-      }" with website ${urlAppleId ? urlAppleId : body.url ? body.url : ''} ${
-        description ? ` and description: "${description}"` : ''
-      }". E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
+      promptFeatures = `Create 3-4 features for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access, etc. Feature should be without hashtag, can be multiple words. Feature shouldn't contain word 'feature'. Return features separated by comma.`;
 
       promptUserTypes = `Create 1-4 user types / target audiences for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". * E.g. Individuals, Teams, Students, Startups, Enterprises etc. User type should be without hashtag, can be multiple words. User types shouldn't contain word 'user type'. Return user types separated by comma.`;
 
@@ -577,6 +598,39 @@ const createAppNode = async (token, body) => {
       promptUseCases = `Create 3-4 use cases for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Social media automation, Time tracking, Resume building, Text summarization, etc. Use case should be without hashtag, can be multiple words. Use case shouldn't contain word 'use case'. Return use cases separated by comma.`;
 
       promptIndustries = `Create 1-4 industries for this app: "${body.title}" with website ${urlAppleId} and description: "${description}". E.g. Healthcare, Legal, Real Estate, Content Creators, Developers, etc. Industry should be without hashtag, can be multiple words. Industry shouldn't contain word 'industry'. Return industries separated by comma.`;
+
+      promptPricing = `Given the app "${body.title}"${
+        body.url ? ` with website ${urlAppleId}` : ''
+      }${
+        description ? ` and description: "${description}"` : ''
+      }, determine its pricing model.
+
+Return JSON with keys:
+{
+  "pricing_freemium": true/false,
+  "pricing_subscription": true/false,
+  "pricing_one_time": true/false,
+  "pricing_trial_available": true/false,
+  "pricing_details": "short human-readable text about pricing, e.g. '$9/mo or $89/year'",
+  "pricing_url": "official pricing page URL if available, otherwise null"
+}
+
+Respond ONLY with valid JSON.`;
+
+      const promptAttributes = `Based on the app "${body.title}"${
+        body.url ? ` with website ${urlAppleId}` : ''
+      }${description ? ` and description: "${description}"` : ''}, determine if:
+
+- It is AI-powered (uses artificial intelligence or machine learning in its features).
+- It is open-source software.
+
+Return JSON with keys:
+{
+  "is_ai_powered": true/false,
+  "is_open_source": true/false
+}
+
+Respond ONLY with valid JSON.`;
 
       // features
       featuresIds = await createItems(promptFeatures, 'features');
@@ -596,6 +650,9 @@ const createAppNode = async (token, body) => {
       // industries
       industriesIds = await createItems(promptIndustries, 'industries');
 
+      const pricingData = await useChatGptForData(promptPricing);
+      const attributesData = await useChatGptForData(promptAttributes);
+
       const appUrl = body.url ? normalizedUrl : normalizedUrlAppleId;
 
       const [appId] = await knex('apps').insert({
@@ -613,6 +670,9 @@ const createAppNode = async (token, body) => {
         released,
         languages,
         pricing_free: free,
+        pricing_paid: !free,
+        ...pricingData,
+        ...attributesData,
       });
 
       const insertedAppToTags = await Promise.all(
@@ -699,11 +759,47 @@ const createAppNode = async (token, body) => {
 
     const description = descContent.trim();
 
+    promptPricing = `Given the app "${body.title}"${
+      body.url ? ` with website ${body.url}` : ''
+    }, determine its pricing model.
+
+Return JSON with keys:
+{
+  "pricing_freemium": true/false,
+  "pricing_subscription": true/false,
+  "pricing_one_time": true/false,
+  "pricing_trial_available": true/false,
+  "pricing_details": "short human-readable text about pricing, e.g. '$9/mo or $89/year'",
+  "pricing_url": "official pricing page URL if available, otherwise null"
+}
+
+Respond ONLY with valid JSON.`;
+
+    const promptAttributes = `Based on the app "${body.title}"${
+      body.url ? ` with website ${body.url}` : ''
+    }, determine if:
+
+- It is AI-powered (uses artificial intelligence or machine learning in its features).
+- It is open-source software.
+
+Return JSON with keys:
+{
+  "is_ai_powered": true/false,
+  "is_open_source": true/false
+}
+
+Respond ONLY with valid JSON.`;
+
+    const pricingData = await useChatGptForData(promptPricing);
+    const attributesData = await useChatGptForData(promptAttributes);
+
     const [appId] = await knex('apps').insert({
       title: body.title,
       category_id: body.category_id,
       url: normalizedUrl,
       description,
+      ...pricingData,
+      ...attributesData,
     });
 
     promptFeatures = `Create 3-4 features for this app: "${body.title}"${
