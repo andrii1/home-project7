@@ -241,6 +241,9 @@ export const Apps = () => {
     filteredSearch,
   ]);
 
+  console.log(filteredTags, 'tags');
+  console.log(filteredCategories, 'categories');
+
   const fetchApps = async () => {
     setIsLoading(true);
     setError(null);
@@ -382,8 +385,9 @@ export const Apps = () => {
   useEffect(() => {
     async function fetchCategories() {
       const response = await fetch(`${apiURL()}/categories/`);
-      const categoriesResponse = await response.json();
-      setCategories(categoriesResponse);
+      const data = await response.json();
+      const sorted = data.sort((a, b) => a.title.localeCompare(b.title));
+      setCategories(sorted);
     }
 
     async function fetchTags() {
@@ -605,9 +609,9 @@ export const Apps = () => {
   const categoriesList = categories.map((category) => {
     return (
       <Button
-        onClick={() => filterHandler('categories', category.id)}
-        primary={filteredCategories.includes(String(category.id))}
-        secondary={!filteredCategories.includes(String(category.id))}
+        onClick={() => filterHandler('categories', category.slug)}
+        primary={filteredCategories.includes(String(category.slug))}
+        secondary={!filteredCategories.includes(String(category.slug))}
         label={category.title}
       />
     );

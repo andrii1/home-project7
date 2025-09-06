@@ -331,7 +331,7 @@ const getAppsBy = async ({
         .modify((queryBuilder) => {
           if (categories !== undefined) {
             const categoriesArray = categories.split(',');
-            queryBuilder.whereIn('apps.category_id', categoriesArray);
+            queryBuilder.whereIn('categories.slug', categoriesArray);
           }
           if (pricing !== undefined) {
             const pricingArray = pricing.split(',');
@@ -668,7 +668,7 @@ const createAppNode = async (token, body) => {
         developerId,
         developerUrl,
         released: toMySQLTimestamp(released),
-        languages,
+        languages: JSON.stringify(languages),
         pricing_free: free,
         pricing_paid: !free,
       };
