@@ -99,40 +99,40 @@ export const Apps = () => {
     document.body.style.overflow = 'visible';
   };
 
-  // // set filters from url
-  // useEffect(() => {
-  //   const urlToSetterMap = {
-  //     categories: setFilteredCategories,
-  //     tags: setFilteredTags,
-  //     features: setFilteredFeatures,
-  //     userTypes: setFilteredUserTypes,
-  //     businessModels: setFilteredBusinessModels,
-  //     useCases: setFilteredUseCases,
-  //     industries: setFilteredIndustries,
-  //     pricing: setFilteredPricing,
-  //     platforms: setFilteredPlatforms,
-  //     socials: setFilteredSocials,
-  //     other: setFilteredOther,
-  //     search: setFilteredSearch,
-  //   };
+  // set filters from url
+  useEffect(() => {
+    const urlToSetterMap = {
+      categories: setFilteredCategories,
+      tags: setFilteredTags,
+      features: setFilteredFeatures,
+      userTypes: setFilteredUserTypes,
+      businessModels: setFilteredBusinessModels,
+      useCases: setFilteredUseCases,
+      industries: setFilteredIndustries,
+      pricing: setFilteredPricing,
+      platforms: setFilteredPlatforms,
+      socials: setFilteredSocials,
+      other: setFilteredOther,
+      search: setFilteredSearch,
+    };
 
-  //   Object.entries(urlToSetterMap).forEach(([key, setter]) => {
-  //     const valuesFromUrl = searchParams.get(key);
-  //     if (valuesFromUrl) {
-  //       // split on comma & convert to number if needed
-  //       const parsedValues = valuesFromUrl
-  //         .split(',')
-  //         .map((v) => (isNaN(v) ? v : Number(v)));
-  //       setter(parsedValues);
-  //     } else {
-  //       setter([]);
-  //     }
-  //   });
+    Object.entries(urlToSetterMap).forEach(([key, setter]) => {
+      const valuesFromUrl = searchParams.get(key);
+      if (valuesFromUrl) {
+        // split on comma & convert to number if needed
+        const parsedValues = valuesFromUrl
+          .split(',')
+          .map((v) => (isNaN(v) ? v : Number(v)));
+        setter(parsedValues);
+      } else {
+        setter([]);
+      }
+    });
 
-  //   // ✅ reset pagination and apps when filters change
-  //   // setPage(0);
-  //   // setApps({ data: [], lastItem: null, hasMore: true });
-  // }, [searchParams]);
+    // ✅ reset pagination and apps when filters change
+    // setPage(0);
+    // setApps({ data: [], lastItem: null, hasMore: true });
+  }, [searchParams]);
 
   // first fetch
   useEffect(() => {
@@ -519,33 +519,33 @@ export const Apps = () => {
 
     setter(newValues);
 
-    // // Prepare all filters in an object
-    // const allFilters = {
-    //   categories: type === 'categories' ? newValues : filteredCategories,
-    //   tags: type === 'tags' ? newValues : filteredTags,
-    //   features: type === 'features' ? newValues : filteredFeatures,
-    //   userTypes: type === 'userTypes' ? newValues : filteredUserTypes,
-    //   businessModels:
-    //     type === 'businessModels' ? newValues : filteredBusinessModels,
-    //   useCases: type === 'useCases' ? newValues : filteredUseCases,
-    //   industries: type === 'industries' ? newValues : filteredIndustries,
-    //   pricing: type === 'pricing' ? newValues : filteredPricing,
-    //   platforms: type === 'platforms' ? newValues : filteredPlatforms,
-    //   socials: type === 'socials' ? newValues : filteredSocials,
-    //   other: type === 'other' ? newValues : filteredOther,
-    //   search: type === 'search' ? newValues : filteredSearch,
-    // };
+    // Prepare all filters in an object
+    const allFilters = {
+      categories: type === 'categories' ? newValues : filteredCategories,
+      tags: type === 'tags' ? newValues : filteredTags,
+      features: type === 'features' ? newValues : filteredFeatures,
+      userTypes: type === 'userTypes' ? newValues : filteredUserTypes,
+      businessModels:
+        type === 'businessModels' ? newValues : filteredBusinessModels,
+      useCases: type === 'useCases' ? newValues : filteredUseCases,
+      industries: type === 'industries' ? newValues : filteredIndustries,
+      pricing: type === 'pricing' ? newValues : filteredPricing,
+      platforms: type === 'platforms' ? newValues : filteredPlatforms,
+      socials: type === 'socials' ? newValues : filteredSocials,
+      other: type === 'other' ? newValues : filteredOther,
+      search: type === 'search' ? newValues : filteredSearch,
+    };
 
-    // const params = new URLSearchParams();
+    const params = new URLSearchParams();
 
-    // // Only add non-empty arrays to the URL
-    // Object.entries(allFilters).forEach(([key, value]) => {
-    //   if (value.length > 0) {
-    //     params.set(key, value.join(','));
-    //   }
-    // });
+    // Only add non-empty arrays to the URL
+    Object.entries(allFilters).forEach(([key, value]) => {
+      if (value.length > 0) {
+        params.set(key, value.join(','));
+      }
+    });
 
-    // navigate(`/apps?${params.toString()}`, { replace: true });
+    navigate(`/apps?${params.toString()}`, { replace: true });
   };
 
   const clearFiltersHandler = () => {
