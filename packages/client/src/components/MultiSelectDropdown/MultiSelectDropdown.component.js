@@ -51,7 +51,7 @@ const MultiSelectDropdown = ({
                   <label>
                     <input
                       type="checkbox"
-                      checked={selected.includes(value)}
+                      checked={selected.includes(String(value))}
                       onChange={() => onChange(title, value)}
                     />
                     {label}

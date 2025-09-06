@@ -49,6 +49,7 @@ export const Apps = () => {
   // const { searchParam } = useParams();
   const [searchTerms, setSearchTerms] = useState();
   const [sortOrder, setSortOrder] = useState('Recent');
+  const [resultsHome, setResultsHome] = useState([]);
 
   const [openModal, setOpenModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -98,39 +99,40 @@ export const Apps = () => {
     document.body.style.overflow = 'visible';
   };
 
-  const parseFiltersFromPath = useCallback(() => {
-    // Remove "/apps/" from the start
-    const path = location.pathname.replace(/^\/apps\/?/, '');
-    const parts = path.split('/');
-
-    const filters = {};
-    for (let i = 0; i < parts.length; i += 2) {
-      const key = parts[i];
-      const value = parts[i + 1];
-      if (key && value) {
-        filters[key] = value.split(',');
-      }
-    }
-    return filters;
-  }, [location.pathname]);
-
   // set filters from url
   useEffect(() => {
-    const filters = parseFiltersFromPath();
+    const urlToSetterMap = {
+      categories: setFilteredCategories,
+      tags: setFilteredTags,
+      features: setFilteredFeatures,
+      userTypes: setFilteredUserTypes,
+      businessModels: setFilteredBusinessModels,
+      useCases: setFilteredUseCases,
+      industries: setFilteredIndustries,
+      pricing: setFilteredPricing,
+      platforms: setFilteredPlatforms,
+      socials: setFilteredSocials,
+      other: setFilteredOther,
+      search: setFilteredSearch,
+    };
 
-    setFilteredCategories(filters.categories || []);
-    setFilteredTags(filters.tags || []);
-    setFilteredFeatures(filters.features || []);
-    setFilteredUserTypes(filters.userTypes || []);
-    setFilteredBusinessModels(filters.businessModels || []);
-    setFilteredUseCases(filters.useCases || []);
-    setFilteredIndustries(filters.industries || []);
-    setFilteredPricing(filters.pricing || []);
-    setFilteredPlatforms(filters.platforms || []);
-    setFilteredSocials(filters.socials || []);
-    setFilteredOther(filters.other || []);
-    setFilteredSearch(filters.search || []);
-  }, [location.pathname, parseFiltersFromPath]);
+    Object.entries(urlToSetterMap).forEach(([key, setter]) => {
+      const valuesFromUrl = searchParams.get(key);
+      if (valuesFromUrl) {
+        // split on comma & convert to number if needed
+        const parsedValues = valuesFromUrl
+          .split(',')
+          .map((v) => (isNaN(v) ? v : Number(v)));
+        setter(parsedValues);
+      } else {
+        setter([]);
+      }
+    });
+
+    // ✅ reset pagination and apps when filters change
+    // setPage(0);
+    // setApps({ data: [], lastItem: null, hasMore: true });
+  }, [searchParams]);
 
   // first fetch
   useEffect(() => {
@@ -437,32 +439,6 @@ export const Apps = () => {
     fetchIndustries();
   }, []);
 
-  const updateUrlFromFilters = (filters) => {
-    const parts = [];
-    Object.entries(filters).forEach(([key, values]) => {
-      if (values.length > 0) {
-        parts.push(`${key}/${values.join(',')}`);
-      }
-    });
-    navigate(`/apps/${parts.join('/')}`, { replace: true });
-  };
-
-  const filterHandler = (type, id) => {
-    const filters = parseFiltersFromPath();
-    const currentValues = filters[type] || [];
-
-    const newValues = currentValues.includes(String(id))
-      ? currentValues.filter((v) => v !== String(id))
-      : [...currentValues, id];
-
-    if (newValues.length > 0) {
-      filters[type] = newValues;
-    } else {
-      delete filters[type];
-    }
-
-    updateUrlFromFilters(filters);
-  };
   // const filterHandler = (type, id) => {
   //   const params = new URLSearchParams(location.search);
   //   const existing = params.get(type)?.split(',') || [];
@@ -480,97 +456,97 @@ export const Apps = () => {
   //   navigate(`/apps?${params.toString()}`, { replace: true });
   // };
 
-  // const filterHandler = (type, id) => {
-  //   let currentValues;
-  //   let setter;
+  const filterHandler = (type, id) => {
+    let currentValues;
+    let setter;
 
-  //   switch (type) {
-  //     case 'categories':
-  //       currentValues = filteredCategories;
-  //       setter = setFilteredCategories;
-  //       break;
-  //     case 'tags':
-  //       currentValues = filteredTags;
-  //       setter = setFilteredTags;
-  //       break;
-  //     case 'features':
-  //       currentValues = filteredFeatures;
-  //       setter = setFilteredFeatures;
-  //       break;
-  //     case 'userTypes':
-  //       currentValues = filteredUserTypes;
-  //       setter = setFilteredUserTypes;
-  //       break;
-  //     case 'businessModels':
-  //       currentValues = filteredBusinessModels;
-  //       setter = setFilteredBusinessModels;
-  //       break;
-  //     case 'useCases':
-  //       currentValues = filteredUseCases;
-  //       setter = setFilteredUseCases;
-  //       break;
-  //     case 'industries':
-  //       currentValues = filteredIndustries;
-  //       setter = setFilteredIndustries;
-  //       break;
-  //     case 'pricing':
-  //       currentValues = filteredPricing;
-  //       setter = setFilteredPricing;
-  //       break;
-  //     case 'platforms':
-  //       currentValues = filteredPlatforms;
-  //       setter = setFilteredPlatforms;
-  //       break;
-  //     case 'socials':
-  //       currentValues = filteredSocials;
-  //       setter = setFilteredSocials;
-  //       break;
-  //     case 'other':
-  //       currentValues = filteredOther;
-  //       setter = setFilteredOther;
-  //       break;
-  //     case 'search':
-  //       currentValues = filteredSearch;
-  //       setter = setFilteredSearch;
-  //       break;
-  //     default:
-  //       return;
-  //   }
+    switch (type) {
+      case 'categories':
+        currentValues = filteredCategories;
+        setter = setFilteredCategories;
+        break;
+      case 'tags':
+        currentValues = filteredTags;
+        setter = setFilteredTags;
+        break;
+      case 'features':
+        currentValues = filteredFeatures;
+        setter = setFilteredFeatures;
+        break;
+      case 'userTypes':
+        currentValues = filteredUserTypes;
+        setter = setFilteredUserTypes;
+        break;
+      case 'businessModels':
+        currentValues = filteredBusinessModels;
+        setter = setFilteredBusinessModels;
+        break;
+      case 'useCases':
+        currentValues = filteredUseCases;
+        setter = setFilteredUseCases;
+        break;
+      case 'industries':
+        currentValues = filteredIndustries;
+        setter = setFilteredIndustries;
+        break;
+      case 'pricing':
+        currentValues = filteredPricing;
+        setter = setFilteredPricing;
+        break;
+      case 'platforms':
+        currentValues = filteredPlatforms;
+        setter = setFilteredPlatforms;
+        break;
+      case 'socials':
+        currentValues = filteredSocials;
+        setter = setFilteredSocials;
+        break;
+      case 'other':
+        currentValues = filteredOther;
+        setter = setFilteredOther;
+        break;
+      case 'search':
+        currentValues = filteredSearch;
+        setter = setFilteredSearch;
+        break;
+      default:
+        return;
+    }
 
-  //   const newValues = currentValues.includes(id)
-  //     ? currentValues.filter((v) => v !== id)
-  //     : [...currentValues, id];
+    const newValues = currentValues.includes(id)
+      ? currentValues.filter((v) => v !== id)
+      : [...currentValues, id];
 
-  //   setter(newValues);
+    setter(newValues);
 
-  //   // Prepare all filters in an object
-  //   const allFilters = {
-  //     categories: type === 'categories' ? newValues : filteredCategories,
-  //     tags: type === 'tags' ? newValues : filteredTags,
-  //     features: type === 'features' ? newValues : filteredFeatures,
-  //     userTypes: type === 'userTypes' ? newValues : filteredUserTypes,
-  //     businessModels:
-  //       type === 'businessModels' ? newValues : filteredBusinessModels,
-  //     useCases: type === 'useCases' ? newValues : filteredUseCases,
-  //     industries: type === 'industries' ? newValues : filteredIndustries,
-  //     pricing: type === 'pricing' ? newValues : filteredPricing,
-  //     platforms: type === 'platforms' ? newValues : filteredPlatforms,
-  //     socials: type === 'socials' ? newValues : filteredSocials,
-  //     other: type === 'other' ? newValues : filteredOther,
-  //     search: type === 'search' ? newValues : filteredSearch,
-  //   };
+    // Prepare all filters in an object
+    const allFilters = {
+      categories: type === 'categories' ? newValues : filteredCategories,
+      tags: type === 'tags' ? newValues : filteredTags,
+      features: type === 'features' ? newValues : filteredFeatures,
+      userTypes: type === 'userTypes' ? newValues : filteredUserTypes,
+      businessModels:
+        type === 'businessModels' ? newValues : filteredBusinessModels,
+      useCases: type === 'useCases' ? newValues : filteredUseCases,
+      industries: type === 'industries' ? newValues : filteredIndustries,
+      pricing: type === 'pricing' ? newValues : filteredPricing,
+      platforms: type === 'platforms' ? newValues : filteredPlatforms,
+      socials: type === 'socials' ? newValues : filteredSocials,
+      other: type === 'other' ? newValues : filteredOther,
+      search: type === 'search' ? newValues : filteredSearch,
+    };
 
-  //   const params = new URLSearchParams();
+    const params = new URLSearchParams();
 
-  //   // Only add non-empty arrays to the URL
-  //   Object.entries(allFilters).forEach(([key, value]) => {
-  //     if (value.length > 0) {
-  //       params.set(key, value.join(','));
-  //     }
-  //   });
+    // Only add non-empty arrays to the URL
+    Object.entries(allFilters).forEach(([key, value]) => {
+      if (value.length > 0) {
+        params.set(key, value.join(','));
+      }
+    });
 
-  //   navigate(`/apps?${params.toString()}`, { replace: true });
-  // };
+    navigate(`/apps?${params.toString()}`, { replace: true });
+  };
 
   const clearFiltersHandler = () => {
     // Reset all filter states
@@ -606,8 +582,8 @@ export const Apps = () => {
     return (
       <Button
         onClick={() => filterHandler('categories', category.id)}
-        primary={filteredCategories.includes(String(category.id))}
-        secondary={!filteredCategories.includes(String(category.id))}
+        primary={filteredCategories.includes(category.id)}
+        secondary={!filteredCategories.includes(category.id)}
         label={category.title}
       />
     );
@@ -616,9 +592,9 @@ export const Apps = () => {
   const tagsList = tags.map((tag) => {
     return (
       <Button
-        onClick={() => filterHandler('tags', tag.slug)}
-        primary={filteredTags.includes(String(tag.slug))}
-        secondary={!filteredTags.includes(String(tag.slug))}
+        onClick={() => filterHandler('tags', tag.id)}
+        primary={filteredTags.includes(tag.id)}
+        secondary={!filteredTags.includes(tag.id)}
         label={tag.title}
       />
     );
@@ -644,8 +620,8 @@ export const Apps = () => {
     return (
       <Button
         onClick={() => filterHandler('search', searchItem.searchId)}
-        primary={filteredTags.includes(String(searchItem.searchId))}
-        secondary={!filteredTags.includes(String(searchItem.searchId))}
+        primary={filteredTags.includes(searchItem.searchId)}
+        secondary={!filteredTags.includes(searchItem.searchId)}
         label={capitalize(searchItem.searchId)}
       />
     );

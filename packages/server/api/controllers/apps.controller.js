@@ -386,55 +386,122 @@ const getAppsBy = async ({
             });
           }
 
+          // if (tags !== undefined) {
+          //   const tagsArray = tags.split(',');
+          //   queryBuilder.whereIn('apps.id', function () {
+          //     this.select('app_id')
+          //       .from('tagsApps')
+          //       .whereIn('tag_id', tagsArray);
+          //   });
+          // }
           if (tags !== undefined) {
             const tagsArray = tags.split(',');
             queryBuilder.whereIn('apps.id', function () {
-              this.select('app_id')
+              this.select('tagsApps.app_id')
                 .from('tagsApps')
-                .whereIn('tag_id', tagsArray);
+                .join('tags', 'tagsApps.tag_id', 'tags.id')
+                .whereIn('tags.slug', tagsArray);
             });
           }
 
           if (features !== undefined) {
             const featuresArray = features.split(',');
             queryBuilder.whereIn('apps.id', function () {
-              this.select('app_id')
+              this.select('featuresApps.app_id')
                 .from('featuresApps')
-                .whereIn('feature_id', featuresArray);
+                .join('features', 'featuresApps.feature_id', 'features.id')
+                .whereIn('features.slug', featuresArray);
             });
           }
+
           if (userTypes !== undefined) {
             const userTypesArray = userTypes.split(',');
             queryBuilder.whereIn('apps.id', function () {
-              this.select('app_id')
+              this.select('userTypesApps.app_id')
                 .from('userTypesApps')
-                .whereIn('userType_id', userTypesArray);
+                .join('userTypes', 'userTypesApps.userType_id', 'userTypes.id')
+                .whereIn('userTypes.slug', userTypesArray);
             });
           }
+
           if (businessModels !== undefined) {
             const businessModelsArray = businessModels.split(',');
             queryBuilder.whereIn('apps.id', function () {
-              this.select('app_id')
+              this.select('businessModelsApps.app_id')
                 .from('businessModelsApps')
-                .whereIn('businessModel_id', businessModelsArray);
+                .join(
+                  'businessModels',
+                  'businessModelsApps.businessModel_id',
+                  'businessModels.id',
+                )
+                .whereIn('businessModels.slug', businessModelsArray);
             });
           }
+
           if (useCases !== undefined) {
             const useCasesArray = useCases.split(',');
             queryBuilder.whereIn('apps.id', function () {
-              this.select('app_id')
+              this.select('useCasesApps.app_id')
                 .from('useCasesApps')
-                .whereIn('useCase_id', useCasesArray);
+                .join('useCases', 'useCasesApps.useCase_id', 'useCases.id')
+                .whereIn('useCases.slug', useCasesArray);
             });
           }
+
           if (industries !== undefined) {
             const industriesArray = industries.split(',');
             queryBuilder.whereIn('apps.id', function () {
-              this.select('app_id')
+              this.select('industriesApps.app_id')
                 .from('industriesApps')
-                .whereIn('industry_id', industriesArray);
+                .join(
+                  'industries',
+                  'industriesApps.industry_id',
+                  'industries.id',
+                )
+                .whereIn('industries.slug', industriesArray);
             });
           }
+
+          // if (features !== undefined) {
+          //   const featuresArray = features.split(',');
+          //   queryBuilder.whereIn('apps.id', function () {
+          //     this.select('app_id')
+          //       .from('featuresApps')
+          //       .whereIn('feature_id', featuresArray);
+          //   });
+          // }
+          // if (userTypes !== undefined) {
+          //   const userTypesArray = userTypes.split(',');
+          //   queryBuilder.whereIn('apps.id', function () {
+          //     this.select('app_id')
+          //       .from('userTypesApps')
+          //       .whereIn('userType_id', userTypesArray);
+          //   });
+          // }
+          // if (businessModels !== undefined) {
+          //   const businessModelsArray = businessModels.split(',');
+          //   queryBuilder.whereIn('apps.id', function () {
+          //     this.select('app_id')
+          //       .from('businessModelsApps')
+          //       .whereIn('businessModel_id', businessModelsArray);
+          //   });
+          // }
+          // if (useCases !== undefined) {
+          //   const useCasesArray = useCases.split(',');
+          //   queryBuilder.whereIn('apps.id', function () {
+          //     this.select('app_id')
+          //       .from('useCasesApps')
+          //       .whereIn('useCase_id', useCasesArray);
+          //   });
+          // }
+          // if (industries !== undefined) {
+          //   const industriesArray = industries.split(',');
+          //   queryBuilder.whereIn('apps.id', function () {
+          //     this.select('app_id')
+          //       .from('industriesApps')
+          //       .whereIn('industry_id', industriesArray);
+          //   });
+          // }
         });
     const lastItem = await getModel()
       .orderBy(column, lastItemDirection)
