@@ -53,6 +53,28 @@ async function slugExists(slug) {
   return !!existing;
 }
 
+// Helper: ensure the slug is unique by checking the DB
+async function ensureUniqueSlugItems(baseSlug, table) {
+  let slug = baseSlug;
+  let counter = 1;
+
+  // eslint-disable-next-line no-await-in-loop
+  while (await slugExistsItems(slug, table)) {
+    const suffix = `-${counter}`;
+    const maxBaseLength = 200 - suffix.length;
+    slug = `${baseSlug.slice(0, maxBaseLength)}${suffix}`;
+    counter += 1;
+  }
+
+  return slug;
+}
+
+// Helper: check if a slug already exists in the database
+async function slugExistsItems(slug, table) {
+  const existing = await knex(table).where({ slug }).first();
+  return !!existing;
+}
+
 async function createItems(prompt, table) {
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -78,8 +100,12 @@ async function createItems(prompt, table) {
         return existing.id;
       }
 
+      const baseSlug = generateSlug(item);
+      const uniqueSlug = await ensureUniqueSlugItems(baseSlug, table);
+
       const [itemId] = await knex(table).insert({
         title: item,
+        slug: uniqueSlug,
       }); // just use the ID
       return itemId;
     }),
@@ -279,30 +305,30 @@ const getAppsByTag = async (page, column, direction, tag) => {
 };
 
 const pricingFiltersMap = {
-  FREE: (qb) => qb.orWhere('apps.pricing_free', true),
-  FREEMIUM: (qb) => qb.orWhere('apps.pricing_freemium', true),
-  PAID: (qb) => qb.orWhere('apps.pricing_paid', true),
-  SUB: (qb) => qb.orWhere('apps.pricing_subscription', true),
-  ONE: (qb) => qb.orWhere('apps.pricing_one_time', true),
-  TRIAL: (qb) => qb.orWhere('apps.pricing_trial_available', true),
+  free: (qb) => qb.orWhere('apps.pricing_free', true),
+  freemium: (qb) => qb.orWhere('apps.pricing_freemium', true),
+  paid: (qb) => qb.orWhere('apps.pricing_paid', true),
+  subscription: (qb) => qb.orWhere('apps.pricing_subscription', true),
+  'one-time': (qb) => qb.orWhere('apps.pricing_one_time', true),
+  trial: (qb) => qb.orWhere('apps.pricing_trial_available', true),
 };
 
 const platformsFiltersMap = {
-  EXT: (qb) => qb.orWhereNotNull('apps.url_chrome_extension'),
-  IOS: (qb) => qb.orWhereNotNull('apps.apple_id'),
-  ANDROID: (qb) => qb.orWhereNotNull('apps.url_google_play_store'),
-  WIN: (qb) => qb.orWhereNotNull('apps.url_windows'),
-  MAC: (qb) => qb.orWhereNotNull('apps.url_mac'),
+  'browser-extension': (qb) => qb.orWhereNotNull('apps.url_chrome_extension'),
+  ios: (qb) => qb.orWhereNotNull('apps.apple_id'),
+  android: (qb) => qb.orWhereNotNull('apps.url_google_play_store'),
+  windows: (qb) => qb.orWhereNotNull('apps.url_windows'),
+  mac: (qb) => qb.orWhereNotNull('apps.url_mac'),
 };
 
 const socialMediaFiltersMap = {
-  TWITTER: (qb) => qb.orWhereNotNull('apps.url_x'),
-  DISCORD: (qb) => qb.orWhereNotNull('apps.url_discord'),
+  twitter: (qb) => qb.orWhereNotNull('apps.url_x'),
+  discord: (qb) => qb.orWhereNotNull('apps.url_discord'),
 };
 
 const otherFiltersMap = {
-  OS: (qb) => qb.orWhere('apps.is_open_source', true),
-  AI: (qb) => qb.orWhere('apps.is_ai_powered', true),
+  'open-source': (qb) => qb.orWhere('apps.is_open_source', true),
+  ai: (qb) => qb.orWhere('apps.is_ai_powered', true),
 };
 
 const getAppsBy = async ({

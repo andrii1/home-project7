@@ -21,8 +21,8 @@ const buildMetaFromFilters = (filterConfig) => {
       let match;
 
       if (matchField === 'id') {
-        const parsedVal = isNaN(val) ? val : parseInt(val, 10);
-        match = options.find((item) => item.id === parsedVal);
+        // const parsedVal = isNaN(val) ? val : parseInt(val, 10);
+        match = options.find((item) => item.slug === String(val));
         if (match?.title) {
           allTitles.push(match.title);
         }

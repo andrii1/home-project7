@@ -241,9 +241,6 @@ export const Apps = () => {
     filteredSearch,
   ]);
 
-  console.log(filteredTags, 'tags');
-  console.log(filteredCategories, 'categories');
-
   const fetchApps = async () => {
     setIsLoading(true);
     setError(null);
@@ -592,7 +589,7 @@ export const Apps = () => {
     setFilteredSearch([]);
 
     // Reset the URL (remove all query params)
-    navigate('/apps', { replace: true });
+    navigate('/', { replace: true });
 
     // ✅ Optional: also reset pagination/apps if needed
     // setPage(0);
@@ -603,6 +600,20 @@ export const Apps = () => {
     setFilteredCategories([]);
     const params = new URLSearchParams(location.search);
     params.delete('categories');
+    navigate(`/apps?${params.toString()}`, { replace: true });
+  };
+
+  const filterHandlerAllTags = () => {
+    setFilteredTags([]);
+    const params = new URLSearchParams(location.search);
+    params.delete('tags');
+    navigate(`/apps?${params.toString()}`, { replace: true });
+  };
+
+  const filterHandlerAllSearches = () => {
+    setFilteredTags([]);
+    const params = new URLSearchParams(location.search);
+    params.delete('search');
     navigate(`/apps?${params.toString()}`, { replace: true });
   };
 
@@ -922,6 +933,7 @@ export const Apps = () => {
             primary={!filteredTags.length > 0}
             secondary={filteredTags.length > 0}
             label="All tags"
+            onClick={filterHandlerAllTags}
           />
           {tagsList}
           <Link to="/tags">
@@ -936,6 +948,7 @@ export const Apps = () => {
               primary={!filteredSearch.length > 0}
               secondary={filteredSearch.length > 0}
               label="All searches"
+              onClick={filterHandlerAllSearches}
             />
           </Link>
 
@@ -953,7 +966,7 @@ export const Apps = () => {
                   {filter.values.map((item) => {
                     // find the matching option for display
                     const option = filter.options.find(
-                      (opt) => String(opt.key ?? opt.id) === String(item),
+                      (opt) => String(opt.key ?? opt.slug) === String(item),
                     );
                     const displayLabel = option?.title || option?.label || item;
 
@@ -1068,7 +1081,7 @@ export const Apps = () => {
                 selected={filteredFeatures}
                 onChange={filterHandler}
                 placeholder="Select features"
-                valueKey="id"
+                valueKey="slug"
                 labelKey="title"
                 title="features"
               />
@@ -1078,7 +1091,7 @@ export const Apps = () => {
                 selected={filteredUserTypes}
                 onChange={filterHandler}
                 placeholder="Select user types"
-                valueKey="id"
+                valueKey="slug"
                 labelKey="title"
                 title="userTypes"
               />
@@ -1088,7 +1101,7 @@ export const Apps = () => {
                 selected={filteredBusinessModels}
                 onChange={filterHandler}
                 placeholder="Select business models"
-                valueKey="id"
+                valueKey="slug"
                 labelKey="title"
                 title="businessModels"
               />
@@ -1098,7 +1111,7 @@ export const Apps = () => {
                 selected={filteredUseCases}
                 onChange={filterHandler}
                 placeholder="Select use cases"
-                valueKey="id"
+                valueKey="slug"
                 labelKey="title"
                 title="useCases"
               />
@@ -1108,7 +1121,7 @@ export const Apps = () => {
                 selected={filteredIndustries}
                 onChange={filterHandler}
                 placeholder="Select industries"
-                valueKey="id"
+                valueKey="slug"
                 labelKey="title"
                 title="industries"
               />
