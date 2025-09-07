@@ -250,6 +250,14 @@ form.home {
   }
 }
 
+.container-details-section,
+.container-topics-section {
+  position: relative;
+  display: none;
+  justify-content: center;
+  animation: slide-in 500ms;
+}
+
 .container-details-section.show,
 .container-topics-section.show {
   display: flex !important;
@@ -257,13 +265,6 @@ form.home {
   left: 0;
   animation: slide-in 500ms;
   margin-bottom: 2rem;
-}
-
-.container-details-section,
-.container-topics-section {
-  display: none;
-  justify-content: center;
-  animation: slide-in 500ms;
 }
 
 .container-form {

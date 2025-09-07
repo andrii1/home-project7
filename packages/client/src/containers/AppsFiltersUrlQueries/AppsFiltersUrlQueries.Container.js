@@ -7,7 +7,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import './Apps.Style.css';
+import './AppsFiltersUrlQueries.Style.css.Style.css';
 import { apiURL } from '../../apiURL';
 import { Card } from '../../components/Card/Card.component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

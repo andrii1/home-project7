@@ -650,7 +650,7 @@ export const Apps = () => {
         onClick={() => filterHandler('tags', tag.slug)}
         primary={filteredTags.includes(String(tag.slug))}
         secondary={!filteredTags.includes(String(tag.slug))}
-        label={tag.title}
+        label={capitalize(tag.title)}
       />
     );
   });
@@ -1160,6 +1160,14 @@ export const Apps = () => {
             </div>
           </div>
         </div>
+        <Button
+          secondary
+          type="button"
+          onClick={() => setShowFiltersContainer(!showFiltersContainer)}
+          className="btn-filters"
+        >
+          X
+        </Button>
       </section>
       {apps.data ? (
         <section className="container-scroll">

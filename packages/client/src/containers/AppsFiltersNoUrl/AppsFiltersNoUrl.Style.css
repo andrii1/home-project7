@@ -257,6 +257,7 @@ form.home {
   left: 0;
   animation: slide-in 500ms;
   margin-bottom: 2rem;
+  position: relative;
 }
 
 .container-details-section,
