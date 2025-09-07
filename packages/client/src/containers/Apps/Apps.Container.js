@@ -598,23 +598,39 @@ export const Apps = () => {
 
   const filterHandlerAllCategories = () => {
     setFilteredCategories([]);
+
+    // remove `/categories/...` from the pathname
+    const newPath = location.pathname.replace(/\/categories\/[^/]+/, '');
+
+    // keep query params if any
     const params = new URLSearchParams(location.search);
-    params.delete('categories');
-    navigate(`/apps?${params.toString()}`, { replace: true });
+    const search = params.toString();
+
+    navigate(search ? `${newPath}?${search}` : newPath, { replace: true });
   };
 
   const filterHandlerAllTags = () => {
     setFilteredTags([]);
+
+    const newPath = location.pathname.replace(/\/tags\/[^/]+/, '');
+
+    // keep query params if any
     const params = new URLSearchParams(location.search);
-    params.delete('tags');
-    navigate(`/apps?${params.toString()}`, { replace: true });
+    const search = params.toString();
+
+    navigate(search ? `${newPath}?${search}` : newPath, { replace: true });
   };
 
   const filterHandlerAllSearches = () => {
-    setFilteredTags([]);
+    setFilteredSearch([]);
+
+    const newPath = location.pathname.replace(/\/search\/[^/]+/, '');
+
+    // keep query params if any
     const params = new URLSearchParams(location.search);
-    params.delete('search');
-    navigate(`/apps?${params.toString()}`, { replace: true });
+    const search = params.toString();
+
+    navigate(search ? `${newPath}?${search}` : newPath, { replace: true });
   };
 
   const categoriesList = categories.map((category) => {
