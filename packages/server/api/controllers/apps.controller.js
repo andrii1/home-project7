@@ -742,7 +742,7 @@ Return JSON with keys:
   "pricing_trial_available": true/false,
   "pricing_details": "short human-readable text about pricing, e.g. '$9/mo or $89/year'",
   "pricing_url": "official pricing page URL if available, otherwise null",
-  "pricing_free": "true/false, whether the app is completely free"
+  "pricing_free": true/false
 }
 
 Respond ONLY with valid JSON.`,

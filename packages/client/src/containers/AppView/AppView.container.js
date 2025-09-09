@@ -986,6 +986,96 @@ export const AppView = () => {
             )}
           </div>
           <div className="container-details container-badges">
+            <h2 className="no-margin">Pricing</h2>
+            <div className="container-tags">
+              <div className="badges">
+                <p className="p-no-margin">Pricing: </p>
+                <div className="badges-keywords">
+                  {!!app.pricing_free && (
+                    <Link to={`../apps/pricing/free`}>
+                      <Button secondary label="free" size="small" />
+                    </Link>
+                  )}
+                  {!!app.pricing_freemium && (
+                    <Link to={`../apps/pricing/freemium`}>
+                      <Button secondary label="freemium" size="small" />
+                    </Link>
+                  )}
+                  {!!app.pricing_subscription && (
+                    <Link to={`../apps/pricing/subscription`}>
+                      <Button secondary label="subscription" size="small" />
+                    </Link>
+                  )}
+                  {!!app.pricing_one_time && (
+                    <Link to={`../apps/pricing/one-time`}>
+                      <Button secondary label="one-time" size="small" />
+                    </Link>
+                  )}
+                  {!!app.pricing_trial_available && (
+                    <Link to={`../apps/pricing/trial`}>
+                      <Button secondary label="trial" size="small" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="container-tags">
+              <div className="badges">
+                <p className="p-no-margin">iOS app pricing: </p>
+                <div className="badges-keywords">
+                  {!!app.pricing_ios_app_free && (
+                    <Link to={`../apps/pricing/ios-free`}>
+                      <Button secondary label="free" size="small" />
+                    </Link>
+                  )}
+                  {!!app.pricing_ios_app_paid && (
+                    <Link to={`../apps/pricing/ios-paid`}>
+                      <Button secondary label="paid" size="small" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+            {!!app.pricing_ios_app_paid &&
+              app.price > 0 &&
+              `${app.price} ${app.currency}`}
+            {app.pricing_details && (
+              <p className="p-no-margin">{app.pricing_details}</p>
+            )}
+            {app.pricing_url && (
+              <div>
+                <Link target="_blank" to={app.pricing_url}>
+                  <span className="underline">Pricing page</span>{' '}
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} size="sm" />
+                </Link>
+              </div>
+            )}
+          </div>
+          <div className="container-details container-badges">
+            <h2 className="no-margin">Category & tags</h2>
+            <div className="container-tags">
+              <div className="badges">
+                <p>Category: </p>
+                <div>
+                  <Link
+                    to={`/apps/category/${app.category_id}`}
+                    target="_blank"
+                  >
+                    <Button
+                      secondary
+                      label={app.categoryTitle}
+                      size="small"
+                      icon={
+                        <FontAwesomeIcon
+                          icon={faArrowUpRightFromSquare}
+                          size="sm"
+                        />
+                      }
+                    />
+                  </Link>
+                </div>
+              </div>
+            </div>
             {topicsFromDeals.length > 0 && (
               <div className="container-tags">
                 <div className="badges">
@@ -1018,6 +1108,8 @@ export const AppView = () => {
                 </div>
               </div>
             )}
+          </div>
+          <div className="container-details container-badges">
             {features.length > 0 && (
               <div className="container-tags">
                 <div className="badges">
@@ -1183,6 +1275,7 @@ export const AppView = () => {
               </div>
             )}
           </div>
+
           {app.appUrlAppStore || app.appUrlGooglePlayStore ? (
             <div className="container-appview-box">
               <h2>Download {app.appTitle} app</h2>

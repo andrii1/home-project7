@@ -70,7 +70,9 @@
   justify-content: center;
   align-items: center;
 }
-
+h2.no-margin {
+  margin: 0rem;
+}
 .container-details {
   padding: 1.5rem;
   background-color: #ffe5d9;
@@ -306,6 +308,10 @@ img.copy-referral-code.smaller-icon {
 
 .app-description ul li {
   list-style-type: disc;
+}
+
+span.underline:hover {
+  text-decoration: none !important;
 }
 
 @media only screen and (max-width: 768px) {
