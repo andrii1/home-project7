@@ -703,12 +703,12 @@ const createAppNode = async (token, body) => {
         price,
         currency,
         developer,
-        developerId,
-        developerUrl,
+        developer_id: developerId,
+        developer_url: developerUrl,
         released: toMySQLTimestamp(released),
         languages: JSON.stringify(languages),
-        pricing_free: free,
-        pricing_paid: !free,
+        pricing_ios_app_free: free,
+        pricing_ios_app_paid: !free,
       };
     } else {
       const completion = await openai.chat.completions.create({
@@ -741,7 +741,8 @@ Return JSON with keys:
   "pricing_one_time": true/false,
   "pricing_trial_available": true/false,
   "pricing_details": "short human-readable text about pricing, e.g. '$9/mo or $89/year'",
-  "pricing_url": "official pricing page URL if available, otherwise null"
+  "pricing_url": "official pricing page URL if available, otherwise null",
+  "pricing_free": "true/false, whether the app is completely free"
 }
 
 Respond ONLY with valid JSON.`,
