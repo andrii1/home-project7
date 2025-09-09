@@ -756,11 +756,23 @@ Respond ONLY with valid JSON.`,
 
 - It is AI-powered (uses artificial intelligence or machine learning in its features).
 - It is open-source software.
+- Does it have browser extension. If it does - return url for browser extension.
+- Does it have an Android app. If it does - return url.
+- Does it have a Windows app. If it does - return url.
+- Does it have a Mac app. If it does - return url.
+- Does it have a Twitter account. If it does - return url.
+- Does it have a Discord account. If it does - return url.
 
 Return JSON with keys:
 {
   "is_ai_powered": true/false,
-  "is_open_source": true/false
+  "is_open_source": true/false,
+  "url_chrome_extension": url for browser extension (if available),
+  "url_google_play_store": url for android app (if available),
+  "url_windows": url for windows app (if available),
+  "url_mac": url for mac app (if available),
+  "url_x": url for twitter account (if available),
+  "url_discord": url for discord account (if available),
 }
 
 Respond ONLY with valid JSON.`,
