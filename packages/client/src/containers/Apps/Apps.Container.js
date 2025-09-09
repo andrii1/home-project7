@@ -802,6 +802,8 @@ export const Apps = () => {
     deleteFavorites();
   };
 
+  console.log('apps1', apps);
+
   const tabsGroup = tabs.map((tab) => {
     return (
       <Button
@@ -1189,7 +1191,7 @@ export const Apps = () => {
                   url={app.url}
                   urlImage={app.url_icon || mousePointer}
                   topic={app.categoryTitle}
-                  topicId={app.category_id}
+                  topicId={app.categorySlug}
                   pricingType={app.pricing_type}
                   isFavorite={favorites.some((x) => x.id === app.id)}
                   addFavorite={(event) => addFavorite(app.id)}
@@ -1198,7 +1200,7 @@ export const Apps = () => {
                     setOpenModal(true);
                     setModalTitle('Sign up to add bookmarks');
                   }}
-                  cardUrl={`/apps/${app.id}`}
+                  cardUrl={`/apps/${app.slug}`}
                 />
               );
             })}

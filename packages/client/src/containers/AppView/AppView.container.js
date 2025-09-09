@@ -49,11 +49,12 @@ import { useUserContext } from '../../userContext';
 import { getMostUsedWords } from '../../utils/getMostUsedWords';
 
 export const AppView = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [openModal, setOpenModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [openToast, setOpenToast] = useState(false);
   const [animation, setAnimation] = useState('');
+  const [id, setId] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [topicsFromDeals, setTopicsFromDeals] = useState([]);
   const navigate = useNavigate();
@@ -96,8 +97,13 @@ export const AppView = () => {
       const response = await fetch(`${apiURL()}/apps/${appId}`);
       const appResponse = await response.json();
       setApp(appResponse[0]);
+      setId(appResponse[0].id);
     }
 
+    fetchSingleApp(slug);
+  }, [slug]);
+
+  useEffect(() => {
     async function fetchTagsForApp(appId) {
       const response = await fetch(`${apiURL()}/tags/?app=${appId}`);
       const data = await response.json();
@@ -131,7 +137,6 @@ export const AppView = () => {
       setLoading(true);
       setError(null); // Clear previous errors
       try {
-        await fetchSingleApp(id);
         await fetchTagsForApp(id);
         // await fetchCodesForADeal(id);
         // await fetchSearchesForADeal(id);

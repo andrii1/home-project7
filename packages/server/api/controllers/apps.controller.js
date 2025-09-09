@@ -158,7 +158,11 @@ const getApps = async (page, column, direction) => {
   try {
     const getModel = () =>
       knex('apps')
-        .select('apps.*', 'categories.title as categoryTitle')
+        .select(
+          'apps.*',
+          'categories.title as categoryTitle',
+          'categories.slug as categorySlug',
+        )
         .join('categories', 'apps.category_id', '=', 'categories.id');
     const lastItem = await getModel()
       .orderBy(column, lastItemDirection)
@@ -181,7 +185,11 @@ const getAppsPagination = async (column, direction, page, size) => {
   try {
     const getModel = () =>
       knex('apps')
-        .select('apps.*', 'categories.title as categoryTitle')
+        .select(
+          'apps.*',
+          'categories.title as categoryTitle',
+          'categories.slug as categorySlug',
+        )
         .join('categories', 'apps.category_id', '=', 'categories.id')
         .orderBy(column, direction);
     const totalCount = await getModel()
@@ -352,7 +360,11 @@ const getAppsBy = async ({
   try {
     const getModel = () =>
       knex('apps')
-        .select('apps.*', 'categories.title as categoryTitle')
+        .select(
+          'apps.*',
+          'categories.title as categoryTitle',
+          'categories.slug as categorySlug',
+        )
         .join('categories', 'apps.category_id', '=', 'categories.id')
         .modify((queryBuilder) => {
           if (categories !== undefined) {
@@ -555,7 +567,7 @@ const getAppById = async (id) => {
     const app = await knex('apps')
       .select('apps.*', 'categories.title as categoryTitle')
       .join('categories', 'apps.category_id', '=', 'categories.id')
-      .where({ 'apps.id': id });
+      .where({ 'apps.slug': id });
     if (app.length === 0) {
       throw new HttpError(`incorrect entry with the id of ${id}`, 404);
     }
@@ -754,9 +766,13 @@ Return JSON with keys:
 Respond ONLY with valid JSON.`,
     );
 
+    const baseSlug = generateSlug(body.title);
+    const uniqueSlug = await ensureUniqueSlugItems(baseSlug, 'apps');
+
     // === Insert app ===
     const [appId] = await knex('apps').insert({
       title: body.title,
+      slug: uniqueSlug,
       category_id: body.category_id,
       url: appUrl,
       description,

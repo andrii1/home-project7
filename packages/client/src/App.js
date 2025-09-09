@@ -33,7 +33,7 @@ function App() {
             <Route path="/landing" element={<LandingPage />} />
             <Route path="/test" element={<Prompts />} />
             <Route path="/categories" element={<Categories />} />
-            <Route exact path="/apps/:id" element={<AppView />} />
+            <Route exact path="/apps/:slug" element={<AppView />} />
             <Route path="/apps/*" element={<Apps />} />
             <Route
               exact
