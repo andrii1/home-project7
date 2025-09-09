@@ -78,6 +78,11 @@ export const AppView = () => {
   const [openAddCodeForm, setOpenAddCodeForm] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [tags, setTags] = useState([]);
+  const [businessModels, setBusinessModels] = useState([]);
+  const [features, setFeatures] = useState([]);
+  const [industries, setIndustries] = useState([]);
+  const [useCases, setUseCases] = useState([]);
+  const [userTypes, setUserTypes] = useState([]);
   const {
     likes: positiveLikes,
     allLikes: allPositiveLikes,
@@ -110,6 +115,36 @@ export const AppView = () => {
       setTags(data);
     }
 
+    async function fetchBusinessModelsForApp(appId) {
+      const response = await fetch(`${apiURL()}/businessModels/?app=${appId}`);
+      const data = await response.json();
+      setBusinessModels(data);
+    }
+
+    async function fetchFeaturesForApp(appId) {
+      const response = await fetch(`${apiURL()}/features/?app=${appId}`);
+      const data = await response.json();
+      setFeatures(data);
+    }
+
+    async function fetchIndustriesForApp(appId) {
+      const response = await fetch(`${apiURL()}/industries/?app=${appId}`);
+      const data = await response.json();
+      setIndustries(data);
+    }
+
+    async function fetchUseCasesForApp(appId) {
+      const response = await fetch(`${apiURL()}/useCases/?app=${appId}`);
+      const data = await response.json();
+      setUseCases(data);
+    }
+
+    async function fetchUserTypesForApp(appId) {
+      const response = await fetch(`${apiURL()}/userTypes/?app=${appId}`);
+      const data = await response.json();
+      setUserTypes(data);
+    }
+
     // async function fetchCodesForADeal(dealId) {
     //   const response = await fetch(`${apiURL()}/codes/?deal=${dealId}`);
     //   const appResponse = await response.json();
@@ -138,6 +173,11 @@ export const AppView = () => {
       setError(null); // Clear previous errors
       try {
         await fetchTagsForApp(id);
+        await fetchBusinessModelsForApp(id);
+        await fetchFeaturesForApp(id);
+        await fetchIndustriesForApp(id);
+        await fetchUseCasesForApp(id);
+        await fetchUserTypesForApp(id);
         // await fetchCodesForADeal(id);
         // await fetchSearchesForADeal(id);
         // await fetchKeywordsForADeal(id);
@@ -525,6 +565,7 @@ export const AppView = () => {
 
   console.log(app);
   console.log('tags', tags);
+  console.log(appAppStore === true, 'appleapp');
 
   return (
     <>
@@ -667,7 +708,7 @@ export const AppView = () => {
               </>
             )}
           </div>
-          {appAppStore || app.url_google_play_store ? (
+          {app.apple_id || app.url_google_play_store ? (
             <div className="container-appview-box">
               <h2>Download app</h2>
               <div className="container-store-logos">
@@ -965,7 +1006,97 @@ export const AppView = () => {
                   <p className="p-no-margin">Tags: </p>
                   <div className="badges-keywords">
                     {tags.map((tag) => (
-                      <Link to={`../apps/tag/${tag.slug}`}>
+                      <Link to={`../apps/tags/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {features.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Features: </p>
+                  <div className="badges-keywords">
+                    {features.map((tag) => (
+                      <Link to={`../apps/features/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {industries.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Industries: </p>
+                  <div className="badges-keywords">
+                    {industries.map((tag) => (
+                      <Link to={`../apps/industries/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {businessModels.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Business models: </p>
+                  <div className="badges-keywords">
+                    {businessModels.map((tag) => (
+                      <Link to={`../apps/businessModels/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {useCases.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Use cases: </p>
+                  <div className="badges-keywords">
+                    {useCases.map((tag) => (
+                      <Link to={`../apps/useCases/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {userTypes.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">User types: </p>
+                  <div className="badges-keywords">
+                    {userTypes.map((tag) => (
+                      <Link to={`../apps/userTypes/${tag.slug}`}>
                         <Button
                           secondary
                           label={tag.title.toLowerCase()}

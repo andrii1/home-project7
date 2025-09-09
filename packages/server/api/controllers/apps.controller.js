@@ -800,7 +800,7 @@ Respond ONLY with valid JSON.`,
 
       return `Create ${type} ${base}. ${examples[type]}. ${capitalize(
         type,
-      )} should be without hashtag, can be multiple words. Return ${type} separated by comma.`;
+      )} should be without hashtag, can be multiple words. Maximum 5 ${type}. Return ${type} separated by comma.`;
     };
 
     // === Features, UserTypes, BusinessModels, UseCases, Industries ===

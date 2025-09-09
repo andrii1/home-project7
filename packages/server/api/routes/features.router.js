@@ -9,10 +9,17 @@ const router = express.Router({ mergeParams: true });
 const featuresController = require('../controllers/features.controller');
 
 router.get('/', (req, res, next) => {
-  featuresController
-    .getFeatures()
-    .then((result) => res.json(result))
-    .catch(next);
+  if (req.query.app) {
+    featuresController
+      .getFeaturesByApp(req.query.app)
+      .then((result) => res.json(result))
+      .catch(next);
+  } else {
+    featuresController
+      .getFeatures()
+      .then((result) => res.json(result))
+      .catch(next);
+  }
 });
 
 module.exports = router;

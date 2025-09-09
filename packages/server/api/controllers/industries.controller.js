@@ -12,6 +12,25 @@ const getIndustries = async () => {
   }
 };
 
+const getIndustriesByApp = async (app) => {
+  try {
+    const industries = await knex('industries')
+      .select('industries.*')
+      .join(
+        'industriesApps',
+        'industriesApps.industry_id',
+        '=',
+        'industries.id',
+      )
+      .join('apps', 'industriesApps.app_id', '=', 'apps.id')
+      .where({ app_id: app });
+    return industries;
+  } catch (error) {
+    return error.message;
+  }
+};
+
 module.exports = {
   getIndustries,
+  getIndustriesByApp,
 };

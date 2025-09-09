@@ -9,10 +9,17 @@ const router = express.Router({ mergeParams: true });
 const userTypesController = require('../controllers/userTypes.controller');
 
 router.get('/', (req, res, next) => {
-  userTypesController
-    .getUserTypes()
-    .then((result) => res.json(result))
-    .catch(next);
+  if (req.query.app) {
+    userTypesController
+      .getUserTypesByApp(req.query.app)
+      .then((result) => res.json(result))
+      .catch(next);
+  } else {
+    userTypesController
+      .getUserTypes()
+      .then((result) => res.json(result))
+      .catch(next);
+  }
 });
 
 module.exports = router;

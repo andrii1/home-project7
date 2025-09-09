@@ -9,10 +9,17 @@ const router = express.Router({ mergeParams: true });
 const useCasesController = require('../controllers/useCases.controller');
 
 router.get('/', (req, res, next) => {
-  useCasesController
-    .getUseCases()
-    .then((result) => res.json(result))
-    .catch(next);
+  if (req.query.app) {
+    useCasesController
+      .getUseCasesByApp(req.query.app)
+      .then((result) => res.json(result))
+      .catch(next);
+  } else {
+    useCasesController
+      .getUseCases()
+      .then((result) => res.json(result))
+      .catch(next);
+  }
 });
 
 module.exports = router;

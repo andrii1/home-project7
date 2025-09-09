@@ -12,6 +12,20 @@ const getUseCases = async () => {
   }
 };
 
+const getUseCasesByApp = async (app) => {
+  try {
+    const useCases = await knex('useCases')
+      .select('useCases.*')
+      .join('useCasesApps', 'useCasesApps.useCase_id', '=', 'useCases.id')
+      .join('apps', 'useCasesApps.app_id', '=', 'apps.id')
+      .where({ app_id: app });
+    return useCases;
+  } catch (error) {
+    return error.message;
+  }
+};
+
 module.exports = {
   getUseCases,
+  getUseCasesByApp,
 };

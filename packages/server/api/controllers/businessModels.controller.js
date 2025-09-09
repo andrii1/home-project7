@@ -13,6 +13,25 @@ const getBusinessModels = async () => {
   }
 };
 
+const getBusinessModelsByApp = async (app) => {
+  try {
+    const businessModels = await knex('businessModels')
+      .select('businessModels.*')
+      .join(
+        'businessModelsApps',
+        'businessModelsApps.businessModel_id',
+        '=',
+        'businessModels.id',
+      )
+      .join('apps', 'businessModelsApps.app_id', '=', 'apps.id')
+      .where({ app_id: app });
+    return businessModels;
+  } catch (error) {
+    return error.message;
+  }
+};
+
 module.exports = {
   getBusinessModels,
+  getBusinessModelsByApp,
 };

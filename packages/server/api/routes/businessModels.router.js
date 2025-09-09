@@ -9,10 +9,17 @@ const router = express.Router({ mergeParams: true });
 const businessModelsController = require('../controllers/businessModels.controller');
 
 router.get('/', (req, res, next) => {
-  businessModelsController
-    .getBusinessModels()
-    .then((result) => res.json(result))
-    .catch(next);
+  if (req.query.app) {
+    businessModelsController
+      .getBusinessModelsByApp(req.query.app)
+      .then((result) => res.json(result))
+      .catch(next);
+  } else {
+    businessModelsController
+      .getBusinessModels()
+      .then((result) => res.json(result))
+      .catch(next);
+  }
 });
 
 module.exports = router;

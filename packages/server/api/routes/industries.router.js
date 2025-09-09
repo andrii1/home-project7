@@ -9,10 +9,17 @@ const router = express.Router({ mergeParams: true });
 const industriesController = require('../controllers/industries.controller');
 
 router.get('/', (req, res, next) => {
-  industriesController
-    .getIndustries()
-    .then((result) => res.json(result))
-    .catch(next);
+  if (req.query.app) {
+    industriesController
+      .getIndustriesByApp(req.query.app)
+      .then((result) => res.json(result))
+      .catch(next);
+  } else {
+    industriesController
+      .getIndustries()
+      .then((result) => res.json(result))
+      .catch(next);
+  }
 });
 
 module.exports = router;
