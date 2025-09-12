@@ -47,6 +47,7 @@ import { apiURL } from '../../apiURL';
 import './AppView.styles.css';
 import { useUserContext } from '../../userContext';
 import { getMostUsedWords } from '../../utils/getMostUsedWords';
+import { getDateFromTimestamp } from '../../utils/getDateFromTimestamp';
 
 export const AppView = () => {
   const { slug } = useParams();
@@ -505,6 +506,8 @@ export const AppView = () => {
     }, 2500);
   };
 
+  console.log(app, 'appresult');
+
   const dealCodesInTitle = dealCodes.map((i) => {
     return `(${i.title})`;
   });
@@ -563,7 +566,6 @@ export const AppView = () => {
     );
   }
 
-  console.log(app);
   console.log('tags', tags);
   console.log(appAppStore === true, 'appleapp');
 
@@ -1269,6 +1271,71 @@ export const AppView = () => {
                   <div className="badges-keywords">
                     {keywords.map((keyword) => (
                       <Badge secondary label={keyword.title} size="small" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="container-details container-badges">
+            <h2 className="no-margin">Other</h2>
+            {app.developer && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Developer: </p>
+                  <div>
+                    <Link to={app.developer_url} target="_blank">
+                      <Button
+                        secondary
+                        label={app.developer}
+                        size="small"
+                        icon={
+                          <FontAwesomeIcon
+                            icon={faArrowUpRightFromSquare}
+                            size="sm"
+                          />
+                        }
+                      />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+            {app.released && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Released: </p>
+                  <div>{getDateFromTimestamp(app.released)}</div>
+                </div>
+              </div>
+            )}
+            {topicsFromDeals.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Related topics: </p>
+                  <div className="badges-keywords">
+                    {topicsFromDeals.map((topic, index) => (
+                      <Link to={`../../${topic.url}`}>
+                        <Button secondary label={topic.title} size="small" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {tags.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Tags: </p>
+                  <div className="badges-keywords">
+                    {tags.map((tag) => (
+                      <Link to={`../apps/tags/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
                     ))}
                   </div>
                 </div>
