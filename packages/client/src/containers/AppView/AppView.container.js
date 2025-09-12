@@ -994,27 +994,27 @@ export const AppView = () => {
                 <p className="p-no-margin">Pricing: </p>
                 <div className="badges-keywords">
                   {!!app.pricing_free && (
-                    <Link to={`../apps/pricing/free`}>
+                    <Link to="../apps/pricing/free">
                       <Button secondary label="free" size="small" />
                     </Link>
                   )}
                   {!!app.pricing_freemium && (
-                    <Link to={`../apps/pricing/freemium`}>
+                    <Link to="../apps/pricing/freemium">
                       <Button secondary label="freemium" size="small" />
                     </Link>
                   )}
                   {!!app.pricing_subscription && (
-                    <Link to={`../apps/pricing/subscription`}>
+                    <Link to="../apps/pricing/subscription">
                       <Button secondary label="subscription" size="small" />
                     </Link>
                   )}
                   {!!app.pricing_one_time && (
-                    <Link to={`../apps/pricing/one-time`}>
+                    <Link to="../apps/pricing/one-time">
                       <Button secondary label="one-time" size="small" />
                     </Link>
                   )}
                   {!!app.pricing_trial_available && (
-                    <Link to={`../apps/pricing/trial`}>
+                    <Link to="../apps/pricing/trial">
                       <Button secondary label="trial" size="small" />
                     </Link>
                   )}
@@ -1026,12 +1026,12 @@ export const AppView = () => {
                 <p className="p-no-margin">iOS app pricing: </p>
                 <div className="badges-keywords">
                   {!!app.pricing_ios_app_free && (
-                    <Link to={`../apps/pricing/ios-free`}>
+                    <Link to="../apps/pricing/ios-free">
                       <Button secondary label="free" size="small" />
                     </Link>
                   )}
                   {!!app.pricing_ios_app_paid && (
-                    <Link to={`../apps/pricing/ios-paid`}>
+                    <Link to="../apps/pricing/ios-paid">
                       <Button secondary label="paid" size="small" />
                     </Link>
                   )}
@@ -1112,6 +1112,7 @@ export const AppView = () => {
             )}
           </div>
           <div className="container-details container-badges">
+            <h2 className="no-margin">Features & use cases</h2>
             {features.length > 0 && (
               <div className="container-tags">
                 <div className="badges">
@@ -1119,6 +1120,47 @@ export const AppView = () => {
                   <div className="badges-keywords">
                     {features.map((tag) => (
                       <Link to={`../apps/features/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {useCases.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Use cases: </p>
+                  <div className="badges-keywords">
+                    {useCases.map((tag) => (
+                      <Link to={`../apps/useCases/${tag.slug}`}>
+                        <Button
+                          secondary
+                          label={tag.title.toLowerCase()}
+                          size="small"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="container-details container-badges">
+            <h2 className="no-margin">Industries & users</h2>
+
+            {userTypes.length > 0 && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p className="p-no-margin">Best for: </p>
+                  <div className="badges-keywords">
+                    {userTypes.map((tag) => (
+                      <Link to={`../apps/userTypes/${tag.slug}`}>
                         <Button
                           secondary
                           label={tag.title.toLowerCase()}
@@ -1148,6 +1190,7 @@ export const AppView = () => {
                 </div>
               </div>
             )}
+
             {businessModels.length > 0 && (
               <div className="container-tags">
                 <div className="badges">
@@ -1161,116 +1204,6 @@ export const AppView = () => {
                           size="small"
                         />
                       </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            {useCases.length > 0 && (
-              <div className="container-tags">
-                <div className="badges">
-                  <p className="p-no-margin">Use cases: </p>
-                  <div className="badges-keywords">
-                    {useCases.map((tag) => (
-                      <Link to={`../apps/useCases/${tag.slug}`}>
-                        <Button
-                          secondary
-                          label={tag.title.toLowerCase()}
-                          size="small"
-                        />
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            {userTypes.length > 0 && (
-              <div className="container-tags">
-                <div className="badges">
-                  <p className="p-no-margin">User types: </p>
-                  <div className="badges-keywords">
-                    {userTypes.map((tag) => (
-                      <Link to={`../apps/userTypes/${tag.slug}`}>
-                        <Button
-                          secondary
-                          label={tag.title.toLowerCase()}
-                          size="small"
-                        />
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="container-tags">
-              {/* <div className="badges">
-                <p>App: </p>
-                <div>
-                  <Link to={`/apps/${app.app_id}`} target="_blank">
-                    <Button
-                      secondary
-                      label={app.appTitle}
-                      size="small"
-                      icon={
-                        <FontAwesomeIcon
-                          icon={faArrowUpRightFromSquare}
-                          size="sm"
-                        />
-                      }
-                    />
-                  </Link>
-                </div>
-              </div> */}
-            </div>
-            <div className="container-tags">
-              <div className="badges">
-                <p>Topic: </p>
-                <div>
-                  <Link to={`/apps/topic/${app.topic_id}`} target="_blank">
-                    <Button
-                      secondary
-                      label={app.topicTitle}
-                      size="small"
-                      icon={
-                        <FontAwesomeIcon
-                          icon={faArrowUpRightFromSquare}
-                          size="sm"
-                        />
-                      }
-                    />
-                  </Link>
-                </div>
-              </div>
-              <div className="badges">
-                <p>Category: </p>
-                <div>
-                  <Link
-                    to={`/apps/category/${app.category_id}`}
-                    target="_blank"
-                  >
-                    <Button
-                      secondary
-                      label={app.categoryTitle}
-                      size="small"
-                      icon={
-                        <FontAwesomeIcon
-                          icon={faArrowUpRightFromSquare}
-                          size="sm"
-                        />
-                      }
-                    />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {keywords.length > 0 && (
-              <div className="container-tags">
-                <div className="badges">
-                  <p className="p-no-margin">Tags: </p>
-                  <div className="badges-keywords">
-                    {keywords.map((keyword) => (
-                      <Badge secondary label={keyword.title} size="small" />
                     ))}
                   </div>
                 </div>
