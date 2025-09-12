@@ -1210,6 +1210,12 @@ export const AppView = () => {
               </div>
             )}
           </div>
+          {app.languages && (
+            <div className="container-details container-badges">
+              <h2 className="no-margin">Languages</h2>
+              {JSON.parse(app.languages).join(', ')}
+            </div>
+          )}
           <div className="container-details container-badges">
             <h2 className="no-margin">Other</h2>
             {app.developer && (
