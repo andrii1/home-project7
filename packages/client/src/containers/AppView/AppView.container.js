@@ -13,6 +13,9 @@ import Modal from '../../components/Modal/Modal.Component';
 import iconCopy from '../../assets/images/icons8-copy-24.png';
 import appStoreLogo from '../../assets/images/download-on-the-app-store-apple-logo.svg';
 import googlePlayStoreLogo from '../../assets/images/google-play-badge-logo.svg';
+import macLogo from '../../assets/images/macos.svg';
+import windowsLogo from '../../assets/images/windows.svg';
+import chromeLogo from '../../assets/images/chrome.png';
 import mousePointer from '../../assets/images/mouse-pointer.svg';
 import { Dropdown } from '../../components/Dropdown/Dropdown.Component';
 import TextFormTextarea from '../../components/Input/TextFormTextarea.component';
@@ -738,6 +741,41 @@ export const AppView = () => {
                       alt="Google Play store logo"
                       className="logo-store"
                     />
+                  </Link>
+                )}
+                {app.url_chrome_extension && (
+                  <Link
+                    target="_blank"
+                    to={app.url_chrome_extension}
+                    className="simple-link"
+                  >
+                    <img
+                      src={chromeLogo}
+                      alt="Chrome logo"
+                      className="logo-store"
+                    />
+                  </Link>
+                )}
+                {app.url_windows && (
+                  <Link
+                    target="_blank"
+                    to={app.url_windows}
+                    className="simple-link"
+                  >
+                    <img
+                      src={windowsLogo}
+                      alt="Windows logo"
+                      className="logo-store"
+                    />
+                  </Link>
+                )}
+                {app.url_mac && (
+                  <Link
+                    target="_blank"
+                    to={app.url_mac}
+                    className="simple-link"
+                  >
+                    <img src={macLogo} alt="Mac logo" className="logo-store" />
                   </Link>
                 )}
               </div>
