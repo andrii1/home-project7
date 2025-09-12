@@ -1309,34 +1309,40 @@ export const AppView = () => {
                 </div>
               </div>
             )}
-            {topicsFromDeals.length > 0 && (
+            {(app.is_ai_powered || app.is_open_source) && (
               <div className="container-tags">
                 <div className="badges">
-                  <p className="p-no-margin">Related topics: </p>
-                  <div className="badges-keywords">
-                    {topicsFromDeals.map((topic, index) => (
-                      <Link to={`../../${topic.url}`}>
-                        <Button secondary label={topic.title} size="small" />
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            {tags.length > 0 && (
-              <div className="container-tags">
-                <div className="badges">
-                  <p className="p-no-margin">Tags: </p>
-                  <div className="badges-keywords">
-                    {tags.map((tag) => (
-                      <Link to={`../apps/tags/${tag.slug}`}>
+                  <div>
+                    {!!app.is_ai_powered && (
+                      <Link to="../apps/other/ai" target="_blank">
                         <Button
                           secondary
-                          label={tag.title.toLowerCase()}
+                          label="AI powered"
                           size="small"
+                          icon={
+                            <FontAwesomeIcon
+                              icon={faArrowUpRightFromSquare}
+                              size="sm"
+                            />
+                          }
                         />
                       </Link>
-                    ))}
+                    )}
+                    {!!app.is_open_source && (
+                      <Link to="../apps/other/open-source" target="_blank">
+                        <Button
+                          secondary
+                          label="open source"
+                          size="small"
+                          icon={
+                            <FontAwesomeIcon
+                              icon={faArrowUpRightFromSquare}
+                              size="sm"
+                            />
+                          }
+                        />
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

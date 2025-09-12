@@ -1,18 +1,19 @@
 export const PRICING_OPTIONS = [
   { key: 'free', label: 'Free' },
   { key: 'freemium', label: 'Freemium' },
-  { key: 'paid', label: 'Paid' },
+  { key: 'ios-free', label: 'Free iOS' },
+  { key: 'ios-paid', label: 'Paid iOS' },
   { key: 'subscription', label: 'Subscription' },
   { key: 'one-time', label: 'One time' },
-  { key: 'trial', label: 'Trial available' },
+  { key: 'trial', label: 'Trial' },
 ];
 
 export const PLATFORMS_OPTIONS = [
   { key: 'browser-extension', label: 'Browser extension' },
-  { key: 'ios', label: 'iOS app available' },
-  { key: 'android', label: 'Android app available' },
-  { key: 'windows', label: 'Windows app' },
-  { key: 'mac', label: 'Mac app' },
+  { key: 'ios', label: 'iOS' },
+  { key: 'android', label: 'Android' },
+  { key: 'windows', label: 'Windows' },
+  { key: 'mac', label: 'Mac' },
 ];
 
 export const SOCIALS_OPTIONS = [
@@ -21,6 +22,6 @@ export const SOCIALS_OPTIONS = [
 ];
 
 export const OTHER_OPTIONS = [
-  { key: 'open-source', label: 'Is Open Source?' },
-  { key: 'ai', label: 'Is AI powered?' },
+  { key: 'open-source', label: 'Open Source' },
+  { key: 'ai', label: 'AI powered' },
 ];

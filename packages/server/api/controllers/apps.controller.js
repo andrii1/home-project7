@@ -315,7 +315,8 @@ const getAppsByTag = async (page, column, direction, tag) => {
 const pricingFiltersMap = {
   free: (qb) => qb.orWhere('apps.pricing_free', true),
   freemium: (qb) => qb.orWhere('apps.pricing_freemium', true),
-  paid: (qb) => qb.orWhere('apps.pricing_paid', true),
+  'ios-paid': (qb) => qb.orWhere('apps.pricing_ios_app_paid', true),
+  'ios-free': (qb) => qb.orWhere('apps.pricing_ios_app_free', true),
   subscription: (qb) => qb.orWhere('apps.pricing_subscription', true),
   'one-time': (qb) => qb.orWhere('apps.pricing_one_time', true),
   trial: (qb) => qb.orWhere('apps.pricing_trial_available', true),
