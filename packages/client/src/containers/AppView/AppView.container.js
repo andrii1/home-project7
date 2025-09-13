@@ -67,6 +67,7 @@ export const AppView = () => {
   const [app, setApp] = useState({});
   const [dealCodes, setDealCodes] = useState([]);
   const [appAppStore, setAppAppStore] = useState({});
+  const [appAppStoreScraper, setAppAppStoreScraper] = useState({});
   const [similarApps, setSimilarApps] = useState([]);
   const [similarDealsFromApp, setSimilarDealsFromApp] = useState([]);
   const [comments, setComments] = useState([]);
@@ -213,6 +214,23 @@ export const AppView = () => {
   }, [app.apple_id]);
 
   useEffect(() => {
+    async function fetchAppAppStoreScraper(appleId) {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${apiURL()}/appsAppStoreScraper/${appleId}`,
+        );
+        const data = await response.json();
+        setAppAppStoreScraper(data);
+      } catch (e) {
+        setError({ message: e.message || 'Failed to fetch data' });
+      }
+      setLoading(false);
+    }
+    app.apple_id && fetchAppAppStoreScraper(app.apple_id);
+  }, [app.apple_id]);
+
+  useEffect(() => {
     async function fetchSimilarApps() {
       setLoading(true);
       try {
@@ -242,6 +260,8 @@ export const AppView = () => {
     const commentResponse = await response.json();
     setComments(commentResponse);
   }, []);
+
+  console.log(appAppStoreScraper, 'appAppStore');
 
   useEffect(() => {
     fetchCommentsByAppId(id);
@@ -1096,7 +1116,103 @@ export const AppView = () => {
               </div>
             )}
           </div>
+          <div className="container-details container-badges">
+            <h2 className="no-margin">Reviews</h2>
 
+            {appAppStore.averageUserRating && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Average rating: </p>
+                  <div>{appAppStore.averageUserRating.toFixed(2)}</div>
+                </div>
+              </div>
+            )}
+            {appAppStore.userRatingCount && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Number of ratings: </p>
+                  <div>{appAppStore.userRatingCount}</div>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="container-details container-badges">
+            <h2 className="no-margin">Version & release</h2>
+            {app.developer && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Developer: </p>
+                  <div>
+                    <Link to={app.developer_url} target="_blank">
+                      <Button
+                        secondary
+                        label={app.developer}
+                        size="small"
+                        icon={
+                          <FontAwesomeIcon
+                            icon={faArrowUpRightFromSquare}
+                            size="sm"
+                          />
+                        }
+                      />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+            {app.released && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Released: </p>
+                  <div>{getDateFromTimestamp(app.released)}</div>
+                </div>
+              </div>
+            )}
+            {appAppStoreScraper.updated && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Updated: </p>
+                  <div>{getDateFromTimestamp(appAppStoreScraper.updated)}</div>
+                </div>
+              </div>
+            )}
+            {appAppStore.version && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Current version: </p>
+                  <div>{appAppStore.version}</div>
+                </div>
+              </div>
+            )}
+            {appAppStore.fileSizeBytes && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Size: </p>
+                  <div>
+                    {`${(appAppStore.fileSizeBytes / (1024 * 1024)).toFixed(
+                      2,
+                    )} MB`}
+                  </div>
+                </div>
+              </div>
+            )}
+            {appAppStore.minimumOsVersion && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Minimum iOS version: </p>
+                  <div>{appAppStore.minimumOsVersion}</div>
+                </div>
+              </div>
+            )}
+            {appAppStore.trackContentRating && (
+              <div className="container-tags">
+                <div className="badges">
+                  <p>Content rating: </p>
+                  <div>{appAppStore.trackContentRating}</div>
+                </div>
+              </div>
+            )}
+          </div>
           <div className="container-details container-badges">
             <h2 className="no-margin">Category & tags</h2>
             <div className="container-tags">
@@ -1262,36 +1378,7 @@ export const AppView = () => {
           )}
           <div className="container-details container-badges">
             <h2 className="no-margin">Other</h2>
-            {app.developer && (
-              <div className="container-tags">
-                <div className="badges">
-                  <p>Developer: </p>
-                  <div>
-                    <Link to={app.developer_url} target="_blank">
-                      <Button
-                        secondary
-                        label={app.developer}
-                        size="small"
-                        icon={
-                          <FontAwesomeIcon
-                            icon={faArrowUpRightFromSquare}
-                            size="sm"
-                          />
-                        }
-                      />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-            {app.released && (
-              <div className="container-tags">
-                <div className="badges">
-                  <p>Released: </p>
-                  <div>{getDateFromTimestamp(app.released)}</div>
-                </div>
-              </div>
-            )}
+
             {(!!app.is_ai_powered || !!app.is_open_source) && (
               <div className="container-tags">
                 <div className="badges">
@@ -1331,8 +1418,9 @@ export const AppView = () => {
               </div>
             )}
           </div>
+
           <div className="container-details container-badges">
-            <h2 className="no-margin">Social</h2>
+            <h2 className="no-margin">Social media accounts</h2>
             {(!!app.url_x || !!app.url_discord) && (
               <div className="container-tags">
                 {!!app.url_x && (
