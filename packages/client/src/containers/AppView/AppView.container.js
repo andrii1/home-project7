@@ -874,6 +874,36 @@ export const AppView = () => {
           ) : (
             ''
           )}
+          {app.apple_id && (
+            <div className="container-appview-box container-description">
+              <h2>FAQs</h2>
+              <p className="app-description ">No data yet</p>
+            </div>
+          )}
+          {app.apple_id && (
+            <div className="container-appview-box container-description">
+              <h2>{app.title} deals, promo codes, referral codes</h2>
+              <p className="app-description ">No data yet</p>
+            </div>
+          )}
+          {app.apple_id && (
+            <div className="container-appview-box container-description">
+              <h2>{app.title} errors</h2>
+              <p className="app-description ">No data yet</p>
+            </div>
+          )}
+          {app.apple_id && (
+            <div className="container-appview-box container-description">
+              <h2>Is {app.title} down?</h2>
+              <p className="app-description ">No data yet</p>
+            </div>
+          )}
+          {app.apple_id && (
+            <div className="container-appview-box container-description">
+              <h2>How to contact {app.title} support?</h2>
+              <p className="app-description ">No data yet</p>
+            </div>
+          )}
           {/* <div className="container-codes">
             {dealCodes.length > 0 ? (
               <>
