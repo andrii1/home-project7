@@ -811,7 +811,7 @@ Return JSON with keys:
     "faq_log_out": answer,
     "faq_is_app_on_android": answer,
     "faq_app_doesnt_work_bugs": answer,
-    "faq_is_safe_to_use_legit": answer,
+    "faq_is_safe_to_use": answer,
     "faq_how_to_make_money": answer,
 
 }

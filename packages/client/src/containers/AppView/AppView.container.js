@@ -104,6 +104,8 @@ export const AppView = () => {
     deleteLike: deleteNegativeLike,
   } = useLikes(user, 'negativeLikes');
 
+  const [faqs, setFaqs] = useState([]);
+
   useEffect(() => {
     async function fetchSingleApp(appId) {
       const response = await fetch(`${apiURL()}/apps/${appId}`);
@@ -212,6 +214,92 @@ export const AppView = () => {
     }
     app.apple_id && fetchAppAppStore(app.apple_id);
   }, [app.apple_id]);
+
+  useEffect(() => {
+    const faqArray = [];
+
+    if (app.faq_create_account)
+      faqArray.push({
+        id: 'faq_create_account',
+        title: 'How to create an account?',
+        text: app.faq_create_account,
+        open: false,
+      });
+
+    if (app.faq_delete_account)
+      faqArray.push({
+        id: 'faq_delete_account',
+        title: 'How to delete an account?',
+        text: app.faq_delete_account,
+        open: false,
+      });
+
+    if (app.faq_cancel_subscription)
+      faqArray.push({
+        id: 'faq_cancel_subscription',
+        title: 'How to cancel subscription?',
+        text: app.faq_cancel_subscription,
+        open: false,
+      });
+
+    if (app.faq_change_profile_picture)
+      faqArray.push({
+        id: 'faq_change_profile_picture',
+        title: 'How to change profile picture?',
+        text: app.faq_change_profile_picture,
+        open: false,
+      });
+
+    if (app.faq_log_in)
+      faqArray.push({
+        id: 'faq_log_in',
+        title: 'How to log in?',
+        text: app.faq_log_in,
+        open: false,
+      });
+
+    if (app.faq_log_out)
+      faqArray.push({
+        id: 'faq_log_out',
+        title: 'How to log out?',
+        text: app.faq_log_out,
+        open: false,
+      });
+
+    if (app.faq_is_app_on_android)
+      faqArray.push({
+        id: 'faq_is_app_on_android',
+        title: 'Is app on Android?',
+        text: app.faq_is_app_on_android,
+        open: false,
+      });
+
+    if (app.faq_app_doesnt_work_bugs)
+      faqArray.push({
+        id: 'faq_app_doesnt_work_bugs',
+        title: `App doesn't work, bugs`,
+        text: app.faq_app_doesnt_work_bugs,
+        open: false,
+      });
+
+    if (app.faq_is_safe_to_use)
+      faqArray.push({
+        id: 'faq_is_safe_to_use',
+        title: 'Is app safe to use',
+        text: app.faq_is_safe_to_use,
+        open: false,
+      });
+
+    if (app.faq_how_to_make_money)
+      faqArray.push({
+        id: 'faq_how_to_make_money',
+        title: 'Can you make money?',
+        text: app.faq_how_to_make_money,
+        open: false,
+      });
+
+    setFaqs(faqArray);
+  }, [app]);
 
   useEffect(() => {
     async function fetchAppAppStoreScraper(appleId) {
@@ -577,6 +665,28 @@ export const AppView = () => {
   //   );
   // }
 
+  const handleFaqs = (faqId) => {
+    setFaqs(
+      faqs.map((item) => {
+        if (item.id === faqId) {
+          return { ...item, open: !item.open };
+        }
+        return item;
+      }),
+    );
+  };
+
+  const faqsItems = faqs.map((faq) => {
+    return (
+      <div>
+        <h3 className="h3-faq" onClick={() => handleFaqs(faq.id)}>
+          {faq.title} {faq.open ? '▲' : '▼'}
+        </h3>
+        <p className={!faq.open && 'faq-closed'}>{faq.text}</p>
+      </div>
+    );
+  });
+
   if (error) {
     return (
       <>
@@ -877,7 +987,11 @@ export const AppView = () => {
           {app.apple_id && (
             <div className="container-appview-box container-description">
               <h2>FAQs</h2>
-              <p className="app-description ">No data yet</p>
+              {faqs ? (
+                faqsItems
+              ) : (
+                <p className="app-description ">No data yet</p>
+              )}
             </div>
           )}
           {app.apple_id && (

@@ -285,6 +285,13 @@ img.copy-referral-code.smaller-icon {
   cursor: pointer;
 }
 
+.h3-faq {
+  cursor: pointer;
+}
+p.faq-closed {
+  display: none;
+}
+
 @media only screen and (min-width: 769px) {
   .container-description h2 {
     margin-bottom: 0rem;
