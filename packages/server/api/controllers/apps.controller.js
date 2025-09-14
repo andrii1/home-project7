@@ -6,6 +6,7 @@ Can be deleted as soon as the first real controller is added. */
 const generateSlug = require('../lib/utils/generateSlug');
 const capitalize = require('../lib/utils/capitalize');
 const { normalizeUrl } = require('../lib/utils/normalizeUrl');
+const { getAppleId } = require('../lib/utils/getAppleIdByUrl');
 const knex = require('../../config/db');
 const HttpError = require('../lib/utils/http-error');
 const OpenAI = require('openai');
@@ -608,10 +609,12 @@ const createAppNode = async (token, body) => {
 
     const normalizedUrl = body.url ? normalizeUrl(body.url) : null;
 
+    const appleId = await getAppleId(body);
+
     // === Check for existing apps ===
-    if (body.apple_id) {
+    if (appleId) {
       const existingApp = await knex('apps')
-        .whereRaw('LOWER(apple_id) = ?', [body.apple_id.toLowerCase()])
+        .whereRaw('LOWER(apple_id) = ?', [String(appleId).toLowerCase()])
         .first();
       if (existingApp)
         return {
@@ -676,16 +679,16 @@ const createAppNode = async (token, body) => {
       appUrl,
       appExtra = {};
 
-    if (body.apple_id) {
+    if (appleId) {
       const lookupData = await (
-        await fetch(`https://itunes.apple.com/lookup?id=${body.apple_id}`)
+        await fetch(`https://itunes.apple.com/lookup?id=${appleId}`)
       ).json();
       const appInfo = lookupData.results[0];
       description = appInfo.description;
       urlIcon = appInfo.artworkUrl512;
       const normalizedUrlAppleId = normalizeUrl(appInfo.sellerUrl);
 
-      const app = await store.app({ id: body.apple_id });
+      const app = await store.app({ id: appleId });
       const {
         price,
         currency,
@@ -699,7 +702,7 @@ const createAppNode = async (token, body) => {
 
       appUrl = body.url ? normalizedUrl : normalizedUrlAppleId;
       appExtra = {
-        apple_id: body.apple_id,
+        apple_id: appleId,
         url_icon: urlIcon,
         price,
         currency,
@@ -900,7 +903,7 @@ Respond ONLY with valid JSON.`,
       appId,
       appTitle: body.title,
       url: appUrl,
-      appAppleId: body.apple_id || null,
+      appAppleId: appleId || null,
     };
   } catch (error) {
     return error.message;

@@ -236,18 +236,7 @@ export const AppView = () => {
     app.apple_id && fetchAppAppStore(app.apple_id);
   }, [app.apple_id]);
 
-  useEffect(() => {
-    const faqArray = faqConfig
-      .filter(({ key }) => app[key])
-      .map(({ key, title }) => ({
-        id: key,
-        title: title.replace('{app}', app.title || 'this app'),
-        text: app[key],
-        open: false,
-      }));
-
-    setFaqs(faqArray);
-  }, [app]);
+  console.log(appAppStore, 'appAppStore');
 
   useEffect(() => {
     async function fetchAppAppStoreScraper(appleId) {
@@ -265,6 +254,19 @@ export const AppView = () => {
     }
     app.apple_id && fetchAppAppStoreScraper(app.apple_id);
   }, [app.apple_id]);
+
+  useEffect(() => {
+    const faqArray = faqConfig
+      .filter(({ key }) => app[key])
+      .map(({ key, title }) => ({
+        id: key,
+        title: title.replace('{app}', app.title || 'this app'),
+        text: app[key],
+        open: false,
+      }));
+
+    setFaqs(faqArray);
+  }, [app]);
 
   useEffect(() => {
     async function fetchSimilarApps() {
@@ -296,8 +298,6 @@ export const AppView = () => {
     const commentResponse = await response.json();
     setComments(commentResponse);
   }, []);
-
-  console.log(appAppStoreScraper, 'appAppStore');
 
   useEffect(() => {
     fetchCommentsByAppId(id);

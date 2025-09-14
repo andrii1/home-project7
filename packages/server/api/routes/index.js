@@ -27,6 +27,7 @@ const userTypes = require('./userTypes.router');
 const businessModels = require('./businessModels.router');
 const useCases = require('./useCases.router');
 const industries = require('./industries.router');
+const findAppleIdByUrl = require('./findAppleIdByUrl.router');
 
 /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -81,5 +82,6 @@ router.use('/userTypes', userTypes);
 router.use('/businessModels', businessModels);
 router.use('/useCases', useCases);
 router.use('/industries', industries);
+router.use('/findAppleIdByUrl', findAppleIdByUrl);
 
 module.exports = router;
