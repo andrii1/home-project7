@@ -780,6 +780,45 @@ Return JSON with keys:
 Respond ONLY with valid JSON.`,
     );
 
+    const faqData = await useChatGptForData(
+      `Based on the app "${body.title}"${
+        appUrl ? ` with website ${appUrl}` : ''
+      }${
+        description ? ` and description: \"${description}\"` : ''
+      }, determine if:
+
+- How to create an account in app "${body.title}".
+- How to delete an account in app "${body.title}".
+- How to contact support in app "${body.title}".
+- How to cancel subscription for app "${body.title}".
+- How to change profile picture in app "${body.title}".
+- How to log in "${body.title}".
+- How to log out "${body.title}".
+- Is app "${body.title}" on Android?
+- App "${body.title}" doesn't work? Any common bugs? How to solve them?
+- Is app "${body.title}" safe to use? Is it legit or scammy?
+- Can you make money with app "${body.title}"?
+
+
+Return JSON with keys:
+{
+    "faq_create_account": answer,
+    "faq_delete_account": answer,
+    "faq_contact_support": answer,
+    "faq_cancel_subscription": answer,
+    "faq_change_profile_picture": answer,
+    "faq_log_in": answer,
+    "faq_log_out": answer,
+    "faq_is_app_on_android": answer,
+    "faq_app_doesnt_work_bugs": answer,
+    "faq_is_safe_to_use_legit": answer,
+    "faq_how_to_make_money": answer,
+
+}
+
+Respond ONLY with valid JSON.`,
+    );
+
     const baseSlug = generateSlug(body.title);
     const uniqueSlug = await ensureUniqueSlugItems(baseSlug, 'apps');
 
@@ -793,6 +832,7 @@ Respond ONLY with valid JSON.`,
       ...appExtra,
       ...pricingData,
       ...attributesData,
+      ...faqData,
     });
 
     // === Prompt builder ===
