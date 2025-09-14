@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-nested-ternary */
@@ -53,6 +55,25 @@ import './AppView.styles.css';
 import { useUserContext } from '../../userContext';
 import { getMostUsedWords } from '../../utils/getMostUsedWords';
 import { getDateFromTimestamp } from '../../utils/getDateFromTimestamp';
+
+const faqConfig = [
+  { key: 'faq_create_account', title: 'How to create an account in {app}?' },
+  { key: 'faq_delete_account', title: 'How to delete {app} account?' },
+  {
+    key: 'faq_cancel_subscription',
+    title: 'How to cancel subscription in {app}?',
+  },
+  {
+    key: 'faq_change_profile_picture',
+    title: 'How to change profile picture?',
+  },
+  { key: 'faq_log_in', title: 'How to log in to {app}?' },
+  { key: 'faq_log_out', title: 'How to log out from {app}?' },
+  { key: 'faq_is_app_on_android', title: 'Is {app} available on Android?' },
+  { key: 'faq_app_doesnt_work_bugs', title: "{app} doesn't work, bugs" },
+  { key: 'faq_is_safe_to_use', title: 'Is {app} safe to use?' },
+  { key: 'faq_how_to_make_money', title: 'Can you make money with {app}?' },
+];
 
 export const AppView = () => {
   const { slug } = useParams();
@@ -216,87 +237,14 @@ export const AppView = () => {
   }, [app.apple_id]);
 
   useEffect(() => {
-    const faqArray = [];
-
-    if (app.faq_create_account)
-      faqArray.push({
-        id: 'faq_create_account',
-        title: 'How to create an account?',
-        text: app.faq_create_account,
+    const faqArray = faqConfig
+      .filter(({ key }) => app[key])
+      .map(({ key, title }) => ({
+        id: key,
+        title: title.replace('{app}', app.title || 'this app'),
+        text: app[key],
         open: false,
-      });
-
-    if (app.faq_delete_account)
-      faqArray.push({
-        id: 'faq_delete_account',
-        title: 'How to delete an account?',
-        text: app.faq_delete_account,
-        open: false,
-      });
-
-    if (app.faq_cancel_subscription)
-      faqArray.push({
-        id: 'faq_cancel_subscription',
-        title: 'How to cancel subscription?',
-        text: app.faq_cancel_subscription,
-        open: false,
-      });
-
-    if (app.faq_change_profile_picture)
-      faqArray.push({
-        id: 'faq_change_profile_picture',
-        title: 'How to change profile picture?',
-        text: app.faq_change_profile_picture,
-        open: false,
-      });
-
-    if (app.faq_log_in)
-      faqArray.push({
-        id: 'faq_log_in',
-        title: 'How to log in?',
-        text: app.faq_log_in,
-        open: false,
-      });
-
-    if (app.faq_log_out)
-      faqArray.push({
-        id: 'faq_log_out',
-        title: 'How to log out?',
-        text: app.faq_log_out,
-        open: false,
-      });
-
-    if (app.faq_is_app_on_android)
-      faqArray.push({
-        id: 'faq_is_app_on_android',
-        title: 'Is app on Android?',
-        text: app.faq_is_app_on_android,
-        open: false,
-      });
-
-    if (app.faq_app_doesnt_work_bugs)
-      faqArray.push({
-        id: 'faq_app_doesnt_work_bugs',
-        title: `App doesn't work, bugs`,
-        text: app.faq_app_doesnt_work_bugs,
-        open: false,
-      });
-
-    if (app.faq_is_safe_to_use)
-      faqArray.push({
-        id: 'faq_is_safe_to_use',
-        title: 'Is app safe to use',
-        text: app.faq_is_safe_to_use,
-        open: false,
-      });
-
-    if (app.faq_how_to_make_money)
-      faqArray.push({
-        id: 'faq_how_to_make_money',
-        title: 'Can you make money?',
-        text: app.faq_how_to_make_money,
-        open: false,
-      });
+      }));
 
     setFaqs(faqArray);
   }, [app]);
@@ -678,7 +626,7 @@ export const AppView = () => {
 
   const faqsItems = faqs.map((faq) => {
     return (
-      <div>
+      <div key={faq.id}>
         <h3 className="h3-faq" onClick={() => handleFaqs(faq.id)}>
           {faq.title} {faq.open ? '▲' : '▼'}
         </h3>
@@ -984,16 +932,15 @@ export const AppView = () => {
           ) : (
             ''
           )}
-          {app.apple_id && (
-            <div className="container-appview-box container-description">
-              <h2>FAQs</h2>
-              {faqs ? (
-                faqsItems
-              ) : (
-                <p className="app-description ">No data yet</p>
-              )}
-            </div>
-          )}
+          <div className="container-appview-box container-description">
+            <h2>FAQs</h2>
+            {faqs.length > 0 ? (
+              faqsItems
+            ) : (
+              <p className="app-description ">No data yet</p>
+            )}
+          </div>
+
           {app.apple_id && (
             <div className="container-appview-box container-description">
               <h2>{app.title} deals, promo codes, referral codes</h2>
@@ -1193,7 +1140,6 @@ export const AppView = () => {
               </div>
             </div>
           )}
-
           <div className="container-comments">
             <h2 className="h-no-margin h-no-margin-bottom">Comments</h2>
             {comments.length === 0 && (
@@ -1562,7 +1508,6 @@ export const AppView = () => {
               </div>
             )}
           </div>
-
           <div className="container-details container-badges">
             <h2 className="no-margin">Social media accounts</h2>
             {(!!app.url_x || !!app.url_discord) && (
@@ -1580,7 +1525,6 @@ export const AppView = () => {
               </div>
             )}
           </div>
-
           {app.appUrlAppStore || app.appUrlGooglePlayStore ? (
             <div className="container-appview-box">
               <h2>Download {app.appTitle} app</h2>
