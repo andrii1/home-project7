@@ -567,8 +567,6 @@ export const AppView = () => {
     }, 2500);
   };
 
-  console.log(app, 'appresult');
-
   const dealCodesInTitle = dealCodes.map((i) => {
     return `(${i.title})`;
   });
@@ -648,9 +646,6 @@ export const AppView = () => {
       </>
     );
   }
-
-  console.log('tags', tags);
-  console.log(appAppStore === true, 'appleapp');
 
   return (
     <>
@@ -962,7 +957,11 @@ export const AppView = () => {
           {app.apple_id && (
             <div className="container-appview-box container-description">
               <h2>How to contact {app.title} support?</h2>
-              <p className="app-description ">No data yet</p>
+              {app.faq_contact_support ? (
+                <p className="app-description ">{app.faq_contact_support}</p>
+              ) : (
+                <p className="app-description ">No data yet</p>
+              )}
             </div>
           )}
           {/* <div className="container-codes">
