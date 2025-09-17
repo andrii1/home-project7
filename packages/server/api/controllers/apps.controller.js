@@ -801,6 +801,13 @@ Respond ONLY with valid JSON.`,
 - App "${body.title}" doesn't work? Any common bugs? How to solve them?
 - Is app "${body.title}" safe to use? Is it legit or scammy?
 - Can you make money with app "${body.title}"?
+- Does it make sense to upgrade in app "${
+        body.title
+      }"? What are main features of premium version.
+- Can you use app "${
+        body.title
+      }" for free? Any ways to credits/coins for free? Either via promos, invite codes, completing tasks, etc.
+- How to use "${body.title}"? Longer description.
 
 
 Return JSON with keys:
@@ -816,6 +823,9 @@ Return JSON with keys:
     "faq_app_doesnt_work_bugs": answer,
     "faq_is_safe_to_use": answer,
     "faq_how_to_make_money": answer,
+    "faq_should_you_upgrade": answer,
+    "faq_can_use_for_free": answer,
+    "description_how_to_use": answer,
 
 }
 

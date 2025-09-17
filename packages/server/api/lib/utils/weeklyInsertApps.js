@@ -14,13 +14,13 @@ const openai = new OpenAI({
 const USER_UID = process.env.USER_UID_APPS_PROD;
 const API_PATH = process.env.API_PATH_APPS_PROD;
 
-const today = new Date();
-const isSunday = today.getDay() === 0; // 0 = Sunday
+// const today = new Date();
+// const isSunday = today.getDay() === 0; // 0 = Sunday
 
-if (!isSunday) {
-  console.log('Not Sunday, skipping weekly job.');
-  process.exit(0);
-}
+// if (!isSunday) {
+//   console.log('Not Sunday, skipping weekly job.');
+//   process.exit(0);
+// }
 
 // fetch helpers
 
@@ -100,36 +100,8 @@ const insertApps = async (appsParam) => {
     const { appId } = newApp;
     const newAppTitle = newApp.appTitle;
     console.log('Inserted app:', newApp);
-
-    // const deal = `${newAppTitle} referral codes`;
-
-    // const match = newAppTitle.match(/^(.*?)(?:-|:)/);
-    // const appName = match ? match[1].trim() : newAppTitle;
-    // const deal = `${appName} referral codes`;
-
-    // const newDeal = await insertDeal(deal, appleId, appId);
-    // const { dealId } = newDeal;
-    // console.log('Inserted deal:', newDeal);
-
-    // const newCode = await insertCode(code, dealId);
-    // const codeId = newCode.codeId;
-    // console.log("Inserted code:", newCode);
   }
 };
-
-// insertApps(apps).catch(console.error);
-
-// Promise.all([
-//   store.list({
-//     collection: store.collection.TOP_GROSSING_IOS,
-//     num: 10,
-//   }),
-// ])
-//   .then((results) => {
-//     const allApps = results.flat(); // flatten arrays into one
-//     return insertApps(allApps);
-//   })
-//   .catch(console.log); // eslint-disable-line no-console
 
 Promise.all([
   store.list({
@@ -138,21 +110,21 @@ Promise.all([
   }),
   store.list({
     collection: store.collection.TOP_GROSSING_IOS,
-    num: 100,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_PAID_IOS,
-    num: 100,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.ENTERTAINMENT,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.FINANCE,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
@@ -162,42 +134,42 @@ Promise.all([
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.PHOTO_AND_VIDEO,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.SOCIAL_NETWORKING,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.HEALTH_AND_FITNESS,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.MUSIC,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.PRODUCTIVITY,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.BUSINESS,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.TRAVEL,
-    num: 150,
+    num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.UTILITIES,
-    num: 150,
+    num: 200,
   }),
 ])
   .then((results) => {
