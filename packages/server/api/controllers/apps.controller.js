@@ -690,7 +690,9 @@ const createAppNode = async (token, body) => {
       const appInfo = lookupData.results[0];
       description = appInfo.description;
       urlIcon = appInfo.artworkUrl512;
-      const normalizedUrlAppleId = normalizeUrl(appInfo.sellerUrl);
+      const normalizedUrlAppleId = appInfo.sellerUrl
+        ? normalizeUrl(appInfo.sellerUrl)
+        : null;
 
       const app = await store.app({ id: appleId });
       const {
