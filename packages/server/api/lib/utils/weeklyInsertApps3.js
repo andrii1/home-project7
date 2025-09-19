@@ -15,13 +15,13 @@ const openai = new OpenAI({
 const USER_UID = process.env.USER_UID_DEALS_PROD;
 const API_PATH = process.env.API_PATH_DEALS_PROD;
 
-const today = new Date();
-const isTuesday = today.getDay() === 2; // 2 = Tuesday
+// const today = new Date();
+// const isTuesday = today.getDay() === 2; // 2 = Tuesday
 
-if (!isTuesday) {
-  console.log('Not Tuesday, skipping weekly job.');
-  process.exit(0);
-}
+// if (!isTuesday) {
+//   console.log('Not Tuesday, skipping weekly job.');
+//   process.exit(0);
+// }
 
 // fetch helpers
 
