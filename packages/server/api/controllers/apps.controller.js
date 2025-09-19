@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 /* eslint-disable one-var */
 /* eslint-disable no-console */
 /* eslint-disable import/no-extraneous-dependencies */
@@ -141,6 +142,16 @@ async function useChatGptForData(prompt) {
     console.error('OpenAI API error:', error);
     return {}; // fallback if API call fails
   }
+}
+
+// === Timeout wrapper ===
+async function withTimeout(promise, ms = 15000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('OpenAI request timeout')), ms),
+    ),
+  ]);
 }
 
 const getAppsAll = async () => {
@@ -739,10 +750,14 @@ const createAppNode = async (token, body) => {
     }
 
     // === Pricing + Attributes ===
-    const pricingData = await useChatGptForData(
-      `Given the app "${body.title}"${appUrl ? ` with website ${appUrl}` : ''}${
-        description ? ` and description: \"${description}\"` : ''
-      }, determine its pricing model.
+
+    const [pricingData, attributesData, faqData] = await Promise.all([
+      useChatGptForData(
+        `Given the app "${body.title}"${
+          appUrl ? ` with website ${appUrl}` : ''
+        }${
+          description ? ` and description: \"${description}\"` : ''
+        }, determine its pricing model.
 
 Return JSON with keys:
 {
@@ -756,14 +771,14 @@ Return JSON with keys:
 }
 
 Respond ONLY with valid JSON.`,
-    );
+      ),
 
-    const attributesData = await useChatGptForData(
-      `Based on the app "${body.title}"${
-        appUrl ? ` with website ${appUrl}` : ''
-      }${
-        description ? ` and description: \"${description}\"` : ''
-      }, determine if:
+      useChatGptForData(
+        `Based on the app "${body.title}"${
+          appUrl ? ` with website ${appUrl}` : ''
+        }${
+          description ? ` and description: \"${description}\"` : ''
+        }, determine if:
 
 Return JSON with keys:
 {
@@ -781,14 +796,14 @@ Return JSON with keys:
 }
 
 Respond ONLY with valid JSON.`,
-    );
+      ),
 
-    const faqData = await useChatGptForData(
-      `Based on the app "${body.title}"${
-        appUrl ? ` with website ${appUrl}` : ''
-      }${
-        description ? ` and description: \"${description}\"` : ''
-      }, determine if:
+      useChatGptForData(
+        `Based on the app "${body.title}"${
+          appUrl ? ` with website ${appUrl}` : ''
+        }${
+          description ? ` and description: \"${description}\"` : ''
+        }, determine if:
 
 - How to create an account in app "${body.title}".
 - How to delete an account in app "${body.title}".
@@ -802,11 +817,11 @@ Respond ONLY with valid JSON.`,
 - Is app "${body.title}" safe to use? Is it legit or scammy?
 - Can you make money with app "${body.title}"?
 - Does it make sense to upgrade in app "${
-        body.title
-      }"? What are main features of premium version.
+          body.title
+        }"? What are main features of premium version.
 - Can you use app "${
-        body.title
-      }" for free? Any ways to credits/coins for free? Either via promos, invite codes, completing tasks, etc.
+          body.title
+        }" for free? Any ways to credits/coins for free? Either via promos, invite codes, completing tasks, etc.
 - How to use "${body.title}"? Longer description.
 
 
@@ -830,7 +845,8 @@ Return JSON with keys:
 }
 
 Respond ONLY with valid JSON.`,
-    );
+      ),
+    ]);
 
     const baseSlug = generateSlug(body.title);
     const uniqueSlug = await ensureUniqueSlugItems(baseSlug, 'apps');
