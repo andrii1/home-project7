@@ -802,8 +802,6 @@ export const Apps = () => {
     deleteFavorites();
   };
 
-  console.log('apps1', apps);
-
   const tabsGroup = tabs.map((tab) => {
     return (
       <Button

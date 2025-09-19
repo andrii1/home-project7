@@ -238,7 +238,6 @@ export const AppView = () => {
     app.apple_id && fetchAppAppStore(app.apple_id);
   }, [app.apple_id]);
 
-  console.log(appAppStore, 'appAppStore');
 
   useEffect(() => {
     async function fetchAppAppStoreScraper(appleId) {
@@ -612,7 +611,6 @@ export const AppView = () => {
   //   );
   // }
 
-  console.log('app', app);
 
   const handleFaqs = (faqId) => {
     setFaqs(
