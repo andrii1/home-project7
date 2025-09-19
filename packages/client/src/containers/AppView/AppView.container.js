@@ -275,17 +275,16 @@ export const AppView = () => {
       setLoading(true);
       try {
         const response = await fetch(`${apiURL()}/apps`);
-        const appsResponse = await response.json();
-        const similarAppsArray = appsResponse
-          .filter((item) => item.appTopicId === app.topic_id)
-          .filter((item) => item.app_id !== app.app_id)
+        const data = await response.json();
+        const similarAppsArray = data
+          .filter((item) => item.category_id === app.category_id)
           .filter((item) => item.id !== app.id);
         setSimilarApps(similarAppsArray);
 
-        const similarDealsFromAppArray = appsResponse
-          .filter((item) => item.app_id === app.app_id)
-          .filter((item) => item.id !== app.id);
-        setSimilarDealsFromApp(similarDealsFromAppArray);
+        // const similarDealsFromAppArray = appsResponse
+        //   .filter((item) => item.app_id === app.app_id)
+        //   .filter((item) => item.id !== app.id);
+        // setSimilarDealsFromApp(similarDealsFromAppArray);
       } catch (e) {
         setError({ message: e.message || 'Failed to fetch data' });
       }
@@ -293,7 +292,7 @@ export const AppView = () => {
     }
 
     fetchSimilarApps();
-  }, [app.topic_id, app.id, app.app_id]);
+  }, [app.id, app.category_id]);
 
   const fetchCommentsByAppId = useCallback(async (appId) => {
     const response = await fetch(`${apiURL()}/comments?appId=${appId}`);
@@ -395,33 +394,33 @@ export const AppView = () => {
     return (
       <Card
         id={item.id}
-        cardUrl={`/apps/${item.id}`}
+        cardUrl={`/apps/${item.slug}`}
         title={item.title}
         description={item.description}
         url={item.url}
         urlImage={item.url_image === null ? 'deal' : item.url_image}
-        topic={item.topicTitle}
+        topic={item.categoryTitle}
         appTitle={item.appTitle}
         smallCard
       />
     );
   });
 
-  const cardItemsSimilarDealsFromApp = similarDealsFromApp.map((item) => {
-    return (
-      <Card
-        id={item.id}
-        cardUrl={`/apps/${item.id}`}
-        title={item.title}
-        description={item.description}
-        url={item.url}
-        urlImage={item.url_image === null ? 'deal' : item.url_image}
-        topic={item.topicTitle}
-        appTitle={item.appTitle}
-        smallCard
-      />
-    );
-  });
+  // const cardItemsSimilarDealsFromApp = similarDealsFromApp.map((item) => {
+  //   return (
+  //     <Card
+  //       id={item.id}
+  //       cardUrl={`/apps/${item.id}`}
+  //       title={item.title}
+  //       description={item.description}
+  //       url={item.url}
+  //       urlImage={item.url_image === null ? 'deal' : item.url_image}
+  //       topic={item.topicTitle}
+  //       appTitle={item.appTitle}
+  //       smallCard
+  //     />
+  //   );
+  // });
 
   const searchItems = searches.map((search) => {
     return (
@@ -1645,17 +1644,17 @@ export const AppView = () => {
             </Toast>
           </div>
           <ContainerCta user={user} />
-          {similarDealsFromApp.length > 0 && (
+          {/* {similarDealsFromApp.length > 0 && (
             <div className="container-alternatives">
               <h2>🔎 Other deals from {app.appTitle} app</h2>
               <div className="container-cards small-cards">
                 {cardItemsSimilarDealsFromApp}
               </div>
             </div>
-          )}
+          )} */}
           {similarApps.length > 0 && (
             <div className="container-alternatives">
-              <h2>🔎 Similar deals in {app.topicTitle}</h2>
+              <h2>🔎 Similar apps in {app.categoryTitle}</h2>
               <div className="container-cards small-cards">{cardItems}</div>
             </div>
           )}
