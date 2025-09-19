@@ -1616,28 +1616,28 @@ export const AppView = () => {
               icon={faLink}
               className="button-copy"
               onClick={() =>
-                copyToClipboard(`https://www.trytopapps.com/deals/${app.id}`)
+                copyToClipboard(`https://www.trytopapps.com/apps/${app.slug}`)
               }
             />
-            <FacebookShareButton url={`/apps/${app.id}`}>
+            <FacebookShareButton url={`/apps/${app.slug}`}>
               <FontAwesomeIcon className="share-icon" icon={faFacebookF} />
             </FacebookShareButton>
             <TwitterShareButton
-              url={`https://www.trytopapps.com/apps/${app.id}`}
+              url={`https://www.trytopapps.com/apps/${app.slug}`}
               title={`Check out this app: '${app.title}'`}
               hashtags={['Apps']}
             >
               <FontAwesomeIcon className="share-icon" icon={faTwitter} />
             </TwitterShareButton>
             <LinkedinShareButton
-              url={`https://www.trytopapps.com/apps/${app.id}`}
+              url={`https://www.trytopapps.com/apps/${app.slug}`}
             >
               <FontAwesomeIcon className="share-icon" icon={faLinkedinIn} />
             </LinkedinShareButton>
             <EmailShareButton
               subject="Check out this app!"
               body={`This app is great: '${app.title}'`}
-              url={`https://www.trytopapps.com/apps/${app.id}`}
+              url={`https://www.trytopapps.com/apps/${app.slug}`}
             >
               <FontAwesomeIcon icon={faEnvelope} />
             </EmailShareButton>
