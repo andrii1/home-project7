@@ -612,6 +612,8 @@ export const AppView = () => {
   //   );
   // }
 
+  console.log('app', app);
+
   const handleFaqs = (faqId) => {
     setFaqs(
       faqs.map((item) => {
@@ -1320,7 +1322,7 @@ export const AppView = () => {
                 <p>Category: </p>
                 <div>
                   <Link
-                    to={`/apps/category/${app.category_id}`}
+                    to={`/apps/categories/${app.categorySlug}`}
                     target="_blank"
                   >
                     <Button
@@ -1476,10 +1478,10 @@ export const AppView = () => {
               {JSON.parse(app.languages).join(', ')}
             </div>
           )}
-          <div className="container-details container-badges">
-            <h2 className="no-margin">Other</h2>
+          {(!!app.is_ai_powered || !!app.is_open_source) && (
+            <div className="container-details container-badges">
+              <h2 className="no-margin">Other</h2>
 
-            {(!!app.is_ai_powered || !!app.is_open_source) && (
               <div className="container-tags">
                 <div className="badges">
                   <div>
@@ -1516,8 +1518,8 @@ export const AppView = () => {
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
           <div className="container-details container-badges">
             <h2 className="no-margin">Social media accounts</h2>
             {(!!app.url_x || !!app.url_discord) && (

@@ -567,7 +567,11 @@ const getAppById = async (id) => {
   }
   try {
     const app = await knex('apps')
-      .select('apps.*', 'categories.title as categoryTitle')
+      .select(
+        'apps.*',
+        'categories.title as categoryTitle',
+        'categories.slug as categorySlug',
+      )
       .join('categories', 'apps.category_id', '=', 'categories.id')
       .where({ 'apps.slug': id });
     if (app.length === 0) {
