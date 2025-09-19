@@ -1327,7 +1327,7 @@ export const AppView = () => {
                   >
                     <Button
                       secondary
-                      label={app.categoryTitle}
+                      label={app.categoryTitle?.toLowerCase()}
                       size="small"
                       icon={
                         <FontAwesomeIcon
@@ -1645,7 +1645,7 @@ export const AppView = () => {
               <span>Copied to clipboard!</span>
             </Toast>
           </div>
-          <ContainerCta user={user} />
+          {/* <ContainerCta user={user} /> */}
           {/* {similarDealsFromApp.length > 0 && (
             <div className="container-alternatives">
               <h2>🔎 Other deals from {app.appTitle} app</h2>
