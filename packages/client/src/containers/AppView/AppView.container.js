@@ -238,7 +238,6 @@ export const AppView = () => {
     app.apple_id && fetchAppAppStore(app.apple_id);
   }, [app.apple_id]);
 
-
   useEffect(() => {
     async function fetchAppAppStoreScraper(appleId) {
       setLoading(true);
@@ -610,7 +609,6 @@ export const AppView = () => {
   //     </>
   //   );
   // }
-
 
   const handleFaqs = (faqId) => {
     setFaqs(
@@ -1237,6 +1235,54 @@ export const AppView = () => {
             )}
           </div>
           <div className="container-details container-badges">
+            <h2 className="no-margin">Social media</h2>
+            {(!!app.url_x ||
+              !!app.url_discord ||
+              !!app.url_fb ||
+              !!app.url_linkedin ||
+              !!app['e-mail'] ||
+              !!app.url) && (
+              <div className="container-tags">
+                {!!app.url_x && (
+                  <Link to={app.url_x} target="_blank">
+                    <FontAwesomeIcon className="share-icon" icon={faXTwitter} />
+                  </Link>
+                )}
+                {!!app.url_discord && (
+                  <Link to={app.url_discord} target="_blank">
+                    <FontAwesomeIcon className="share-icon" icon={faDiscord} />
+                  </Link>
+                )}
+                {!!app.url_fb && (
+                  <Link to={app.url_fb} target="_blank">
+                    <FontAwesomeIcon
+                      className="share-icon"
+                      icon={faFacebookF}
+                    />
+                  </Link>
+                )}
+                {!!app.url_linkedin && (
+                  <Link to={app.url_linkedin} target="_blank">
+                    <FontAwesomeIcon
+                      className="share-icon"
+                      icon={faLinkedinIn}
+                    />
+                  </Link>
+                )}
+                {!!app['e-mail'] && (
+                  <Link to={`mailto:${app['e-mail']}`} target="_blank">
+                    <FontAwesomeIcon className="share-icon" icon={faEnvelope} />
+                  </Link>
+                )}
+                {!!app.url && (
+                  <Link to={app.url} target="_blank">
+                    <FontAwesomeIcon className="share-icon" icon={faLink} />
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="container-details container-badges">
             <h2 className="no-margin">Version & release</h2>
             {app.developer && (
               <div className="container-tags">
@@ -1518,23 +1564,7 @@ export const AppView = () => {
               </div>
             </div>
           )}
-          <div className="container-details container-badges">
-            <h2 className="no-margin">Social media accounts</h2>
-            {(!!app.url_x || !!app.url_discord) && (
-              <div className="container-tags">
-                {!!app.url_x && (
-                  <Link to={app.url_x} target="_blank">
-                    <FontAwesomeIcon className="share-icon" icon={faXTwitter} />
-                  </Link>
-                )}
-                {!!app.url_discord && (
-                  <Link to={app.url_discord} target="_blank">
-                    <FontAwesomeIcon className="share-icon" icon={faDiscord} />
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
+
           {app.appUrlAppStore || app.appUrlGooglePlayStore ? (
             <div className="container-appview-box">
               <h2>Download {app.appTitle} app</h2>
@@ -1570,20 +1600,7 @@ export const AppView = () => {
           ) : (
             ''
           )}
-          {app.appAppleId && appAppStore && (
-            <div className="container-appview-box">
-              <h2>{app?.appTitle} app</h2>
-              <p className="app-description">{appAppStore?.description}</p>
-            </div>
-          )}
-          {!app.appAppleId && app.appDescription && (
-            <div className="container-appview-box">
-              <h2>{app?.appTitle} app</h2>
-              <p className="app-description">
-                <Markdown>{app?.appDescription}</Markdown>
-              </p>
-            </div>
-          )}
+
           {app.contact && (
             <div className="container-appview-box">
               <h2>{app.title} support</h2>
