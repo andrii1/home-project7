@@ -328,10 +328,10 @@ export const Navigation = () => {
                     </NavLink>
                     <NavLink
                       onClick={toggleHamburgerUser}
-                      to="/codes/new"
+                      to="/apps/new"
                       className="login nav-link"
                     >
-                      Add referral code
+                      Add your app
                     </NavLink>
                     <NavLink
                       onClick={toggleHamburgerUser}
@@ -437,7 +437,7 @@ export const Navigation = () => {
                   <NavLink to="/bookmarks" className="login">
                     Bookmarks
                   </NavLink>
-                  <NavLink to="/codes/new">Add your referral code</NavLink>
+                  <NavLink to="/apps/new">Add your app</NavLink>
                   <NavLink
                     to={`mailto:agorh@icloud.com?subject=Support%20Request%20TAD&body=Hi%20team%2C%0A%0AMy%20email%20is%3A%20${
                       user ? user?.email : ''

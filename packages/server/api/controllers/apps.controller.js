@@ -763,15 +763,6 @@ Respond ONLY with valid JSON.`,
         description ? ` and description: \"${description}\"` : ''
       }, determine if:
 
-- It is AI-powered (uses artificial intelligence or machine learning in its features).
-- It is open-source software.
-- Does it have browser extension. If it does - return url for browser extension.
-- Does it have an Android app. If it does - return url.
-- Does it have a Windows app. If it does - return url.
-- Does it have a Mac app. If it does - return url.
-- Does it have a Twitter account. If it does - return url.
-- Does it have a Discord account. If it does - return url.
-
 Return JSON with keys:
 {
   "is_ai_powered": true/false,
@@ -780,8 +771,11 @@ Return JSON with keys:
   "url_google_play_store": url for android app (if available),
   "url_windows": url for windows app (if available),
   "url_mac": url for mac app (if available),
-  "url_x": url for twitter account (if available),
+  "url_x": url for X/twitter account (if available),
   "url_discord": url for discord account (if available),
+  "url_fb": url for Facebook account (if available),
+  "url_linkedin": url for linkedin account (if available),
+  "e-mail": e-mail (if available, can be support e-mail),
 }
 
 Respond ONLY with valid JSON.`,
@@ -845,6 +839,7 @@ Respond ONLY with valid JSON.`,
       slug: uniqueSlug,
       category_id: body.category_id,
       url: appUrl,
+      user_id: user.id,
       description,
       ...appExtra,
       ...pricingData,
