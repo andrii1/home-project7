@@ -73,6 +73,8 @@ const faqConfig = [
   { key: 'faq_app_doesnt_work_bugs', title: "{app} doesn't work, bugs" },
   { key: 'faq_is_safe_to_use', title: 'Is {app} safe to use?' },
   { key: 'faq_how_to_make_money', title: 'Can you make money with {app}?' },
+  { key: 'faq_should_you_upgrade', title: 'Should you upgrade?' },
+  { key: 'faq_can_use_for_free', title: '{app} for free?' },
 ];
 
 export const AppView = () => {
@@ -853,6 +855,16 @@ export const AppView = () => {
               </>
             )}
           </div>
+          {app.description_how_to_use && (
+            <div className="container-description">
+              <div className="container-title">
+                <h2>How to use {app.title}</h2>
+              </div>
+              <p className="app-description main-description">
+                <Markdown>{app.description_how_to_use}</Markdown>
+              </p>
+            </div>
+          )}
           {app.apple_id ||
           app.url_google_play_store ||
           app.url_chrome_extension ||
