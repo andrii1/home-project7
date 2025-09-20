@@ -37,7 +37,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { ListFilter, X } from 'lucide-react';
 
-import mousePointer from '../../assets/images/mouse-pointer.svg';
+import globe from '../../assets/images/globe.svg';
 import { logInWithEmailAndPassword } from '../../firebase';
 import MultiSelectDropdown from '../../components/MultiSelectDropdown/MultiSelectDropdown.component';
 
@@ -1187,7 +1187,7 @@ export const Apps = () => {
                   title={app.title}
                   description={app.description}
                   url={app.url}
-                  urlImage={app.url_icon || mousePointer}
+                  urlImage={app.url_icon || globe}
                   topic={app.categoryTitle}
                   topicId={app.categorySlug}
                   pricingType={app.pricing_type}

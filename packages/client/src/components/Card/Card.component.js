@@ -11,10 +11,8 @@ import {
   faHeart as faHeartSolid,
 } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
-import appImage from '../../assets/images/app-placeholder.svg';
 // import appImage from '../../../public/assets/images/small-screenshot.png';
 import { useUserContext } from '../../userContext';
-import iconCopy from '../../assets/images/icons8-copy-24.png';
 
 import './Card.styles.css';
 
