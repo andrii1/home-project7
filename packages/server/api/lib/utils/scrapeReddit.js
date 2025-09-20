@@ -39,11 +39,10 @@ async function fetchRedditWithApi() {
   for (const subredditName of listOfSubreddits) {
     try {
       const subreddit = await reddit.getSubreddit(subredditName);
-      const posts = await subreddit.getTop({ time: 'week', limit: 1 });
+      const posts = await subreddit.getTop({ time: 'week', limit: 30 });
 
       const postsMap = posts.map((post) => ({
         title: post.title,
-        url: `https://reddit.com${post.permalink}`,
         author: post.author.name,
         selftext: post.selftext,
         upvotes: post.ups,
@@ -66,7 +65,7 @@ async function formatReddit() {
   const posts = await fetchRedditWithApi();
   const prompt = `${JSON.stringify(
     posts,
-  )} Here are top Reddit posts about trending apps and websites. Return JSON:
+  )} Here are top Reddit posts about trending apps and websites. You should extract url of website, not url of reddit comment. Do not include links to github or apps.apple.com. Return JSON:
 [{
   "appUrl": url of the app/site,
 }]

@@ -11,8 +11,8 @@ const openai = new OpenAI({
 });
 
 // Credentials (from .env)
-const USER_UID = process.env.USER_UID_APPS_PROD;
-const API_PATH = process.env.API_PATH_APPS_PROD;
+const USER_UID = process.env.USER_UID_APPS_LOCAL;
+const API_PATH = process.env.API_PATH_APPS_LOCAL;
 
 // const today = new Date();
 // const isSunday = today.getDay() === 0; // 0 = Sunday
