@@ -25,7 +25,7 @@ import Toast from '../../components/Toast/Toast.Component';
 import Markdown from 'markdown-to-jsx';
 import { Loading } from '../../components/Loading/Loading.Component';
 import { useLikes } from '../../utils/hooks/useLikes';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Globe } from 'lucide-react';
 
 import {
   faEnvelope,
@@ -664,11 +664,21 @@ export const AppView = () => {
           <div className="header">
             <h1 className="hero-header">{app?.title}</h1>
           </div>
-          <img
+          {app.url_icon ? (
+            <img
+              className="appview-icon default-icon"
+              alt={`${app.title}`}
+              src={app.url_icon || mousePointer}
+            />
+          ) : (
+            <Globe size="15rem" className="appview-icon default-icon" />
+          )}
+          {/* <img
             className={`appview-icon ${!app.url_icon && 'default-icon'}`}
             alt={`${app.title}`}
             src={app.url_icon || mousePointer}
-          />
+          /> */}
+
           {/* <ImageGallery items={images} /> */}
           <div className="container-deal-actions">
             <div className="container-rating">
