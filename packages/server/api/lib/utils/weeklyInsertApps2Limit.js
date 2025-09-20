@@ -122,69 +122,47 @@ const insertApps = async (appsParam) => {
 Promise.all([
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    num: 200,
-  }),
-  store.list({
-    collection: store.collection.TOP_GROSSING_IOS,
-    num: 200,
-  }),
-  store.list({
-    collection: store.collection.TOP_PAID_IOS,
+    category: store.category.BOOKS,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.ENTERTAINMENT,
+    category: store.category.EDUCATION,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.FINANCE,
+    category: store.category.FOOD_AND_DRINK,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.LIFESTYLE,
-    num: 100,
-  }),
-  store.list({
-    collection: store.collection.TOP_FREE_IOS,
-    category: store.category.PHOTO_AND_VIDEO,
+    category: store.category.GAMES,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.SOCIAL_NETWORKING,
+    category: store.category.MEDICAL,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.HEALTH_AND_FITNESS,
+    category: store.category.REFERENCE,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.MUSIC,
+    category: store.category.SHOPPING,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.PRODUCTIVITY,
+    category: store.category.SPORTS,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.BUSINESS,
-    num: 200,
-  }),
-  store.list({
-    collection: store.collection.TOP_FREE_IOS,
-    category: store.category.TRAVEL,
-    num: 200,
-  }),
-  store.list({
-    collection: store.collection.TOP_FREE_IOS,
-    category: store.category.UTILITIES,
+    category: store.category.WEATHER,
     num: 200,
   }),
 ])

@@ -121,71 +121,54 @@ const insertApps = async (appsParam) => {
 
 Promise.all([
   store.list({
-    collection: store.collection.TOP_FREE_IOS,
+    collection: store.collection.TOP_MAC,
     num: 200,
   }),
   store.list({
-    collection: store.collection.TOP_GROSSING_IOS,
+    collection: store.collection.TOP_FREE_MAC,
     num: 200,
   }),
   store.list({
-    collection: store.collection.TOP_PAID_IOS,
-    num: 200,
-  }),
-  store.list({
-    collection: store.collection.TOP_FREE_IOS,
-    category: store.category.ENTERTAINMENT,
+    collection: store.collection.TOP_FREE_IPAD,
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.FINANCE,
-    num: 200,
-  }),
-  store.list({
-    collection: store.collection.TOP_FREE_IOS,
-    category: store.category.LIFESTYLE,
-    num: 100,
-  }),
-  store.list({
-    collection: store.collection.TOP_FREE_IOS,
-    category: store.category.PHOTO_AND_VIDEO,
+    country: 'gb',
     num: 200,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
     category: store.category.SOCIAL_NETWORKING,
     num: 200,
+    country: 'gb',
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.HEALTH_AND_FITNESS,
-    num: 200,
+    category: store.category.LIFESTYLE,
+    num: 100,
+    country: 'gb',
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.MUSIC,
-    num: 200,
+    category: store.category.PHOTO_AND_VIDEO,
+    num: 100,
+    country: 'gb',
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.PRODUCTIVITY,
-    num: 200,
+    country: 'de',
+    num: 100,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.BUSINESS,
-    num: 200,
+    country: 'in',
+    num: 50,
   }),
   store.list({
     collection: store.collection.TOP_FREE_IOS,
-    category: store.category.TRAVEL,
-    num: 200,
-  }),
-  store.list({
-    collection: store.collection.TOP_FREE_IOS,
-    category: store.category.UTILITIES,
-    num: 200,
+    country: 'sg',
+    num: 50,
   }),
 ])
   .then((results) => {
