@@ -65,7 +65,7 @@ async function formatReddit() {
   const posts = await fetchRedditWithApi();
   const prompt = `${JSON.stringify(
     posts,
-  )} Here are top Reddit posts about trending apps and websites. You should extract url of website, not url of reddit comment. Do not include links to github or apps.apple.com. Return JSON:
+  )} Here are top Reddit posts about trending apps and websites. You should extract url of website, not url of reddit comment. Do not include domains like to github.com or apps.apple.com. Return JSON:
 [{
   "appUrl": url of the app/site,
 }]
