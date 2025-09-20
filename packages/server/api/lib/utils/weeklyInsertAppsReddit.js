@@ -21,9 +21,18 @@ const API_PATH = process.env.API_PATH_APPS_PROD;
 
 const today = new Date();
 const isSunday = today.getDay() === 0; // 0 = Sunday
+const currentHour = today.getHours(); // 0–23
+
+// Allowed hours (1am → 1, 2am → 2, ... 5am → 5)
+const allowedHours = [1, 2, 3, 4, 5];
 
 if (!isSunday) {
   console.log('Not Sunday, skipping weekly job.');
+  process.exit(0);
+}
+
+if (!allowedHours.includes(currentHour)) {
+  console.log(`Not in allowed hours (${allowedHours.join(', ')}), skipping.`);
   process.exit(0);
 }
 
