@@ -37,13 +37,13 @@ const listOfPages = [
   'vehicles',
 ];
 
-async function scrapeSimilarWeb() {
+async function scrapeSimilarWebTrending() {
   const allSites = [];
 
   for (const page of listOfPages) {
     const url = page
-      ? `https://www.similarweb.com/top-websites/${page}/`
-      : 'https://www.similarweb.com/top-websites/'; // handle the main top sites page
+      ? `https://www.similarweb.com/top-websites/${page}/trending/`
+      : 'https://www.similarweb.com/top-websites/trending/';
 
     try {
       const res = await fetch(url, {
@@ -56,21 +56,39 @@ async function scrapeSimilarWeb() {
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      $('table tbody tr').each((i, el) => {
-        const site = $(el).find('td:nth-child(2)').text().trim();
-
-        if (site) {
-          allSites.push({
-            appUrl: site,
+      // Trending Up
+      $('div.top-widget[data-test="rising-players"]').each((i, el) => {
+        $(el)
+          .find('tbody tr')
+          .each((j, row) => {
+            const site = $(row)
+              .find('td:nth-child(2) .top-widget__table-domain')
+              .text()
+              .trim();
+            if (site) allSites.push({ appUrl: site });
           });
-        }
       });
+
+      // Joined Top 100
+      $('div.top-widget[data-test="joined-the-top-100"]').each((i, el) => {
+        $(el)
+          .find('tbody tr')
+          .each((j, row) => {
+            const site = $(row)
+              .find('td:nth-child(2) .top-widget__table-domain')
+              .text()
+              .trim();
+            if (site) allSites.push({ appUrl: site });
+          });
+      });
+
+      console.log(allSites);
     } catch (err) {
-      console.error(`Failed to fetch from r/${page}:`, err.message);
+      console.error('Scraping failed:', err.message);
     }
   }
 
   return allSites;
 }
 
-module.exports = scrapeSimilarWeb;
+module.exports = scrapeSimilarWebTrending;

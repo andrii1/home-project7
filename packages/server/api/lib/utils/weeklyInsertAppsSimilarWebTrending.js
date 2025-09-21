@@ -9,7 +9,7 @@
 require('dotenv').config();
 
 const OpenAI = require('openai');
-const formatReddit = require('./scrapeReddit');
+const scrapeSimilarWebTrending = require('./scrapeSimilarWebTrending.js');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // make sure this is set in your .env
@@ -20,29 +20,15 @@ const USER_UID = process.env.USER_UID_APPS_PROD;
 const API_PATH = process.env.API_PATH_APPS_PROD;
 
 const today = new Date();
-const isThursday = today.getDay() === 4; // 0 = Sunday
+const runDay = 11; // change this to whatever day you want
+const isMonthlyRun = today.getDate() === runDay;
 
-if (!isThursday) {
-  console.log('Not Thursday, skipping weekly job.');
+if (!isMonthlyRun) {
+  console.log(`Not the ${runDay}th, skipping monthly job.`);
   process.exit(0);
 }
 
-// const today = new Date();
-// const isSunday = today.getDay() === 0; // 0 = Sunday
-// const currentHour = today.getHours(); // 0–23
-
-// // Allowed hours (1am → 1, 2am → 2, ... 5am → 5)
-// const allowedHours = [1, 2, 3, 4, 5];
-
-// if (!isSunday) {
-//   console.log('Not Sunday, skipping weekly job.');
-//   process.exit(0);
-// }
-
-// if (!allowedHours.includes(currentHour)) {
-//   console.log(`Not in allowed hours (${allowedHours.join(', ')}), skipping.`);
-//   process.exit(0);
-// }
+console.log('Running monthly job...');
 
 // INSTRUCTION
 
@@ -185,8 +171,9 @@ async function insertApp({ appTitle, appleId, appUrl, categoryId }) {
 }
 
 const insertApps = async () => {
-  const scrapedWebsites = await formatReddit();
+  const scrapedWebsites = await scrapeSimilarWebTrending();
   console.log('websites', scrapedWebsites);
+
   for (const appItem of scrapedWebsites) {
     const { appleId, appUrl } = appItem;
     let app;

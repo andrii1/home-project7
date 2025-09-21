@@ -20,10 +20,10 @@ const USER_UID = process.env.USER_UID_APPS_LOCAL;
 const API_PATH = process.env.API_PATH_APPS_LOCAL;
 
 const today = new Date();
-const isMonday = today.getDay() === 1;
+const isWednesday = today.getDay() === 3;
 
-if (!isMonday) {
-  console.log('Not Monday, skipping weekly job.');
+if (!isWednesday) {
+  console.log('Not Wednesday, skipping weekly job.');
   process.exit(0);
 }
 

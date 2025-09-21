@@ -18,24 +18,17 @@ const openai = new OpenAI({
 // Credentials (from .env)
 const USER_UID = process.env.USER_UID_APPS_PROD;
 const API_PATH = process.env.API_PATH_APPS_PROD;
-const limit = 5;
 
-// const today = new Date();
-// const isSunday = today.getDay() === 0; // 0 = Sunday
-// const currentHour = today.getHours(); // 0–23
+const today = new Date();
+const runDay = 10; // change this to whatever day you want
+const isMonthlyRun = today.getDate() === runDay;
 
-// // Allowed hours (1am → 1, 2am → 2, ... 5am → 5)
-// const allowedHours = [1, 2, 3, 4, 5];
+if (!isMonthlyRun) {
+  console.log(`Not the ${runDay}th, skipping monthly job.`);
+  process.exit(0);
+}
 
-// if (!isSunday) {
-//   console.log('Not Sunday, skipping weekly job.');
-//   process.exit(0);
-// }
-
-// if (!allowedHours.includes(currentHour)) {
-//   console.log(`Not in allowed hours (${allowedHours.join(', ')}), skipping.`);
-//   process.exit(0);
-// }
+console.log('Running monthly job...');
 
 // INSTRUCTION
 
@@ -180,12 +173,8 @@ async function insertApp({ appTitle, appleId, appUrl, categoryId }) {
 const insertApps = async () => {
   const scrapedWebsites = await scrapeSimilarWeb();
   console.log('websites', scrapedWebsites);
-  let insertedCount = 0;
+
   for (const appItem of scrapedWebsites) {
-    if (insertedCount >= limit) {
-      console.log('✅ Inserted 20 apps, stopping batch.');
-      break; // exit the loop
-    }
     const { appleId, appUrl } = appItem;
     let app;
     let category;
@@ -212,11 +201,6 @@ const insertApps = async () => {
     const appId = newApp.appId;
     const newAppTitle = newApp.appTitle;
     console.log('Inserted app:', newApp);
-    if (newApp.existing) {
-      console.log(`⚠️ Already exists: ${newApp.appTitle}`);
-      continue;
-    }
-    insertedCount += 1;
   }
 };
 
