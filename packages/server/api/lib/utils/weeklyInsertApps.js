@@ -86,17 +86,6 @@ const insertApps = async (appsParam) => {
       const { categoryId } = newCategory;
       console.log('Inserted category:', newCategory);
 
-      // const createdTopic = await createTopicWithChatGpt(
-      //   category,
-      //   appTitle,
-      //   appDescription,
-      // );
-      // console.log('createdTopic', createdTopic);
-
-      // const newTopic = await insertTopic(createdTopic, categoryId);
-      // const { topicId } = newTopic;
-      // console.log('Inserted topic:', newTopic);
-
       const newApp = await insertApp({ appTitle, appleId, appUrl, categoryId });
       const { appId } = newApp;
       const newAppTitle = newApp.appTitle;
