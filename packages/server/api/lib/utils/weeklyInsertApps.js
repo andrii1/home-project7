@@ -14,13 +14,13 @@ const openai = new OpenAI({
 const USER_UID = process.env.USER_UID_APPS_PROD;
 const API_PATH = process.env.API_PATH_APPS_PROD;
 
-// const today = new Date();
-// const isSunday = today.getDay() === 0; // 0 = Sunday
+const today = new Date();
+const isSunday = today.getDay() === 0; // 0 = Sunday
 
-// if (!isSunday) {
-//   console.log('Not Sunday, skipping weekly job.');
-//   process.exit(0);
-// }
+if (!isSunday) {
+  console.log('Not Sunday, skipping weekly job.');
+  process.exit(0);
+}
 
 // fetch helpers
 
