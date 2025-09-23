@@ -184,10 +184,6 @@ const insertApps = async (appsParam) => {
 
 Promise.all([
   store.list({
-    collection: store.collection.TOP_MAC,
-    num: 200,
-  }),
-  store.list({
     collection: store.collection.TOP_FREE_MAC,
     num: 200,
   }),
