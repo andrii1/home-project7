@@ -1,16 +1,14 @@
 require('dotenv').config();
-const fs = require('fs');
-const path = require('path');
 const { SitemapStream, streamToPromise } = require('sitemap');
 const AWS = require('aws-sdk');
 
-// const today = new Date();
-// const isSunday = today.getDay() === 0; // 0 = Sunday
+const today = new Date();
+const isSunday = today.getDay() === 0; // 0 = Sunday
 
-// if (!isSunday) {
-//   console.log('Not Sunday, skipping weekly job.');
-//   process.exit(0);
-// }
+if (!isSunday) {
+  console.log('Not Sunday, skipping weekly job.');
+  process.exit(0);
+}
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
