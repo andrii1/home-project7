@@ -7,23 +7,24 @@ const s3 = new AWS.S3({
 });
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
-const FOLDER_NAME = 'trytopapps'; // folder prefix
+const FOLDER_NAME = 'trytopapps';
 
-const getSitemap = async () => {
+const getFile = async (fileName) => {
   try {
     const data = await s3
       .getObject({
         Bucket: BUCKET_NAME,
-        Key: `${FOLDER_NAME}/sitemap.xml`,
+        Key: `${FOLDER_NAME}/${fileName}`,
       })
       .promise();
 
     return data.Body.toString();
   } catch (error) {
-    return error.message;
+    console.error('Sitemap S3 error:', error);
+    throw error;
   }
 };
 
 module.exports = {
-  getSitemap,
+  getFile,
 };

@@ -1,16 +1,14 @@
 /* eslint-disable no-await-in-loop */
 require('dotenv').config();
-const { SitemapStream, streamToPromise } = require('sitemap');
+const {
+  SitemapStream,
+  SitemapIndexStream,
+  streamToPromise,
+} = require('sitemap');
 const AWS = require('aws-sdk');
 
-const MAX_URLS = 50000; // Google limit per sitemap file
-
-// Run only on Sunday
-const today = new Date();
-if (today.getDay() !== 0) {
-  console.log('Not Sunday, skipping sitemap generation.');
-  process.exit(0);
-}
+const MAX_URLS = 50000; // Google limit
+const host = 'https://www.trytopapps.com';
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -22,6 +20,7 @@ const s3 = new AWS.S3();
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 const FOLDER_NAME = 'trytopapps';
 
+// Upload helper
 const uploadToS3 = async (key, body) => {
   return s3
     .putObject({
@@ -35,52 +34,40 @@ const uploadToS3 = async (key, body) => {
 
 (async () => {
   try {
-    const host = 'https://www.trytopapps.com';
-
     console.log('Fetching dynamic data...');
 
-    // Fetch data in parallel
+    const api = (path) => fetch(`${host}/api/${path}`).then((r) => r.json());
+
+    // Fetch all data
     const [
-      appsRes,
-      categoriesRes,
-      tagsRes,
-      featuresRes,
-      useCasesRes,
-      userTypesRes,
-      industriesRes,
-      businessModelsRes,
+      apps,
+      categories,
+      tags,
+      features,
+      useCases,
+      userTypes,
+      industries,
+      businessModels,
     ] = await Promise.all([
-      fetch(`${host}/api/apps`),
-      fetch(`${host}/api/categories`),
-      fetch(`${host}/api/tags`),
-      fetch(`${host}/api/features`),
-      fetch(`${host}/api/useCases`),
-      fetch(`${host}/api/userTypes`),
-      fetch(`${host}/api/industries`),
-      fetch(`${host}/api/businessModels`),
+      api('apps'),
+      api('categories'),
+      api('tags'),
+      api('features'),
+      api('useCases'),
+      api('userTypes'),
+      api('industries'),
+      api('businessModels'),
     ]);
 
-    const apps = await appsRes.json();
-    const categories = await categoriesRes.json();
-    const tags = await tagsRes.json();
-    const features = await featuresRes.json();
-    const useCases = await useCasesRes.json();
-    const userTypes = await userTypesRes.json();
-    const industries = await industriesRes.json();
-    const businessModels = await businessModelsRes.json();
-
-    // Collect ALL URLs into a single array
+    // Collect URLs
     let urls = [];
 
-    // Static URLs
     const staticRoutes = ['/', '/apps', '/faq', '/login', '/signup'];
     urls.push(...staticRoutes.map((r) => ({ url: r })));
 
-    // Dynamic URLs
     urls.push(
       ...apps.map((a) => ({ url: `/apps/${a.id}`, changefreq: 'weekly' })),
     );
-
     urls.push(
       ...categories.map((c) => ({
         url: `/apps/categories/${c.slug}`,
@@ -126,50 +113,49 @@ const uploadToS3 = async (key, body) => {
 
     console.log(`Total URLs collected: ${urls.length}`);
 
-    // Split URLs into chunks
+    // Split into 50k chunks
     const chunks = [];
-    while (urls.length) {
-      chunks.push(urls.splice(0, MAX_URLS));
-    }
+    while (urls.length) chunks.push(urls.splice(0, MAX_URLS));
 
     console.log(`Total sitemap parts: ${chunks.length}`);
 
     const sitemapIndexItems = [];
 
-    // Generate each sitemap chunk
+    // Generate each sitemap part
     for (let i = 0; i < chunks.length; i++) {
-      const partNumber = i + 1;
-      const sitemapPartName = `sitemap-${partNumber}.xml`;
-      const key = `${FOLDER_NAME}/${sitemapPartName}`;
+      const part = i + 1;
+      const filename = `sitemap-${part}.xml`;
+      const key = `${FOLDER_NAME}/${filename}`;
 
       const smStream = new SitemapStream({ hostname: host });
-
       chunks[i].forEach((url) => smStream.write(url));
       smStream.end();
 
       const xml = await streamToPromise(smStream);
 
-      console.log(`Uploading ${sitemapPartName} ...`);
+      console.log(`Uploading ${filename} ...`);
       await uploadToS3(key, xml.toString());
 
       sitemapIndexItems.push({
-        loc: `${host}/${sitemapPartName}`,
+        url: `${host}/api/sitemaps/${filename}`, // absolute URL
       });
     }
 
-    // Create sitemap-index.xml
-    const indexStream = new SitemapStream({ hostname: host, level: 'index' });
+    // Create sitemap index
+    console.log('Building sitemap index...');
+
+    const indexStream = new SitemapIndexStream();
+
     sitemapIndexItems.forEach((item) => indexStream.write(item));
     indexStream.end();
 
     const indexXml = await streamToPromise(indexStream);
+    const indexKey = `${FOLDER_NAME}/sitemap.xml`; // main index filename
 
-    const indexKey = `${FOLDER_NAME}/sitemap-index.xml`;
-
-    console.log('Uploading sitemap-index.xml ...');
+    console.log('Uploading sitemap.xml (index)...');
     await uploadToS3(indexKey, indexXml.toString());
 
-    console.log('All sitemaps uploaded successfully!');
+    console.log('Sitemap generation completed successfully!');
   } catch (err) {
     console.error('Error generating sitemap:', err);
   }
