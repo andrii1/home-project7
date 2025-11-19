@@ -15,7 +15,7 @@ const AWS = require('aws-sdk');
 //   process.exit(0);
 // }
 
-const MAX_URLS = 20000; // Google limit
+const MAX_URLS = 10000; // Google limit
 const host = 'https://www.trytopapps.com';
 
 AWS.config.update({
