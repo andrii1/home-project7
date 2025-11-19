@@ -150,7 +150,7 @@ const uploadToS3 = async (key, body) => {
     indexStream.end();
 
     const indexXml = await streamToPromise(indexStream);
-    const indexKey = `${FOLDER_NAME}/sitemap.xml`; // main index filename
+    const indexKey = `${FOLDER_NAME}/sitemap-index.xml`; // main index filename
 
     console.log('Uploading sitemap.xml (index)...');
     await uploadToS3(indexKey, indexXml.toString());
