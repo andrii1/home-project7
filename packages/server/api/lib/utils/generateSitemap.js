@@ -7,13 +7,13 @@ const {
 } = require('sitemap');
 const AWS = require('aws-sdk');
 
-// const today = new Date();
-// const isSunday = today.getDay() === 0; // 0 = Sunday
+const today = new Date();
+const isSunday = today.getDay() === 0; // 0 = Sunday
 
-// if (!isSunday) {
-//   console.log('Not Sunday, skipping weekly job.');
-//   process.exit(0);
-// }
+if (!isSunday) {
+  console.log('Not Sunday, skipping weekly job.');
+  process.exit(0);
+}
 
 const MAX_URLS = 10000; // Google limit
 const host = 'https://www.trytopapps.com';
