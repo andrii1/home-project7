@@ -7,6 +7,14 @@ const {
 } = require('sitemap');
 const AWS = require('aws-sdk');
 
+const today = new Date();
+const isSunday = today.getDay() === 0; // 0 = Sunday
+
+if (!isSunday) {
+  console.log('Not Sunday, skipping weekly job.');
+  process.exit(0);
+}
+
 const MAX_URLS = 50000; // Google limit
 const host = 'https://www.trytopapps.com';
 
@@ -152,7 +160,7 @@ const uploadToS3 = async (key, body) => {
     const indexXml = await streamToPromise(indexStream);
     const indexKey = `${FOLDER_NAME}/sitemap-index.xml`; // main index filename
 
-    console.log('Uploading sitemap.xml (index)...');
+    console.log('Uploading sitemap-index.xml (index)...');
     await uploadToS3(indexKey, indexXml.toString());
 
     console.log('Sitemap generation completed successfully!');
