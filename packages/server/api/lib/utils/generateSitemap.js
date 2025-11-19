@@ -1,12 +1,14 @@
+/* eslint-disable no-await-in-loop */
 require('dotenv').config();
 const { SitemapStream, streamToPromise } = require('sitemap');
 const AWS = require('aws-sdk');
 
-const today = new Date();
-const isSunday = today.getDay() === 0; // 0 = Sunday
+const MAX_URLS = 50000; // Google limit per sitemap file
 
-if (!isSunday) {
-  console.log('Not Sunday, skipping weekly job.');
+// Run only on Sunday
+const today = new Date();
+if (today.getDay() !== 0) {
+  console.log('Not Sunday, skipping sitemap generation.');
   process.exit(0);
 }
 
@@ -17,15 +19,27 @@ AWS.config.update({
 });
 
 const s3 = new AWS.S3();
-const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME; // sitemaps-bucket1
-const FOLDER_NAME = 'trytopapps'; // optional folder prefix
+const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
+const FOLDER_NAME = 'trytopapps';
+
+const uploadToS3 = async (key, body) => {
+  return s3
+    .putObject({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      Body: body,
+      ContentType: 'application/xml',
+    })
+    .promise();
+};
 
 (async () => {
   try {
     const host = 'https://www.trytopapps.com';
-    const sitemap = new SitemapStream({ hostname: host });
 
-    // Fetch dynamic data
+    console.log('Fetching dynamic data...');
+
+    // Fetch data in parallel
     const [
       appsRes,
       categoriesRes,
@@ -36,14 +50,14 @@ const FOLDER_NAME = 'trytopapps'; // optional folder prefix
       industriesRes,
       businessModelsRes,
     ] = await Promise.all([
-      fetch('http://www.trytopapps.com/api/apps'),
-      fetch('http://www.trytopapps.com/api/categories'),
-      fetch('http://www.trytopapps.com/api/tags'),
-      fetch('http://www.trytopapps.com/api/features'),
-      fetch('http://www.trytopapps.com/api/useCases'),
-      fetch('http://www.trytopapps.com/api/userTypes'),
-      fetch('http://www.trytopapps.com/api/industries'),
-      fetch('http://www.trytopapps.com/api/businessModels'),
+      fetch(`${host}/api/apps`),
+      fetch(`${host}/api/categories`),
+      fetch(`${host}/api/tags`),
+      fetch(`${host}/api/features`),
+      fetch(`${host}/api/useCases`),
+      fetch(`${host}/api/userTypes`),
+      fetch(`${host}/api/industries`),
+      fetch(`${host}/api/businessModels`),
     ]);
 
     const apps = await appsRes.json();
@@ -55,81 +69,107 @@ const FOLDER_NAME = 'trytopapps'; // optional folder prefix
     const industries = await industriesRes.json();
     const businessModels = await businessModelsRes.json();
 
-    // Static pages
+    // Collect ALL URLs into a single array
+    let urls = [];
+
+    // Static URLs
     const staticRoutes = ['/', '/apps', '/faq', '/login', '/signup'];
+    urls.push(...staticRoutes.map((r) => ({ url: r })));
 
-    staticRoutes.forEach((route) => sitemap.write({ url: route }));
-
-    // Dynamic pages
-    apps.forEach((app) =>
-      sitemap.write({ url: `/apps/${app.id}`, changefreq: 'weekly' }),
+    // Dynamic URLs
+    urls.push(
+      ...apps.map((a) => ({ url: `/apps/${a.id}`, changefreq: 'weekly' })),
     );
 
-    categories.forEach((c) =>
-      sitemap.write({
+    urls.push(
+      ...categories.map((c) => ({
         url: `/apps/categories/${c.slug}`,
         changefreq: 'weekly',
-      }),
+      })),
     );
-
-    tags.forEach((c) =>
-      sitemap.write({
+    urls.push(
+      ...tags.map((c) => ({
         url: `/apps/tags/${c.slug}`,
         changefreq: 'weekly',
-      }),
+      })),
     );
-
-    features.forEach((c) =>
-      sitemap.write({
+    urls.push(
+      ...features.map((c) => ({
         url: `/apps/features/${c.slug}`,
         changefreq: 'weekly',
-      }),
+      })),
     );
-
-    useCases.forEach((c) =>
-      sitemap.write({
+    urls.push(
+      ...useCases.map((c) => ({
         url: `/apps/useCases/${c.slug}`,
         changefreq: 'weekly',
-      }),
+      })),
     );
-
-    userTypes.forEach((c) =>
-      sitemap.write({
+    urls.push(
+      ...userTypes.map((c) => ({
         url: `/apps/userTypes/${c.slug}`,
         changefreq: 'weekly',
-      }),
+      })),
     );
-
-    industries.forEach((c) =>
-      sitemap.write({
+    urls.push(
+      ...industries.map((c) => ({
         url: `/apps/industries/${c.slug}`,
         changefreq: 'weekly',
-      }),
+      })),
     );
-
-    businessModels.forEach((c) =>
-      sitemap.write({
+    urls.push(
+      ...businessModels.map((c) => ({
         url: `/apps/businessModels/${c.slug}`,
         changefreq: 'weekly',
-      }),
+      })),
     );
 
-    sitemap.end();
+    console.log(`Total URLs collected: ${urls.length}`);
 
-    const xml = await streamToPromise(sitemap);
+    // Split URLs into chunks
+    const chunks = [];
+    while (urls.length) {
+      chunks.push(urls.splice(0, MAX_URLS));
+    }
 
-    // Upload to S3
-    const key = `${FOLDER_NAME}/sitemap.xml`; // e.g., trytopapps/sitemap.xml
-    await s3
-      .putObject({
-        Bucket: BUCKET_NAME,
-        Key: key,
-        Body: xml.toString(),
-        ContentType: 'application/xml',
-      })
-      .promise();
+    console.log(`Total sitemap parts: ${chunks.length}`);
 
-    console.log(`Sitemap uploaded to s3://${BUCKET_NAME}/${key} successfully!`);
+    const sitemapIndexItems = [];
+
+    // Generate each sitemap chunk
+    for (let i = 0; i < chunks.length; i++) {
+      const partNumber = i + 1;
+      const sitemapPartName = `sitemap-${partNumber}.xml`;
+      const key = `${FOLDER_NAME}/${sitemapPartName}`;
+
+      const smStream = new SitemapStream({ hostname: host });
+
+      chunks[i].forEach((url) => smStream.write(url));
+      smStream.end();
+
+      const xml = await streamToPromise(smStream);
+
+      console.log(`Uploading ${sitemapPartName} ...`);
+      await uploadToS3(key, xml.toString());
+
+      sitemapIndexItems.push({
+        loc: `${host}/${sitemapPartName}`,
+      });
+    }
+
+    // Create sitemap-index.xml
+    const indexStream = new SitemapStream({ hostname: host, level: 'index' });
+    sitemapIndexItems.forEach((item) => indexStream.write(item));
+    indexStream.end();
+
+    const indexXml = await streamToPromise(indexStream);
+
+    const indexKey = `${FOLDER_NAME}/sitemap-index.xml`;
+
+    console.log('Uploading sitemap-index.xml ...');
+    await uploadToS3(indexKey, indexXml.toString());
+
+    console.log('All sitemaps uploaded successfully!');
   } catch (err) {
     console.error('Error generating sitemap:', err);
   }
