@@ -242,6 +242,7 @@ export const Apps = () => {
     filteredIndustries,
     searchParams,
     filteredSearch,
+    filtersReady,
   ]);
 
   const fetchApps = async () => {
@@ -368,16 +369,31 @@ export const Apps = () => {
   // }, [searchTerms]);
 
   useEffect(() => {
-    setPage(0);
-  }, [location]);
+    if (!filtersReady) return;
 
-  useEffect(() => {
     setPage(0);
-  }, [sortOrder]);
+  }, [
+    // ALL filters that should trigger a reset
+    filteredCategories,
+    filteredTags,
+    filteredFeatures,
+    filteredUserTypes,
+    filteredBusinessModels,
+    filteredUseCases,
+    filteredIndustries,
+    filteredPlatforms,
+    filteredSocials,
+    filteredOther,
+    filteredPricing,
+    filteredSearch,
+    filtersReady,
 
-  useEffect(() => {
-    setPage(0);
-  }, [filteredPricing]);
+    // sorting
+    sortOrder,
+
+    // URL (only if you want URL → filters sync)
+    location.pathname,
+  ]);
 
   // useEffect(() => {
   //   setPage(0);
