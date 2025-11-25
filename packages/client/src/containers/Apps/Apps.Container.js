@@ -92,6 +92,7 @@ export const Apps = () => {
   const [showSearchContainer, setShowSearchContainer] = useState(false);
   const [searchTrending, setSearchTrending] = useState([]);
   const navigate = useNavigate();
+  const [filtersReady, setFiltersReady] = useState(false);
 
   const toggleModal = () => {
     setOpenModal(false);
@@ -130,10 +131,12 @@ export const Apps = () => {
     setFilteredSocials(filters.socials || []);
     setFilteredOther(filters.other || []);
     setFilteredSearch(filters.search || []);
+    setFiltersReady(true); // <---- ADD THIS
   }, [location.pathname, parseFiltersFromPath]);
 
   // first fetch
   useEffect(() => {
+    if (!filtersReady) return; // ⛔ Wait until filters loaded
     setIsLoading(true);
     const params = new URLSearchParams({
       page: 0,
@@ -242,6 +245,7 @@ export const Apps = () => {
   ]);
 
   const fetchApps = async () => {
+    if (!filtersReady) return; // ⛔ Wait until filters loaded
     setIsLoading(true);
     setError(null);
 
