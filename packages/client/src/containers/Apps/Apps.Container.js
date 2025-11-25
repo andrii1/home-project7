@@ -137,6 +137,7 @@ export const Apps = () => {
   // first fetch
   useEffect(() => {
     if (!filtersReady) return; // ⛔ Wait until filters loaded
+    setPage(0);
     setIsLoading(true);
     const params = new URLSearchParams({
       page: 0,
@@ -368,32 +369,32 @@ export const Apps = () => {
   //   fetchAppsSearch();
   // }, [searchTerms]);
 
-  useEffect(() => {
-    if (!filtersReady) return;
+  // useEffect(() => {
+  //   if (!filtersReady) return;
 
-    setPage(0);
-  }, [
-    // ALL filters that should trigger a reset
-    filteredCategories,
-    filteredTags,
-    filteredFeatures,
-    filteredUserTypes,
-    filteredBusinessModels,
-    filteredUseCases,
-    filteredIndustries,
-    filteredPlatforms,
-    filteredSocials,
-    filteredOther,
-    filteredPricing,
-    filteredSearch,
-    filtersReady,
+  //   setPage(0);
+  // }, [
+  //   // ALL filters that should trigger a reset
+  //   filteredCategories,
+  //   filteredTags,
+  //   filteredFeatures,
+  //   filteredUserTypes,
+  //   filteredBusinessModels,
+  //   filteredUseCases,
+  //   filteredIndustries,
+  //   filteredPlatforms,
+  //   filteredSocials,
+  //   filteredOther,
+  //   filteredPricing,
+  //   filteredSearch,
+  //   filtersReady,
 
-    // sorting
-    sortOrder,
+  //   // sorting
+  //   sortOrder,
 
-    // URL (only if you want URL → filters sync)
-    location.pathname,
-  ]);
+  //   // URL (only if you want URL → filters sync)
+  //   location.pathname,
+  // ]);
 
   // useEffect(() => {
   //   setPage(0);
