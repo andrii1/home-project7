@@ -866,7 +866,7 @@ Respond ONLY with valid JSON.`,
     });
 
     // === Prompt builder ===
-    const buildPrompt = (type, title, url, descriptionParam) => {
+    const buildPrompt = (type, title, url, descriptionParam, quantity) => {
       const examples = {
         features:
           'E.g. Task management, Real-time chat, Analytics dashboard, Export to CSV, API access',
@@ -884,28 +884,28 @@ Respond ONLY with valid JSON.`,
 
       return `Create ${type} ${base}. ${examples[type]}. ${capitalize(
         type,
-      )} should be without hashtag, can be multiple words. Maximum 5 ${type}. Return ${type} separated by comma.`;
+      )} should be without hashtag, can be multiple words. Maximum ${quantity} ${type}. Return ${type} separated by comma.`;
     };
 
     // === Features, UserTypes, BusinessModels, UseCases, Industries ===
     const featuresIds = await createItems(
-      buildPrompt('features', body.title, appUrl, description),
+      buildPrompt('features', body.title, appUrl, description, '8'),
       'features',
     );
     const userTypesIds = await createItems(
-      buildPrompt('userTypes', body.title, appUrl, description),
+      buildPrompt('userTypes', body.title, appUrl, description, '8'),
       'userTypes',
     );
     const businessModelsIds = await createItems(
-      buildPrompt('businessModels', body.title, appUrl, description),
+      buildPrompt('businessModels', body.title, appUrl, description, '5'),
       'businessModels',
     );
     const useCasesIds = await createItems(
-      buildPrompt('useCases', body.title, appUrl, description),
+      buildPrompt('useCases', body.title, appUrl, description, '8'),
       'useCases',
     );
     const industriesIds = await createItems(
-      buildPrompt('industries', body.title, appUrl, description),
+      buildPrompt('industries', body.title, appUrl, description, '5'),
       'industries',
     );
 
